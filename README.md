@@ -1,59 +1,93 @@
-# FrontendVetClinic
+# VetClinic - Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.13.
+Sistema de gestión veterinaria desarrollado con **Angular 21**.
 
-## Development server
+---
 
-To start a local development server, run:
+## Requisitos previos
 
+Instalar los siguientes programas antes de levantar el sistema:
+
+| Programa | Versión | Descarga |
+|----------|---------|----------|
+| Node.js | 18 o superior | https://nodejs.org |
+| Angular CLI | Última versión | Se instala con el comando de abajo |
+| Visual Studio Code | Última versión | https://code.visualstudio.com |
+
+### Instalar Angular CLI
+Después de instalar Node.js, abrir una terminal y ejecutar:
+```bash
+npm install -g @angular/cli
+```
+
+---
+
+## Importante
+
+El frontend requiere que el **backend esté corriendo** antes de iniciarlo.
+Seguir primero las instrucciones del repositorio del backend:
+https://github.com/richardespinozaj-afk/Backend_VetClinic
+
+---
+
+## Levantar el frontend
+
+1. Clonar el repositorio:
+```bash
+git clone https://github.com/richardespinozaj-afk/Frontend_VetClinic.git
+```
+
+2. Abrir la carpeta en **Visual Studio Code**
+
+3. Abrir una terminal en VS Code (`Ctrl + \``) y ejecutar:
+```bash
+npm install
+```
+
+4. Una vez instaladas las dependencias, ejecutar:
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+5. Esperar hasta ver el mensaje:
+```
+Application bundle generation complete.
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+6. Abrir el navegador en: `http://localhost:4200`
 
-```bash
-ng generate --help
-```
+---
 
-## Building
+## Credenciales de acceso
 
-To build the project run:
+| Campo | Valor |
+|-------|-------|
+| Correo | admin@vetclinic.com |
+| Contraseña | admin123 |
 
-```bash
-ng build
-```
+---
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## Módulos disponibles
 
-## Running unit tests
+| Módulo | Ruta | Descripción |
+|--------|------|-------------|
+| Login | `/login` | Inicio de sesión |
+| Gestión de Citas | `/citas` | Agendar, reprogramar y cancelar citas |
+| Gestión de Pacientes | `/pacientes` | Registro de mascotas y propietarios |
+| Historia Clínica | `/historia-clinica/:id` | Expediente del paciente |
+| Atención Clínica | `/atencion/:idCita` | Flujo: triaje → anamnesis → consulta → receta |
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+---
 
-```bash
-ng test
-```
+## Tecnologías utilizadas
 
-## Running end-to-end tests
+- Angular 21
+- TypeScript
+- SweetAlert2
+- HTML / CSS
 
-For end-to-end (e2e) testing, run:
+---
 
-```bash
-ng e2e
-```
+## Repositorio Backend
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+https://github.com/richardespinozaj-afk/Backend_VetClinic
