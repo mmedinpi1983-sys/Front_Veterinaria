@@ -1,0 +1,151 @@
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <img src="IMG.png" alt="VetClinic" style="width:130px;display:block;margin:0 auto;filter:invert(1) contrast(4);mix-blend-mode:screen;">
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" [routerLink]="['/pacientes']"><span>👤</span> Pacientes</div>
+      <div class="nav-item" [routerLink]="['/citas']"><span>📅</span> Citas</div>
+      <div class="nav-item" style="opacity:0.5;cursor:default;"><span>🏥</span> Atención Clínica</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="nav-item" [routerLink]="['/login']"><span>🚪</span> Cerrar Sesión</div>
+    </div>
+  </aside>
+
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="btn-help">Ayuda</button>
+        <button class="btn btn-secondary btn-sm" [routerLink]="['/pacientes']">← Volver</button>
+      </div>
+      <div class="topbar-user">
+        <div class="topbar-user-info">
+          <div class="topbar-user-name">Admin VetClinic</div>
+          <div class="topbar-user-role">Rol: Administrador</div>
+        </div>
+        <div class="user-avatar">AV</div>
+      </div>
+    </header>
+
+    <main class="content">
+      <div class="page-header">
+        <h1 class="page-title">Historia Clínica</h1>
+        <p class="page-subtitle">Expediente completo del paciente</p>
+      </div>
+
+      <div class="hc-grid">
+        <!-- LEFT: INFO -->
+        <div class="hc-left">
+          <!-- Mascota -->
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-header"><span class="card-title">🐾 Información del Paciente</span></div>
+            <div class="card-body">
+              @if (mascota) {
+                <div class="info-grid">
+                  <div class="info-block"><div class="info-label">Nombre</div><div class="info-value">{{mascota.nombre}}</div></div>
+                  <div class="info-block"><div class="info-label">Especie</div><div class="info-value">{{mascota.especie || '—'}}</div></div>
+                  <div class="info-block"><div class="info-label">Raza</div><div class="info-value">{{mascota.raza || '—'}}</div></div>
+                  <div class="info-block"><div class="info-label">Sexo</div><div class="info-value">{{mascota.sexo || '—'}}</div></div>
+                  <div class="info-block"><div class="info-label">Tamaño</div><div class="info-value">{{mascota.tamanio || '—'}}</div></div>
+                </div>
+              } @else {
+                <p style="color:#64748B;font-size:13px;">Cargando...</p>
+              }
+            </div>
+          </div>
+
+          <!-- Dueño -->
+          <div class="card">
+            <div class="card-header"><span class="card-title">👤 Información del Propietario</span></div>
+            <div class="card-body">
+              @if (dueno) {
+                <div class="info-grid">
+                  <div class="info-block"><div class="info-label">Nombre</div><div class="info-value">{{dueno.nombre}} {{dueno.apellidoPaterno}} {{dueno.apellidoMaterno}}</div></div>
+                  <div class="info-block"><div class="info-label">DNI</div><div class="info-value">{{dueno.nroDocumento}}</div></div>
+                  <div class="info-block"><div class="info-label">Email</div><div class="info-value" style="font-size:12px;">{{dueno.correoElectronico || '—'}}</div></div>
+                  <div class="info-block"><div class="info-label">Teléfono</div><div class="info-value">{{dueno.nroTelefono || '—'}}</div></div>
+                </div>
+              } @else {
+                <p style="color:#64748B;font-size:13px;">Sin propietario asignado</p>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: TABS -->
+        <div class="card">
+          <div class="card-body" style="padding-bottom:0;">
+            <div class="tabs">
+              <div class="tab-item" [class.active]="tabActivo==='historial'" (click)="tabActivo='historial'">📋 Historial</div>
+              <div class="tab-item" [class.active]="tabActivo==='citas'" (click)="tabActivo='citas'">📅 Citas</div>
+            </div>
+          </div>
+
+          <!-- TAB HISTORIAL -->
+          @if (tabActivo === 'historial') {
+            <div class="card-body" style="padding-top:12px;">
+              @if (historial.length === 0) {
+                <div class="empty-state">Sin registros de atención clínica</div>
+              }
+              @for (h of historial; track h.idAtencion) {
+                <div class="historial-item">
+                  <div class="historial-header">
+                    <span class="badge badge-accent">Consulta</span>
+                    <span class="text-muted text-sm">{{h.fechaAtencion}}</span>
+                  </div>
+                  @if (h.evaluacionClinica) {
+                    <div class="historial-field">
+                      <div class="historial-label">Diagnóstico</div>
+                      <div>{{h.evaluacionClinica}}</div>
+                    </div>
+                  }
+                  @if (h.tratamiento) {
+                    <div class="historial-field">
+                      <div class="historial-label">Tratamiento</div>
+                      <div>{{h.tratamiento}}</div>
+                    </div>
+                  }
+                  @if (h.fechaProximoControl) {
+                    <div style="font-size:12px;color:#64748B;margin-top:6px;">📅 Próximo control: {{h.fechaProximoControl}}</div>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          <!-- TAB CITAS -->
+          @if (tabActivo === 'citas') {
+            <div class="card-body" style="padding-top:12px;">
+              @if (citas.length === 0) {
+                <div class="empty-state">Sin citas registradas</div>
+              }
+              @for (c of citas; track c.idCitaProgramada) {
+                <div class="historial-item">
+                  <div class="historial-header">
+                    <span [ngClass]="getBadgeCita(c.estadoCita)">{{c.estadoCita}}</span>
+                    <span class="text-muted text-sm">{{c.fecha}}</span>
+                  </div>
+                  <div class="historial-field">
+                    <div class="historial-label">Servicio</div>
+                    <div>{{c.nombreServicio}}</div>
+                  </div>
+                  <div class="historial-field">
+                    <div class="historial-label">Hora</div>
+                    <div>{{c.horaInicio?.toString()?.substring(0,5)}}</div>
+                  </div>
+                  @if (c.motivo) {
+                    <div class="historial-field">
+                      <div class="historial-label">Motivo</div>
+                      <div>{{c.motivo}}</div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </main>
+  </div>
+</div>

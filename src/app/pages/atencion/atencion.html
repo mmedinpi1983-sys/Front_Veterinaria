@@ -1,0 +1,206 @@
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <img src="IMG.png" alt="VetClinic" style="width:130px;display:block;margin:0 auto;filter:invert(1) contrast(4);mix-blend-mode:screen;">
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item"><span>⊞</span> Dashboard</div>
+      <div class="nav-item"><span>👤</span> Pacientes</div>
+      <div class="nav-item"><span>📅</span> Citas</div>
+      <div class="nav-item active"><span>🏥</span> Atención Clínica</div>
+      <div class="nav-item"><span>🛒</span> Ventas</div>
+      <div class="nav-item"><span>📦</span> Inventario</div>
+      <div class="nav-item"><span>📊</span> Reportes</div>
+      <div class="nav-item"><span>⚙️</span> Configuración</div>
+    </nav>
+    <div class="sidebar-footer"><div class="nav-item"><span>🚪</span> Cerrar Sesión</div></div>
+  </aside>
+
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="btn-help">Ayuda</button>
+        <button class="btn btn-secondary" style="font-size:13px;padding:5px 12px;" (click)="router.navigate(['/citas'])">← Volver a Citas</button>
+      </div>
+      <div class="topbar-user">
+        <div class="topbar-user-info">
+          <div class="topbar-user-name">Carlos Flores</div>
+          <div class="topbar-user-role">Rol: Veterinario</div>
+        </div>
+        <div class="user-avatar">CF</div>
+      </div>
+    </header>
+
+    <main class="content">
+      <div class="page-header">
+        <h1 class="page-title">Atención Clínica</h1>
+        <p class="page-subtitle">Gestión completa del proceso de atención veterinaria</p>
+      </div>
+
+      <!-- PATIENT CARD -->
+      <div class="status-card" *ngIf="cita">
+        <div style="width:40px;height:40px;background:#1E3A5F;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;flex-shrink:0;">🐾</div>
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <span class="patient-name">{{cita.nombreMascota}}</span>
+            <span class="badge badge-accent">En proceso</span>
+          </div>
+          <div class="status-fields">
+            <div><div class="sf-label">Propietario</div><div class="sf-value">{{cita.nombreDueno}}</div></div>
+            <div><div class="sf-label">Especie/Raza</div><div class="sf-value">{{cita.especie}} · {{cita.raza}}</div></div>
+            <div><div class="sf-label">Servicio</div><div class="sf-value">{{cita.nombreServicio}}</div></div>
+            <div><div class="sf-label">Fecha/Hora</div><div class="sf-value">{{cita.fecha}} · {{cita.horaInicio?.substring(0,5)}}</div></div>
+            <div><div class="sf-label">Código</div><div class="sf-value fw-600">{{getCodigo()}}</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="card">
+        <div class="card-body" style="padding-bottom:0;">
+          <div class="tabs">
+            <div class="tab-item" [class.active]="tabActivo==='triaje'" (click)="showTab('triaje')">Triaje</div>
+            <div class="tab-item" [class.active]="tabActivo==='anamnesis'" (click)="showTab('anamnesis')">Anamnesis</div>
+            <div class="tab-item" [class.active]="tabActivo==='consulta'" (click)="showTab('consulta')">Consulta</div>
+            <div class="tab-item" [class.active]="tabActivo==='receta'" (click)="showTab('receta')">Receta</div>
+          </div>
+        </div>
+
+        <!-- TRIAJE -->
+        <div class="card-body" *ngIf="tabActivo==='triaje'">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Método de Ingreso <span class="req">*</span></label>
+              <select class="form-control" [(ngModel)]="triaje.metodo">
+                <option value="1">Con cita programada</option>
+                <option value="2">Urgencia</option>
+                <option value="3">Sin cita</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Prioridad <span class="req">*</span></label>
+              <select class="form-control" [(ngModel)]="triaje.prioridad">
+                <option value="1">Normal</option>
+                <option value="2">Urgente</option>
+                <option value="3">Crítico</option>
+              </select>
+            </div>
+          </div>
+          <div style="font-weight:600;font-size:14px;margin-bottom:12px;color:#1E3A5F;">Signos Vitales</div>
+          <div class="form-row">
+            <div class="form-group"><label>Temperatura (°C)</label><input class="form-control" [(ngModel)]="triaje.temperatura" placeholder="Ej: 38.5" type="number" step="0.1"></div>
+            <div class="form-group"><label>Peso (Kg)</label><input class="form-control" [(ngModel)]="triaje.peso" placeholder="Ej: 12.0" type="number" step="0.1"></div>
+          </div>
+          <div class="form-group"><label>Alergias conocidas</label><input class="form-control" [(ngModel)]="triaje.alergias" placeholder="Ej: Penicilina, ninguna"></div>
+          <div class="form-group"><label>Observaciones</label><textarea class="form-control" [(ngModel)]="triaje.observaciones" placeholder="Observaciones al ingreso..."></textarea></div>
+          <div style="display:flex;justify-content:flex-end;gap:10px;">
+            <button class="btn btn-primary" (click)="submitTriaje()" [disabled]="loading">{{loading ? 'Guardando...' : 'Registrar Triaje →'}}</button>
+          </div>
+        </div>
+
+        <!-- ANAMNESIS -->
+        <div class="card-body" *ngIf="tabActivo==='anamnesis'">
+          <div style="font-weight:600;font-size:14px;margin-bottom:12px;color:#1E3A5F;">Historial Médico</div>
+          <div class="form-group"><label>Antecedentes</label><textarea class="form-control" [(ngModel)]="anamnesis.antecedentes" placeholder="Enfermedades previas..."></textarea></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>¿Presenta alergias?</label>
+              <div class="radio-group">
+                <label><input type="radio" [(ngModel)]="anamnesis.alergias" value="1"> Sí</label>
+                <label><input type="radio" [(ngModel)]="anamnesis.alergias" value="0"> No</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>¿Cirugías anteriores?</label>
+              <div class="radio-group">
+                <label><input type="radio" [(ngModel)]="anamnesis.cirugias" value="1"> Sí</label>
+                <label><input type="radio" [(ngModel)]="anamnesis.cirugias" value="0"> No</label>
+              </div>
+            </div>
+          </div>
+          <div class="form-group"><label>Medicamentos actuales</label><input class="form-control" [(ngModel)]="anamnesis.medicamentos" placeholder="Medicamentos actuales"></div>
+          <div class="form-group"><label>Historial de vacunación</label><textarea class="form-control" [(ngModel)]="anamnesis.vacunas" placeholder="Vacunas recibidas y fechas"></textarea></div>
+          <div style="font-weight:600;font-size:14px;margin:16px 0 12px;color:#1E3A5F;">Hábitos</div>
+          <div class="form-row">
+            <div class="form-group"><label>Alimentación</label><input class="form-control" [(ngModel)]="anamnesis.alimentacion" placeholder="Tipo de dieta"></div>
+            <div class="form-group"><label>Comportamiento</label><input class="form-control" [(ngModel)]="anamnesis.comportamiento" placeholder="Tranquilo, agresivo..."></div>
+          </div>
+          <div style="font-weight:600;font-size:14px;margin:16px 0 12px;color:#1E3A5F;">Motivo consulta actual</div>
+          <div class="form-row">
+            <div class="form-group"><label>Inicio de síntomas</label><input class="form-control" [(ngModel)]="anamnesis.inicioSintomas" placeholder="¿Cuándo comenzaron?"></div>
+            <div class="form-group"><label>Evolución</label><input class="form-control" [(ngModel)]="anamnesis.evolucionSintomas" placeholder="¿Cómo han evolucionado?"></div>
+          </div>
+          <div class="form-group"><label>Observaciones</label><textarea class="form-control" [(ngModel)]="anamnesis.observaciones" placeholder="Información adicional..."></textarea></div>
+          <div style="display:flex;justify-content:flex-end;gap:10px;">
+            <button class="btn btn-secondary" (click)="showTab('triaje')">← Anterior</button>
+            <button class="btn btn-primary" (click)="guardarAnamnesis()">Guardar Anamnesis →</button>
+          </div>
+        </div>
+
+        <!-- CONSULTA -->
+        <div class="card-body" *ngIf="tabActivo==='consulta'">
+          <div class="form-group"><label>Diagnóstico <span class="req">*</span></label><textarea class="form-control" [(ngModel)]="consulta.diagnostico" placeholder="Describe el diagnóstico..." style="min-height:100px;"></textarea></div>
+          <div class="form-group"><label>Tratamiento</label><textarea class="form-control" [(ngModel)]="consulta.tratamiento" placeholder="Tratamiento recomendado..."></textarea></div>
+          <div class="form-group"><label>Observaciones</label><textarea class="form-control" [(ngModel)]="consulta.observaciones" placeholder="Observaciones adicionales..."></textarea></div>
+          <div class="form-group">
+            <label>¿Requiere control posterior?</label>
+            <div class="radio-group">
+              <label><input type="radio" [(ngModel)]="consulta.requiereControl" [value]="true"> Sí</label>
+              <label><input type="radio" [(ngModel)]="consulta.requiereControl" [value]="false"> No</label>
+            </div>
+          </div>
+          <div class="form-group" *ngIf="consulta.requiereControl"><label>Fecha de Próximo Control</label><input class="form-control" [(ngModel)]="consulta.fechaControl" type="date"></div>
+          <div style="display:flex;justify-content:flex-end;gap:10px;">
+            <button class="btn btn-secondary" (click)="showTab('anamnesis')">← Anterior</button>
+            <button class="btn btn-primary" (click)="submitConsulta()" [disabled]="loading">{{loading ? 'Guardando...' : 'Guardar Atención →'}}</button>
+          </div>
+        </div>
+
+        <!-- RECETA -->
+        <div class="card-body" *ngIf="tabActivo==='receta'">
+          <div style="font-weight:600;font-size:14px;margin-bottom:12px;color:#1E3A5F;">Prescripción de Medicamentos</div>
+          <div style="border:1px solid #E2E8F0;border-radius:8px;padding:16px;margin-bottom:16px;">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Medicamento <span class="req">*</span></label>
+                <select class="form-control" [(ngModel)]="recetaForm.idMedicamento">
+                  <option value="">Seleccionar medicamento</option>
+                  <option *ngFor="let m of medicamentos" [value]="m.idMedicamento">{{m.nombreMedicamento}}</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Dosis</label><input class="form-control" [(ngModel)]="recetaForm.dosis" placeholder="Ej: 1 cápsula"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Frecuencia</label><input class="form-control" [(ngModel)]="recetaForm.frecuencia" placeholder="Ej: Cada 8 horas"></div>
+              <div class="form-group"><label>Duración</label><input class="form-control" [(ngModel)]="recetaForm.duracion" placeholder="Ej: 7 días"></div>
+            </div>
+            <div class="form-group"><label>Instrucciones</label><input class="form-control" [(ngModel)]="recetaForm.instrucciones" placeholder="Ej: Administrar con comida"></div>
+            <button class="btn btn-secondary btn-sm" (click)="agregarMedicamento()">+ Agregar Medicamento</button>
+          </div>
+
+          <!-- Lista medicamentos -->
+          <div *ngIf="medicamentosReceta.length > 0" style="margin-bottom:16px;">
+            <div style="font-weight:600;font-size:13px;color:#1E3A5F;margin-bottom:8px;">Medicamentos ({{medicamentosReceta.length}})</div>
+            <div *ngFor="let m of medicamentosReceta; let i=index" style="background:#F1F5F9;border-radius:8px;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <span style="font-weight:600;">{{m.nombre}}</span>
+                <span style="color:#64748B;font-size:12px;margin-left:8px;">{{m.dosis}} · {{m.frecuencia}} · {{m.duracion}}</span>
+              </div>
+              <button (click)="quitarMedicamento(i)" style="background:none;border:none;color:#DC2626;cursor:pointer;font-size:16px;">✕</button>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;gap:10px;">
+            <button class="btn btn-secondary" (click)="showTab('consulta')">← Anterior</button>
+            <button class="btn btn-primary" (click)="guardarReceta()" [disabled]="loading">{{loading ? 'Guardando...' : 'Guardar Receta ✓'}}</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" [class.toast-success]="toast.type==='success'" [class.toast-error]="toast.type==='error'" *ngIf="toast.visible">
+  {{toast.msg}}
+</div>
