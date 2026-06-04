@@ -6,6 +6,9 @@ import { CitaService } from '../../services/cita.service';
 import { MascotaService } from '../../services/mascota.service';
 import Swal from 'sweetalert2';
 
+// Página de Gestión de Citas
+// Permite listar, filtrar, registrar, reprogramar y cancelar citas veterinarias
+// Incluye estadísticas del mes y búsqueda en tiempo real de mascotas
 @Component({
   selector: 'app-citas',
   imports: [CommonModule, FormsModule, RouterLink],
@@ -18,7 +21,7 @@ export class Citas implements OnInit {
   citasPaginadas: any[] = [];
   servicios: any[] = [];
 
-  // Búsqueda de mascotas en tiempo real
+    // Variables para la búsqueda de mascotas en tiempo real en el modal "Nueva Cita"
   mascotasBusqueda: any[] = [];
   busquedaMascota = '';
   mascotaSeleccionada: any = null;

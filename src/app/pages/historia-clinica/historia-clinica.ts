@@ -6,6 +6,9 @@ import { PacienteService } from '../../services/paciente.service';
 
 const API = 'http://localhost:8080';
 
+// Página de Historia Clínica
+// Muestra el expediente completo de una mascota: información del paciente, propietario,
+// historial de atenciones clínicas y citas programadas organizados en tabs
 @Component({
   selector: 'app-historia-clinica',
   imports: [CommonModule, RouterLink],

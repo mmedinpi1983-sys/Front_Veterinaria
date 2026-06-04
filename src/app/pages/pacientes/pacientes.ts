@@ -10,6 +10,9 @@ import Swal from 'sweetalert2';
 
 const API = 'http://localhost:8080';
 
+// Página de Gestión de Pacientes
+// Lista mascotas con sus propietarios. Permite registrar (crea Dueño + Mascota + vínculo),
+// editar y eliminar pacientes. Protege el eliminado si hay citas pendientes.
 @Component({
   selector: 'app-pacientes',
   imports: [CommonModule, FormsModule, RouterLink],
