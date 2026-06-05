@@ -52,9 +52,11 @@ export class Citas implements OnInit {
   ) {}
 
   ngOnInit() {
-    const hoy = new Date().toISOString().split('T')[0];
-    this.filtros.fechaInicio = hoy;
-    this.filtros.fechaFin = hoy;
+    // Usar fecha local (no UTC) para evitar desfase por zona horaria de Perú (UTC-5)
+    const hoy = new Date();
+    const fechaLocal = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
+    this.filtros.fechaInicio = fechaLocal;
+    this.filtros.fechaFin = fechaLocal;
     this.cargarStats();
     this.cargarCitas();
     this.citaService.getServicios().subscribe({ next: (r: any) => { this.servicios = r.data || []; this.cdr.detectChanges(); } });
@@ -97,6 +99,11 @@ export class Citas implements OnInit {
   }
 
   onFiltroChange() {
+    // Al escribir en el buscador se limpian las fechas para buscar en todas las citas
+    if (this.filtros.busqueda) {
+      this.filtros.fechaInicio = '';
+      this.filtros.fechaFin = '';
+    }
     clearTimeout(this.filtrTimeout);
     this.filtrTimeout = setTimeout(() => this.cargarCitas(), 400);
   }
@@ -201,7 +208,7 @@ export class Citas implements OnInit {
       Swal.fire({ icon: 'warning', title: 'Completa fecha y hora', timer: 1500, showConfirmButton: false });
       return;
     }
-    const hoy = new Date().toISOString().split('T')[0];
+    const d = new Date(); const hoy = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     if (this.reprog.fecha < hoy) {
       Swal.fire({ icon: 'warning', title: 'Fecha inválida', text: 'No puedes reprogramar a una fecha pasada.' });
       return;
@@ -234,7 +241,7 @@ export class Citas implements OnInit {
       Swal.fire({ icon: 'warning', title: 'Completa todos los campos', timer: 1500, showConfirmButton: false });
       return;
     }
-    const hoy = new Date().toISOString().split('T')[0];
+    const d = new Date(); const hoy = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     if (fecha < hoy) {
       Swal.fire({ icon: 'warning', title: 'Fecha inválida', text: 'No puedes registrar una cita en una fecha pasada.' });
       return;

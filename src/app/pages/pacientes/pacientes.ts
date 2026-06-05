@@ -77,7 +77,7 @@ export class Pacientes implements OnInit {
     this.razaInput = '';
     if (this.nuevo.idEspecie) {
       this.razasFiltradas = this.especiesRazas.filter(
-        (e: any) => e.idEspecie === +this.nuevo.idEspecie
+        (e: any) => e.idEspecie === this.nuevo.idEspecie
       );
     } else {
       this.razasFiltradas = [];
@@ -90,11 +90,11 @@ export class Pacientes implements OnInit {
     this.mostrarRazas = true;
     if (!this.razaInput.trim()) {
       this.razasFiltradas = this.especiesRazas.filter(
-        (e: any) => e.idEspecie === +this.nuevo.idEspecie
+        (e: any) => e.idEspecie === this.nuevo.idEspecie
       );
     } else {
       this.razasFiltradas = this.especiesRazas.filter(
-        (e: any) => e.idEspecie === +this.nuevo.idEspecie &&
+        (e: any) => e.idEspecie === this.nuevo.idEspecie &&
         e.nombre.toLowerCase().includes(this.razaInput.toLowerCase())
       );
     }

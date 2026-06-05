@@ -120,9 +120,9 @@
           <div class="form-group">
             <label>Especie <span class="req">*</span></label>
             <select class="form-control" [(ngModel)]="nuevo.idEspecie" (change)="onEspecieChange()">
-              <option value="">Seleccionar</option>
+              <option [ngValue]="null">Seleccionar</option>
               @for (e of especies; track e.idEspecieRaza) {
-                <option [value]="e.idEspecieRaza">{{e.nombre}}</option>
+                <option [ngValue]="e.idEspecieRaza">{{e.nombre}}</option>
               }
             </select>
           </div>
@@ -170,8 +170,6 @@
             </select>
           </div>
         </div>
-
-        <hr class="divider">
 
         <div class="form-row">
           <div class="form-group">
