@@ -4,16 +4,11 @@
       <img src="IMG.png" alt="VetClinic" style="width:130px;display:block;margin:0 auto;filter:invert(1) contrast(4);mix-blend-mode:screen;">
     </div>
     <nav class="sidebar-nav">
-      <div class="nav-item"><span>⊞</span> Dashboard</div>
-      <div class="nav-item"><span>👤</span> Pacientes</div>
-      <div class="nav-item"><span>📅</span> Citas</div>
+      <div class="nav-item" [routerLink]="['/pacientes']"><span>👤</span> Pacientes</div>
+      <div class="nav-item" [routerLink]="['/citas']"><span>📅</span> Citas</div>
       <div class="nav-item active"><span>🏥</span> Atención Clínica</div>
-      <div class="nav-item"><span>🛒</span> Ventas</div>
-      <div class="nav-item"><span>📦</span> Inventario</div>
-      <div class="nav-item"><span>📊</span> Reportes</div>
-      <div class="nav-item"><span>⚙️</span> Configuración</div>
     </nav>
-    <div class="sidebar-footer"><div class="nav-item"><span>🚪</span> Cerrar Sesión</div></div>
+    <div class="sidebar-footer"><div class="nav-item" [routerLink]="['/login']"><span>🚪</span> Cerrar Sesión</div></div>
   </aside>
 
   <div class="main-wrapper">
