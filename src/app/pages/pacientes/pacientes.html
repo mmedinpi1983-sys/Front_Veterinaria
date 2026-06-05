@@ -119,19 +119,32 @@
           </div>
           <div class="form-group">
             <label>Especie <span class="req">*</span></label>
-            <select class="form-control" [(ngModel)]="nuevo.especie">
+            <select class="form-control" [(ngModel)]="nuevo.idEspecie" (change)="onEspecieChange()">
               <option value="">Seleccionar</option>
-              <option value="Perro">Perro</option>
-              <option value="Gato">Gato</option>
-              <option value="Ave">Ave</option>
-              <option value="Otro">Otro</option>
+              @for (e of especies; track e.idEspecieRaza) {
+                <option [value]="e.idEspecieRaza">{{e.nombre}}</option>
+              }
             </select>
           </div>
         </div>
         <div class="form-row">
-          <div class="form-group">
+          <div class="form-group" style="position:relative;">
             <label>Raza</label>
-            <input class="form-control" [(ngModel)]="nuevo.raza" placeholder="Ej: Bulldog Francés">
+            <input class="form-control"
+              type="text"
+              [(ngModel)]="razaInput"
+              (input)="onRazaInput()"
+              (blur)="cerrarRazas()"
+              [disabled]="!nuevo.idEspecie"
+              placeholder="{{nuevo.idEspecie ? 'Escribe para buscar...' : 'Selecciona una especie primero'}}"
+              autocomplete="off">
+            @if (mostrarRazas && razasFiltradas.length > 0) {
+              <div class="sugerencias">
+                @for (r of razasFiltradas; track r.idEspecieRaza) {
+                  <div class="sugerencia-item" (mousedown)="seleccionarRaza(r)">{{r.nombre}}</div>
+                }
+              </div>
+            }
           </div>
           <div class="form-group">
             <label>Sexo</label>

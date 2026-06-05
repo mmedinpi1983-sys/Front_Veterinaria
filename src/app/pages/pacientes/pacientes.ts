@@ -34,13 +34,18 @@ export class Pacientes implements OnInit {
   modalNuevoVisible = false;
   modalEditarVisible = false;
 
+  // Datos de EspecieRaza cargados desde la BD
   especiesRazas: any[] = [];
-  especies: any[] = [];
-  razasFiltradas: any[] = [];
-  especieSeleccionada: number | null = null;
+  especies: any[] = [];       // Registros con idEspecie = null (Perro, Gato, etc.)
+  razasFiltradas: any[] = []; // Razas de la especie seleccionada
+
+  // Autocomplete de raza
+  razaInput = '';             // Texto escrito por el usuario
+  mostrarRazas = false;       // Controla visibilidad del dropdown de razas
+  razaTimeout: any;
 
   nuevo = {
-    nombre: '', especie: '', raza: '',
+    nombre: '', idEspecie: null as any, idRaza: null as any,
     sexo: '', tamanio: '', edad: '', notas: '',
     nombreDueno: '', apellidoDueno: '', dni: '', email: '', telefono: ''
   };
@@ -57,14 +62,54 @@ export class Pacientes implements OnInit {
 
   ngOnInit() {
     this.cargarPacientes();
+    // Carga todas las especies y razas de la tabla EspecieRaza (tabla autoreferida)
     this.pacienteService.getEspeciesRazas().subscribe({ next: (r: any) => {
       this.especiesRazas = r.data || [];
-      this.especies = this.especiesRazas.filter((e: any) => !e.especie);
+      // Los registros sin idEspecie son las especies principales
+      this.especies = this.especiesRazas.filter((e: any) => !e.idEspecie);
       this.cdr.detectChanges();
     }});
   }
 
-  onEspecieChange() {}
+  // Al cambiar especie: filtra las razas que pertenecen a esa especie
+  onEspecieChange() {
+    this.nuevo.idRaza = null;
+    this.razaInput = '';
+    if (this.nuevo.idEspecie) {
+      this.razasFiltradas = this.especiesRazas.filter(
+        (e: any) => e.idEspecie === +this.nuevo.idEspecie
+      );
+    } else {
+      this.razasFiltradas = [];
+    }
+  }
+
+  // Filtra las razas según lo que el usuario escribe
+  onRazaInput() {
+    this.nuevo.idRaza = null;
+    this.mostrarRazas = true;
+    if (!this.razaInput.trim()) {
+      this.razasFiltradas = this.especiesRazas.filter(
+        (e: any) => e.idEspecie === +this.nuevo.idEspecie
+      );
+    } else {
+      this.razasFiltradas = this.especiesRazas.filter(
+        (e: any) => e.idEspecie === +this.nuevo.idEspecie &&
+        e.nombre.toLowerCase().includes(this.razaInput.toLowerCase())
+      );
+    }
+  }
+
+  // Al seleccionar una raza del autocomplete
+  seleccionarRaza(r: any) {
+    this.nuevo.idRaza = r.idEspecieRaza;
+    this.razaInput = r.nombre;
+    this.mostrarRazas = false;
+  }
+
+  cerrarRazas() {
+    setTimeout(() => { this.mostrarRazas = false; }, 200);
+  }
 
   cargarPacientes() {
     this.mascotaService.buscar(this.busqueda || '').subscribe({ next: (r: any) => {
@@ -103,8 +148,10 @@ export class Pacientes implements OnInit {
   }
 
   abrirNuevo() {
-    this.nuevo = { nombre: '', especie: '', raza: '', sexo: '', tamanio: '', edad: '', notas: '', nombreDueno: '', apellidoDueno: '', dni: '', email: '', telefono: '' };
+    this.nuevo = { nombre: '', idEspecie: null, idRaza: null, sexo: '', tamanio: '', edad: '', notas: '', nombreDueno: '', apellidoDueno: '', dni: '', email: '', telefono: '' };
+    this.razaInput = '';
     this.razasFiltradas = [];
+    this.mostrarRazas = false;
     this.modalNuevoVisible = true;
   }
 
@@ -133,7 +180,7 @@ export class Pacientes implements OnInit {
   }
 
   async guardarNuevo() {
-    if (!this.nuevo.nombre || !this.nuevo.especie || !this.nuevo.nombreDueno || !this.nuevo.dni || !this.nuevo.telefono) {
+    if (!this.nuevo.nombre || !this.nuevo.idEspecie || !this.nuevo.nombreDueno || !this.nuevo.dni || !this.nuevo.telefono) {
       Swal.fire({ icon: 'warning', title: 'Completa todos los campos obligatorios (*)', timer: 2000, showConfirmButton: false });
       return;
     }
@@ -142,11 +189,10 @@ export class Pacientes implements OnInit {
       const nombreD = partes[0];
       const apellidoD = partes.length > 1 ? partes[1] : '-';
       const apellidoM = partes.length > 2 ? partes.slice(2).join(' ') : '-';
+
       const duenoRes: any = await lastValueFrom(this.pacienteService.crearDueno({
         idDocumentoIdentidad: 1, idAsociado: 1,
-        nombre: nombreD,
-        apellidoPaterno: apellidoD,
-        apellidoMaterno: apellidoM,
+        nombre: nombreD, apellidoPaterno: apellidoD, apellidoMaterno: apellidoM,
         nroDocumento: this.nuevo.dni,
         nroTelefono: this.nuevo.telefono || null,
         correoElectronico: this.nuevo.email || null,
@@ -155,14 +201,13 @@ export class Pacientes implements OnInit {
 
       const mascotaRes: any = await lastValueFrom(this.mascotaService.crearMascota({
         nombre: this.nuevo.nombre,
-        idEspecie: null, idRaza: null,
+        idEspecie: this.nuevo.idEspecie ? +this.nuevo.idEspecie : null,
+        idRaza: this.nuevo.idRaza ? +this.nuevo.idRaza : null,
         idAsociado: 1, estado: true,
         sexo: this.nuevo.sexo || null,
         tamanio: this.nuevo.tamanio || null,
         notas: this.nuevo.notas || null,
-        fechaNacimiento: null,
-        especieTexto: this.nuevo.especie || null,
-        razaTexto: this.nuevo.raza || null
+        fechaNacimiento: null
       }));
 
       await lastValueFrom(this.pacienteService.vincularDuenoMascota(
