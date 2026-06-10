@@ -47,7 +47,7 @@ export class Pacientes implements OnInit {
   nuevo = {
     nombre: '', idEspecie: null as any, idRaza: null as any,
     sexo: '', tamanio: '', edad: '', notas: '',
-    nombreDueno: '', apellidoDueno: '', dni: '', email: '', telefono: ''
+    nombreDueno: '', apellidoPaternoDueno: '', apellidoMaternoDueno: '', dni: '', email: '', telefono: ''
   };
 
   editando: any = null;
@@ -148,7 +148,7 @@ export class Pacientes implements OnInit {
   }
 
   abrirNuevo() {
-    this.nuevo = { nombre: '', idEspecie: null, idRaza: null, sexo: '', tamanio: '', edad: '', notas: '', nombreDueno: '', apellidoDueno: '', dni: '', email: '', telefono: '' };
+    this.nuevo = { nombre: '', idEspecie: null, idRaza: null, sexo: '', tamanio: '', edad: '', notas: '', nombreDueno: '', apellidoPaternoDueno: '', apellidoMaternoDueno: '', dni: '', email: '', telefono: '' };
     this.razaInput = '';
     this.razasFiltradas = [];
     this.mostrarRazas = false;
@@ -159,13 +159,14 @@ export class Pacientes implements OnInit {
     this.editando = {
       idMascota: p.idMascota, nombre: p.nombre, especie: p.especie || '',
       raza: p.raza || '', sexo: p.sexo || '', tamanio: p.tamanio || '', notas: '',
-      idDueno: p.idDueno, nombreDueno: '', apellidoDueno: '', dni: '', email: '', telefono: ''
+      idDueno: p.idDueno, nombreDueno: '', apellidoPaternoDueno: '', apellidoMaternoDueno: '', dni: '', email: '', telefono: ''
     };
     if (p.idDueno) {
       this.pacienteService.getDueno(p.idDueno).subscribe({ next: (r: any) => {
         const d = r.data;
         this.editando.nombreDueno = d.nombre || '';
-        this.editando.apellidoDueno = d.apellidoPaterno || '';
+        this.editando.apellidoPaternoDueno = d.apellidoPaterno || '';
+        this.editando.apellidoMaternoDueno = d.apellidoMaterno || '';
         this.editando.dni = d.nroDocumento || '';
         this.editando.email = d.correoElectronico || '';
         this.editando.telefono = d.nroTelefono || '';
@@ -180,19 +181,16 @@ export class Pacientes implements OnInit {
   }
 
   async guardarNuevo() {
-    if (!this.nuevo.nombre || !this.nuevo.idEspecie || !this.nuevo.nombreDueno || !this.nuevo.dni || !this.nuevo.telefono) {
+    if (!this.nuevo.nombre || !this.nuevo.idEspecie || !this.nuevo.nombreDueno || !this.nuevo.apellidoPaternoDueno || !this.nuevo.apellidoMaternoDueno || !this.nuevo.dni || !this.nuevo.telefono) {
       Swal.fire({ icon: 'warning', title: 'Completa todos los campos obligatorios (*)', timer: 2000, showConfirmButton: false });
       return;
     }
     try {
-      const partes = this.nuevo.nombreDueno.trim().split(' ');
-      const nombreD = partes[0];
-      const apellidoD = partes.length > 1 ? partes[1] : '-';
-      const apellidoM = partes.length > 2 ? partes.slice(2).join(' ') : '-';
-
       const duenoRes: any = await lastValueFrom(this.pacienteService.crearDueno({
         idDocumentoIdentidad: 1, idAsociado: 1,
-        nombre: nombreD, apellidoPaterno: apellidoD, apellidoMaterno: apellidoM,
+        nombre: this.nuevo.nombreDueno,
+        apellidoPaterno: this.nuevo.apellidoPaternoDueno,
+        apellidoMaterno: this.nuevo.apellidoMaternoDueno,
         nroDocumento: this.nuevo.dni,
         nroTelefono: this.nuevo.telefono || null,
         correoElectronico: this.nuevo.email || null,
@@ -218,13 +216,29 @@ export class Pacientes implements OnInit {
       Swal.fire({ icon: 'success', title: 'Paciente registrado', timer: 1500, showConfirmButton: false });
       this.cargarPacientes();
     } catch(e) {
-      Swal.fire({ icon: 'error', title: 'Error al registrar paciente' });
+      Swal.fire({ icon: 'error', title: 'No se pudo registrar', html: this.extraerMensajeError(e, 'Error al registrar paciente') });
     }
   }
 
+  // Extrae el mensaje real que envia el backend (validaciones por campo o ApiException).
+  // Devuelve HTML: una lista con vinetas si hay varios errores, o el texto si es uno solo.
+  private extraerMensajeError(e: any, generico: string): string {
+    const err = e?.error;
+    if (err?.data && typeof err.data === 'object') {
+      const msgs = (Object.values(err.data).filter(Boolean) as string[]);
+      if (msgs.length === 1) return msgs[0];
+      if (msgs.length > 1) {
+        return '<ul style="text-align:left; margin:0 auto; display:inline-block; padding-left:1.2em;">'
+          + msgs.map(m => `<li>${m}</li>`).join('')
+          + '</ul>';
+      }
+    }
+    return err?.message || err?.error || generico;
+  }
+
   async guardarEdicion() {
-    if (!this.editando?.nombre) {
-      Swal.fire({ icon: 'warning', title: 'El nombre es requerido', timer: 1500, showConfirmButton: false });
+    if (!this.editando?.nombre || !this.editando?.nombreDueno || !this.editando?.apellidoPaternoDueno || !this.editando?.apellidoMaternoDueno || !this.editando?.dni || !this.editando?.telefono) {
+      Swal.fire({ icon: 'warning', title: 'Completa todos los campos obligatorios (*)', timer: 2000, showConfirmButton: false });
       return;
     }
     try {
@@ -242,7 +256,8 @@ export class Pacientes implements OnInit {
         await lastValueFrom(this.pacienteService.actualizarDueno(this.editando.idDueno, {
           ...duenoRaw.data,
           nombre: this.editando.nombreDueno,
-          apellidoPaterno: this.editando.apellidoDueno || duenoRaw.data.apellidoPaterno,
+          apellidoPaterno: this.editando.apellidoPaternoDueno,
+          apellidoMaterno: this.editando.apellidoMaternoDueno,
           nroDocumento: this.editando.dni || duenoRaw.data.nroDocumento,
           correoElectronico: this.editando.email || null,
           nroTelefono: this.editando.telefono || null
@@ -253,7 +268,7 @@ export class Pacientes implements OnInit {
       Swal.fire({ icon: 'success', title: 'Paciente actualizado', timer: 1500, showConfirmButton: false });
       this.cargarPacientes();
     } catch(e) {
-      Swal.fire({ icon: 'error', title: 'Error al actualizar' });
+      Swal.fire({ icon: 'error', title: 'No se pudo actualizar', html: this.extraerMensajeError(e, 'Error al actualizar') });
     }
   }
 

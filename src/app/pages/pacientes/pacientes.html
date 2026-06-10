@@ -174,7 +174,17 @@
         <div class="form-row">
           <div class="form-group">
             <label>Nombre del Propietario <span class="req">*</span></label>
-            <input class="form-control" [(ngModel)]="nuevo.nombreDueno" placeholder="Ej: Pedro Jiménez García">
+            <input class="form-control" [(ngModel)]="nuevo.nombreDueno" placeholder="Ej: Pedro">
+          </div>
+          <div class="form-group">
+            <label>Apellido Paterno <span class="req">*</span></label>
+            <input class="form-control" [(ngModel)]="nuevo.apellidoPaternoDueno" placeholder="Ej: Jiménez">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Apellido Materno <span class="req">*</span></label>
+            <input class="form-control" [(ngModel)]="nuevo.apellidoMaternoDueno" placeholder="Ej: García">
           </div>
           <div class="form-group">
             <label>DNI <span class="req">*</span></label>
@@ -215,7 +225,7 @@
       <div class="modal-body">
         <div class="form-row">
           <div class="form-group">
-            <label>Nombre del Paciente</label>
+            <label>Nombre del Paciente <span class="req">*</span></label>
             <input class="form-control" [(ngModel)]="editando.nombre">
           </div>
           <div class="form-group">
@@ -249,15 +259,23 @@
           </div>
         </div>
 
-        <hr class="divider">
-
         <div class="form-row">
           <div class="form-group">
-            <label>Nombre del Dueño</label>
+            <label>Nombre del Dueño <span class="req">*</span></label>
             <input class="form-control" [(ngModel)]="editando.nombreDueno">
           </div>
           <div class="form-group">
-            <label>DNI</label>
+            <label>Apellido Paterno <span class="req">*</span></label>
+            <input class="form-control" [(ngModel)]="editando.apellidoPaternoDueno">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Apellido Materno <span class="req">*</span></label>
+            <input class="form-control" [(ngModel)]="editando.apellidoMaternoDueno">
+          </div>
+          <div class="form-group">
+            <label>DNI <span class="req">*</span></label>
             <input class="form-control" [(ngModel)]="editando.dni">
           </div>
         </div>
@@ -267,7 +285,7 @@
             <input class="form-control" [(ngModel)]="editando.email">
           </div>
           <div class="form-group">
-            <label>Teléfono</label>
+            <label>Teléfono <span class="req">*</span></label>
             <input class="form-control" [(ngModel)]="editando.telefono">
           </div>
         </div>
