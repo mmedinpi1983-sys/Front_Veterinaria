@@ -1,0 +1,30 @@
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="login-header">
+      <img src="IMG.png" alt="VetClinic">
+      <p>Sistema de Gestión Veterinaria</p>
+    </div>
+    <div class="login-body">
+      <div class="form-group">
+        <label>Correo Electrónico</label>
+        <input class="form-control" type="email" [(ngModel)]="correo" placeholder="Ingresa tu correo electrónico" (keyup.enter)="ingresar()">
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input class="form-control" type="password" [(ngModel)]="contrasena" placeholder="••••••••" (keyup.enter)="ingresar()">
+      </div>
+      <div class="form-row-check">
+        <label class="checkbox-row">
+          <input type="checkbox"> Recordar sesión
+        </label>
+        <span class="forgot">¿Olvidaste tu contraseña?</span>
+      </div>
+      <button class="btn-login" (click)="ingresar()" [disabled]="cargando">
+        {{ cargando ? 'Ingresando...' : 'Ingresar' }}
+      </button>
+    </div>
+    <div class="login-footer">
+      <p>© 2026 VetClinic · Todos los derechos reservados</p>
+    </div>
+  </div>
+</div>
