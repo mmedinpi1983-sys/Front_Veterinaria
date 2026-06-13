@@ -28,12 +28,7 @@
       <!-- TABS -->
       <div class="card">
         <div class="card-body" style="padding-bottom:0;">
-          <div class="tabs">
-            <div class="tab-item" [class.active]="tabActivo==='triaje'" (click)="showTab('triaje')">Triaje</div>
-            <div class="tab-item" [class.active]="tabActivo==='anamnesis'" (click)="showTab('anamnesis')">Anamnesis</div>
-            <div class="tab-item" [class.active]="tabActivo==='consulta'" (click)="showTab('consulta')">Consulta</div>
-            <div class="tab-item" [class.active]="tabActivo==='receta'" (click)="showTab('receta')">Receta</div>
-          </div>
+          <app-tabs [tabs]="tabs" [activo]="tabActivo" (activoChange)="showTab($event)"></app-tabs>
         </div>
 
         <!-- TRIAJE -->

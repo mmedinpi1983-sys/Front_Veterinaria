@@ -12,10 +12,7 @@
       <div class="card">
         <div class="card-body" style="padding-bottom:0;">
           <div class="search-bar">
-            <div class="search-input-wrap" style="flex:2;">
-              <span class="search-icon">🔍</span>
-              <input type="text" placeholder="Buscar por nombre de mascota o propietario..." [(ngModel)]="busqueda" (input)="onBusqueda()">
-            </div>
+            <app-search-bar placeholder="Buscar por nombre de mascota o propietario..." [(texto)]="busqueda" (buscar)="onBusqueda()"></app-search-bar>
             <select class="filter-select" [(ngModel)]="filtroEspecie" (change)="cargarPacientes()">
               <option value="">Todas las especies</option>
               <option value="Perro">Perro</option>

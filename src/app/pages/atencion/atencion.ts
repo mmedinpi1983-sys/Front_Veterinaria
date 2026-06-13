@@ -2,18 +2,20 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Tabs } from '../../shared/components/tabs/tabs';
 import { lastValueFrom } from 'rxjs';
 import { ApiService } from '../../services/api';
 
 @Component({
   selector: 'app-atencion',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, Tabs],
   templateUrl: './atencion.html',
   styleUrl: './atencion.css'
 })
 export class Atencion implements OnInit {
   idCita = 0;
   tabActivo = 'triaje';
+  tabs = [{ id: 'triaje', label: 'Triaje' }, { id: 'anamnesis', label: 'Anamnesis' }, { id: 'consulta', label: 'Consulta' }, { id: 'receta', label: 'Receta' }];
   cita: any = null;
   medicamentos: any[] = [];
   medicamentosReceta: any[] = [];
