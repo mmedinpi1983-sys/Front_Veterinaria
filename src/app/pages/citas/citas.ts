@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { CitaService } from '../../services/cita.service';
 import { MascotaService } from '../../services/mascota.service';
 import Swal from 'sweetalert2';
@@ -11,7 +11,7 @@ import Swal from 'sweetalert2';
 // Incluye estadísticas del mes y búsqueda en tiempo real de mascotas
 @Component({
   selector: 'app-citas',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './citas.html',
   styleUrl: './citas.css'
 })

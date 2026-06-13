@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { MascotaService } from '../../services/mascota.service';
 import { PacienteService } from '../../services/paciente.service';
 import { HttpClient } from '@angular/common/http';
@@ -15,7 +15,7 @@ const API = 'http://localhost:8080';
 // editar y eliminar pacientes. Protege el eliminado si hay citas pendientes.
 @Component({
   selector: 'app-pacientes',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './pacientes.html',
   styleUrl: './pacientes.css'
 })
