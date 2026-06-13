@@ -62,15 +62,7 @@
           </table>
         </div>
 
-        @if (totalPaginas > 1) {
-          <div class="pagination">
-            <button class="page-btn" (click)="cambiarPagina(paginaActual - 1)" [disabled]="paginaActual === 1">‹</button>
-            @for (p of paginas; track p) {
-              <button class="page-btn" [class.active]="p === paginaActual" (click)="cambiarPagina(p)">{{p}}</button>
-            }
-            <button class="page-btn" (click)="cambiarPagina(paginaActual + 1)" [disabled]="paginaActual === totalPaginas">›</button>
-          </div>
-        }
+        <app-pagination [paginaActual]="paginaActual" [totalPaginas]="totalPaginas" (cambiar)="cambiarPagina($event)"></app-pagination>
       </div>
     </main>
 
