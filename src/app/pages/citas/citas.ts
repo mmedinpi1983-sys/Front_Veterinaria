@@ -1,7 +1,11 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Modal } from '../../shared/components/modal/modal';
+import { Pagination } from '../../shared/components/pagination/pagination';
+import { Badge } from '../../shared/components/badge/badge';
+import { SearchBar } from '../../shared/components/search-bar/search-bar';
+import { Router } from '@angular/router';
 import { CitaService } from '../../services/cita.service';
 import { MascotaService } from '../../services/mascota.service';
 import Swal from 'sweetalert2';
@@ -11,7 +15,7 @@ import Swal from 'sweetalert2';
 // Incluye estadísticas del mes y búsqueda en tiempo real de mascotas
 @Component({
   selector: 'app-citas',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, Modal, Pagination, Badge, SearchBar],
   templateUrl: './citas.html',
   styleUrl: './citas.css'
 })

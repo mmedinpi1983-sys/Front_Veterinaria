@@ -1,0 +1,5 @@
+<div class="tabs">
+  @for (t of tabs; track t.id) {
+    <div class="tab-item" [class.active]="activo === t.id" (click)="activoChange.emit(t.id)">{{ t.label }}</div>
+  }
+</div>

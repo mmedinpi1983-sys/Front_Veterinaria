@@ -1,3 +1,5 @@
+:host { display: contents; }
+
 .hc-grid {
   display: grid;
   grid-template-columns: 1fr 1.4fr;

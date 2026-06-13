@@ -1,34 +1,7 @@
-<div class="app">
-  <aside class="sidebar">
-    <div class="sidebar-logo">
-      <img src="IMG.png" alt="VetClinic" style="width:130px;display:block;margin:0 auto;filter:invert(1) contrast(4);mix-blend-mode:screen;">
-    </div>
-    <nav class="sidebar-nav">
-      <div class="nav-item active" [routerLink]="['/pacientes']"><span>👤</span> Pacientes</div>
-      <div class="nav-item" [routerLink]="['/citas']"><span>📅</span> Citas</div>
-      <div class="nav-item" style="opacity:0.5;cursor:default;"><span>🏥</span> Atención Clínica</div>
-    </nav>
-    <div class="sidebar-footer">
-      <div class="nav-item" [routerLink]="['/login']"><span>🚪</span> Cerrar Sesión</div>
-    </div>
-  </aside>
-
-  <div class="main-wrapper">
-    <header class="topbar">
-      <div class="topbar-left">
-        <button class="btn-help">Ayuda</button>
-        <button class="btn btn-secondary btn-sm" [routerLink]="['/pacientes']">← Volver</button>
-      </div>
-      <div class="topbar-user">
-        <div class="topbar-user-info">
-          <div class="topbar-user-name">Admin VetClinic</div>
-          <div class="topbar-user-role">Rol: Administrador</div>
-        </div>
-        <div class="user-avatar">AV</div>
-      </div>
-    </header>
-
     <main class="content">
+      <div style="margin-bottom:14px;">
+        <button class="btn btn-secondary btn-sm" routerLink="/pacientes">← Volver</button>
+      </div>
       <div class="page-header">
         <h1 class="page-title">Historia Clínica</h1>
         <p class="page-subtitle">Expediente completo del paciente</p>
@@ -147,5 +120,3 @@
         </div>
       </div>
     </main>
-  </div>
-</div>

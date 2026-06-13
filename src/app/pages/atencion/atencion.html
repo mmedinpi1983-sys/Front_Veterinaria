@@ -1,32 +1,7 @@
-<div class="app">
-  <aside class="sidebar">
-    <div class="sidebar-logo">
-      <img src="IMG.png" alt="VetClinic" style="width:130px;display:block;margin:0 auto;filter:invert(1) contrast(4);mix-blend-mode:screen;">
-    </div>
-    <nav class="sidebar-nav">
-      <div class="nav-item" [routerLink]="['/pacientes']"><span>👤</span> Pacientes</div>
-      <div class="nav-item" [routerLink]="['/citas']"><span>📅</span> Citas</div>
-      <div class="nav-item active"><span>🏥</span> Atención Clínica</div>
-    </nav>
-    <div class="sidebar-footer"><div class="nav-item" [routerLink]="['/login']"><span>🚪</span> Cerrar Sesión</div></div>
-  </aside>
-
-  <div class="main-wrapper">
-    <header class="topbar">
-      <div class="topbar-left">
-        <button class="btn-help">Ayuda</button>
-        <button class="btn btn-secondary" style="font-size:13px;padding:5px 12px;" (click)="router.navigate(['/citas'])">← Volver a Citas</button>
-      </div>
-      <div class="topbar-user">
-        <div class="topbar-user-info">
-          <div class="topbar-user-name">Carlos Flores</div>
-          <div class="topbar-user-role">Rol: Veterinario</div>
-        </div>
-        <div class="user-avatar">CF</div>
-      </div>
-    </header>
-
     <main class="content">
+      <div style="margin-bottom:14px;">
+        <button class="btn btn-secondary btn-sm" (click)="router.navigate(['/citas'])">← Volver a Citas</button>
+      </div>
       <div class="page-header">
         <h1 class="page-title">Atención Clínica</h1>
         <p class="page-subtitle">Gestión completa del proceso de atención veterinaria</p>
@@ -53,12 +28,7 @@
       <!-- TABS -->
       <div class="card">
         <div class="card-body" style="padding-bottom:0;">
-          <div class="tabs">
-            <div class="tab-item" [class.active]="tabActivo==='triaje'" (click)="showTab('triaje')">Triaje</div>
-            <div class="tab-item" [class.active]="tabActivo==='anamnesis'" (click)="showTab('anamnesis')">Anamnesis</div>
-            <div class="tab-item" [class.active]="tabActivo==='consulta'" (click)="showTab('consulta')">Consulta</div>
-            <div class="tab-item" [class.active]="tabActivo==='receta'" (click)="showTab('receta')">Receta</div>
-          </div>
+          <app-tabs [tabs]="tabs" [activo]="tabActivo" (activoChange)="showTab($event)"></app-tabs>
         </div>
 
         <!-- TRIAJE -->
@@ -192,8 +162,7 @@
         </div>
       </div>
     </main>
-  </div>
-</div>
+
 
 <!-- TOAST -->
 <div class="toast" [class.toast-success]="toast.type==='success'" [class.toast-error]="toast.type==='error'" *ngIf="toast.visible">

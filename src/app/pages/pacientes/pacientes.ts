@@ -1,12 +1,15 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { MascotaService } from '../../services/mascota.service';
 import { PacienteService } from '../../services/paciente.service';
 import { HttpClient } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
 import Swal from 'sweetalert2';
+import { Modal } from '../../shared/components/modal/modal';
+import { Pagination } from '../../shared/components/pagination/pagination';
+import { SearchBar } from '../../shared/components/search-bar/search-bar';
 
 const API = 'http://localhost:8080';
 
@@ -15,7 +18,7 @@ const API = 'http://localhost:8080';
 // editar y eliminar pacientes. Protege el eliminado si hay citas pendientes.
 @Component({
   selector: 'app-pacientes',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, Modal, Pagination, SearchBar],
   templateUrl: './pacientes.html',
   styleUrl: './pacientes.css'
 })

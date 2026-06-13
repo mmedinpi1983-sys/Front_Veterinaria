@@ -1,30 +1,3 @@
-<div class="app">
-  <aside class="sidebar">
-    <div class="sidebar-logo">
-      <img src="IMG.png" alt="VetClinic" style="width:130px;display:block;margin:0 auto;filter:invert(1) contrast(4);mix-blend-mode:screen;">
-    </div>
-    <nav class="sidebar-nav">
-      <div class="nav-item" [routerLink]="['/pacientes']"><span>👤</span> Pacientes</div>
-      <div class="nav-item active"><span>📅</span> Citas</div>
-      <div class="nav-item" style="opacity:0.5;cursor:default;"><span>🏥</span> Atención Clínica</div>
-    </nav>
-    <div class="sidebar-footer">
-      <div class="nav-item" [routerLink]="['/login']"><span>🚪</span> Cerrar Sesión</div>
-    </div>
-  </aside>
-
-  <div class="main-wrapper">
-    <header class="topbar">
-      <div class="topbar-left"><button class="btn-help">Ayuda</button></div>
-      <div class="topbar-user">
-        <div class="topbar-user-info">
-          <div class="topbar-user-name">Admin VetClinic</div>
-          <div class="topbar-user-role">Rol: Administrador</div>
-        </div>
-        <div class="user-avatar">AV</div>
-      </div>
-    </header>
-
     <main class="content">
       <div class="page-header">
         <div class="page-header-row">
@@ -48,10 +21,7 @@
       <div class="card" style="margin-bottom:16px;">
         <div class="card-body" style="padding:14px 20px;">
           <div class="search-bar">
-            <div class="search-input-wrap" style="flex:2;">
-              <span class="search-icon">🔍</span>
-              <input type="text" placeholder="Buscar mascota o propietario..." [(ngModel)]="filtros.busqueda" (input)="onFiltroChange()">
-            </div>
+            <app-search-bar placeholder="Buscar mascota o propietario..." [(texto)]="filtros.busqueda" (buscar)="onFiltroChange()"></app-search-bar>
             <select class="filter-select" [(ngModel)]="filtros.idEstado" (change)="cargarCitas()">
               <option value="">Todos los estados</option>
               <option value="1">Pendiente</option>
@@ -95,7 +65,7 @@
                   <td>{{c.nombreDueno}}</td>
                   <td>{{c.nombreServicio}}</td>
                   <td class="text-muted text-sm">{{c.nombreVeterinario}}</td>
-                  <td><span [ngClass]="getBadgeClass(c.estadoCita)">{{c.estadoCita}}</span></td>
+                  <td><app-badge [estado]="c.estadoCita"></app-badge></td>
                   <td>
                     <div class="table-actions">
                       <button class="btn btn-sm btn-secondary" (click)="verDetalle(c)" title="Ver detalle">👁</button>
@@ -116,29 +86,12 @@
         </div>
 
         <!-- PAGINACIÓN -->
-        @if (totalPaginas > 1) {
-          <div class="pagination">
-            <button class="page-btn" (click)="cambiarPagina(paginaActual - 1)" [disabled]="paginaActual === 1">‹</button>
-            @for (p of paginas; track p) {
-              <button class="page-btn" [class.active]="p === paginaActual" (click)="cambiarPagina(p)">{{p}}</button>
-            }
-            <button class="page-btn" (click)="cambiarPagina(paginaActual + 1)" [disabled]="paginaActual === totalPaginas">›</button>
-          </div>
-        }
+        <app-pagination [paginaActual]="paginaActual" [totalPaginas]="totalPaginas" (cambiar)="cambiarPagina($event)"></app-pagination>
       </div>
     </main>
-  </div>
-</div>
 
-<!-- MODAL NUEVA CITA -->
 @if (modalNuevaVisible) {
-  <div class="modal-overlay" (click)="modalNuevaVisible=false">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <div><div class="modal-title">Nueva Cita</div><div class="modal-subtitle">Completa los datos de la consulta</div></div>
-        <button class="modal-close" (click)="modalNuevaVisible=false">✕</button>
-      </div>
-      <div class="modal-body">
+  <app-modal title="Nueva Cita" subtitle="Completa los datos de la consulta" (close)="modalNuevaVisible=false">
         <!-- Búsqueda mascota en tiempo real -->
         <div class="form-group" style="position:relative;">
           <label>Mascota / Propietario <span class="req">*</span></label>
@@ -193,24 +146,16 @@
           <label>Motivo de Consulta <span class="req">*</span></label>
           <textarea class="form-control" [(ngModel)]="nuevaCita.motivo" placeholder="Describe el motivo de la consulta..."></textarea>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="modalNuevaVisible=false">Cancelar</button>
-        <button class="btn btn-primary" (click)="guardarCita()">Guardar Cita</button>
-      </div>
+    <div modal-footer>
+      <button class="btn btn-secondary" (click)="modalNuevaVisible=false">Cancelar</button>
+      <button class="btn btn-primary" (click)="guardarCita()">Guardar Cita</button>
     </div>
-  </div>
+  </app-modal>
 }
 
 <!-- MODAL DETALLE -->
 @if (modalDetalleVisible && citaSeleccionada) {
-  <div class="modal-overlay" (click)="modalDetalleVisible=false">
-    <div class="modal modal-sm" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <div class="modal-title">Detalle de Cita</div>
-        <button class="modal-close" (click)="modalDetalleVisible=false">✕</button>
-      </div>
-      <div class="modal-body">
+  <app-modal title="Detalle de Cita" size="sm" [footer]="false" (close)="modalDetalleVisible=false">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
           <div style="display:flex;align-items:center;gap:10px;">
             <div style="width:40px;height:40px;background:#1E3A5F;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;">🐾</div>
@@ -219,7 +164,7 @@
               <div style="font-size:12px;color:#64748B;">Propietario: {{citaSeleccionada.nombreDueno}}</div>
             </div>
           </div>
-          <span [ngClass]="getBadgeClass(citaSeleccionada.estadoCita)">{{citaSeleccionada.estadoCita}}</span>
+          <app-badge [estado]="citaSeleccionada.estadoCita"></app-badge>
         </div>
         <div class="grid-2" style="gap:12px;margin-bottom:16px;">
           <div style="background:#F8FAFC;border-radius:8px;padding:12px;">
@@ -250,20 +195,12 @@
             Esta cita está <strong>{{citaSeleccionada.estadoCita}}</strong> y no puede modificarse.
           </div>
         }
-      </div>
-    </div>
-  </div>
+  </app-modal>
 }
 
 <!-- MODAL REPROGRAMAR -->
 @if (modalReprogVisible) {
-  <div class="modal-overlay" (click)="modalReprogVisible=false">
-    <div class="modal modal-sm" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <div><div class="modal-title">Reprogramar Cita</div><div class="modal-subtitle">Actualice los datos de la cita</div></div>
-        <button class="modal-close" (click)="modalReprogVisible=false">✕</button>
-      </div>
-      <div class="modal-body">
+  <app-modal title="Reprogramar Cita" subtitle="Actualice los datos de la cita" size="sm" (close)="modalReprogVisible=false">
         <div class="form-group">
           <label>Nueva fecha <span class="req">*</span></label>
           <input type="date" class="form-control" [(ngModel)]="reprog.fecha">
@@ -279,11 +216,9 @@
           <label>Motivo de reprogramación <span class="req">*</span></label>
           <textarea class="form-control" [(ngModel)]="reprog.motivo" placeholder="Explica el motivo del cambio..."></textarea>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="modalReprogVisible=false">Volver</button>
-        <button class="btn btn-primary" (click)="guardarReprogramacion()">Guardar cambios</button>
-      </div>
+    <div modal-footer>
+      <button class="btn btn-secondary" (click)="modalReprogVisible=false">Volver</button>
+      <button class="btn btn-primary" (click)="guardarReprogramacion()">Guardar cambios</button>
     </div>
-  </div>
+  </app-modal>
 }
