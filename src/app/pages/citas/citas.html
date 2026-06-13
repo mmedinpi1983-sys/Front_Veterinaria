@@ -102,13 +102,7 @@
     </main>
 
 @if (modalNuevaVisible) {
-  <div class="modal-overlay" (click)="modalNuevaVisible=false">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <div><div class="modal-title">Nueva Cita</div><div class="modal-subtitle">Completa los datos de la consulta</div></div>
-        <button class="modal-close" (click)="modalNuevaVisible=false">✕</button>
-      </div>
-      <div class="modal-body">
+  <app-modal title="Nueva Cita" subtitle="Completa los datos de la consulta" (close)="modalNuevaVisible=false">
         <!-- Búsqueda mascota en tiempo real -->
         <div class="form-group" style="position:relative;">
           <label>Mascota / Propietario <span class="req">*</span></label>
@@ -163,24 +157,16 @@
           <label>Motivo de Consulta <span class="req">*</span></label>
           <textarea class="form-control" [(ngModel)]="nuevaCita.motivo" placeholder="Describe el motivo de la consulta..."></textarea>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="modalNuevaVisible=false">Cancelar</button>
-        <button class="btn btn-primary" (click)="guardarCita()">Guardar Cita</button>
-      </div>
+    <div modal-footer>
+      <button class="btn btn-secondary" (click)="modalNuevaVisible=false">Cancelar</button>
+      <button class="btn btn-primary" (click)="guardarCita()">Guardar Cita</button>
     </div>
-  </div>
+  </app-modal>
 }
 
 <!-- MODAL DETALLE -->
 @if (modalDetalleVisible && citaSeleccionada) {
-  <div class="modal-overlay" (click)="modalDetalleVisible=false">
-    <div class="modal modal-sm" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <div class="modal-title">Detalle de Cita</div>
-        <button class="modal-close" (click)="modalDetalleVisible=false">✕</button>
-      </div>
-      <div class="modal-body">
+  <app-modal title="Detalle de Cita" size="sm" [footer]="false" (close)="modalDetalleVisible=false">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
           <div style="display:flex;align-items:center;gap:10px;">
             <div style="width:40px;height:40px;background:#1E3A5F;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;">🐾</div>
@@ -220,20 +206,12 @@
             Esta cita está <strong>{{citaSeleccionada.estadoCita}}</strong> y no puede modificarse.
           </div>
         }
-      </div>
-    </div>
-  </div>
+  </app-modal>
 }
 
 <!-- MODAL REPROGRAMAR -->
 @if (modalReprogVisible) {
-  <div class="modal-overlay" (click)="modalReprogVisible=false">
-    <div class="modal modal-sm" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <div><div class="modal-title">Reprogramar Cita</div><div class="modal-subtitle">Actualice los datos de la cita</div></div>
-        <button class="modal-close" (click)="modalReprogVisible=false">✕</button>
-      </div>
-      <div class="modal-body">
+  <app-modal title="Reprogramar Cita" subtitle="Actualice los datos de la cita" size="sm" (close)="modalReprogVisible=false">
         <div class="form-group">
           <label>Nueva fecha <span class="req">*</span></label>
           <input type="date" class="form-control" [(ngModel)]="reprog.fecha">
@@ -249,11 +227,9 @@
           <label>Motivo de reprogramación <span class="req">*</span></label>
           <textarea class="form-control" [(ngModel)]="reprog.motivo" placeholder="Explica el motivo del cambio..."></textarea>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="modalReprogVisible=false">Volver</button>
-        <button class="btn btn-primary" (click)="guardarReprogramacion()">Guardar cambios</button>
-      </div>
+    <div modal-footer>
+      <button class="btn btn-secondary" (click)="modalReprogVisible=false">Volver</button>
+      <button class="btn btn-primary" (click)="guardarReprogramacion()">Guardar cambios</button>
     </div>
-  </div>
+  </app-modal>
 }

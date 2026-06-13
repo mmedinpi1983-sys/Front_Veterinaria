@@ -75,13 +75,7 @@
     </main>
 
 @if (modalNuevoVisible) {
-  <div class="modal-overlay" (click)="modalNuevoVisible=false">
-    <div class="modal modal-lg" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <div><div class="modal-title">Registrar Nuevo Paciente</div><div class="modal-subtitle">Completa la información del paciente</div></div>
-        <button class="modal-close" (click)="modalNuevoVisible=false">✕</button>
-      </div>
-      <div class="modal-body">
+  <app-modal title="Registrar Nuevo Paciente" subtitle="Completa la información del paciente" size="lg" (close)="modalNuevoVisible=false">
         <div class="form-row">
           <div class="form-group">
             <label>Nombre del Paciente <span class="req">*</span></label>
@@ -175,24 +169,16 @@
           <label>Notas Adicionales</label>
           <textarea class="form-control" [(ngModel)]="nuevo.notas" placeholder="Ej: Alergias, condiciones especiales, etc."></textarea>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="modalNuevoVisible=false">Cancelar</button>
-        <button class="btn btn-primary" (click)="guardarNuevo()">Registrar Paciente</button>
-      </div>
+    <div modal-footer>
+      <button class="btn btn-secondary" (click)="modalNuevoVisible=false">Cancelar</button>
+      <button class="btn btn-primary" (click)="guardarNuevo()">Registrar Paciente</button>
     </div>
-  </div>
+  </app-modal>
 }
 
 <!-- MODAL EDITAR PACIENTE -->
 @if (modalEditarVisible && editando) {
-  <div class="modal-overlay" (click)="modalEditarVisible=false">
-    <div class="modal modal-lg" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <div><div class="modal-title">Editar Paciente</div><div class="modal-subtitle">Modificar datos del paciente y dueño</div></div>
-        <button class="modal-close" (click)="modalEditarVisible=false">✕</button>
-      </div>
-      <div class="modal-body">
+  <app-modal title="Editar Paciente" subtitle="Modificar datos del paciente y dueño" size="lg" (close)="modalEditarVisible=false">
         <div class="form-row">
           <div class="form-group">
             <label>Nombre del Paciente <span class="req">*</span></label>
@@ -263,11 +249,9 @@
           <label>Notas Adicionales</label>
           <textarea class="form-control" [(ngModel)]="editando.notas" placeholder="Ej: Alergias, condiciones especiales, etc."></textarea>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="modalEditarVisible=false">Cancelar</button>
-        <button class="btn btn-primary" (click)="guardarEdicion()">Guardar Cambios</button>
-      </div>
+    <div modal-footer>
+      <button class="btn btn-secondary" (click)="modalEditarVisible=false">Cancelar</button>
+      <button class="btn btn-primary" (click)="guardarEdicion()">Guardar Cambios</button>
     </div>
-  </div>
+  </app-modal>
 }

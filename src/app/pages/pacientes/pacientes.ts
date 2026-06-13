@@ -7,6 +7,7 @@ import { PacienteService } from '../../services/paciente.service';
 import { HttpClient } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
 import Swal from 'sweetalert2';
+import { Modal } from '../../shared/components/modal/modal';
 
 const API = 'http://localhost:8080';
 
@@ -15,7 +16,7 @@ const API = 'http://localhost:8080';
 // editar y eliminar pacientes. Protege el eliminado si hay citas pendientes.
 @Component({
   selector: 'app-pacientes',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, Modal],
   templateUrl: './pacientes.html',
   styleUrl: './pacientes.css'
 })
