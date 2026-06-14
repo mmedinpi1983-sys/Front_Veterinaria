@@ -10,7 +10,7 @@ Instalar los siguientes programas antes de levantar el sistema:
 
 | Programa | Versión | Descarga |
 |----------|---------|----------|
-| Node.js | 18 o superior | https://nodejs.org |
+| Node.js | 20.19 o superior (recomendado 22 LTS) | https://nodejs.org |
 | Angular CLI | Última versión | Se instala con el comando de abajo |
 | Visual Studio Code | Última versión | https://code.visualstudio.com |
 
