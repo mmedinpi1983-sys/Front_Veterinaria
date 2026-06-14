@@ -5,6 +5,7 @@ import { Citas } from './pages/citas/citas';
 import { Pacientes } from './pages/pacientes/pacientes';
 import { Atencion } from './pages/atencion/atencion';
 import { HistoriaClinica } from './pages/historia-clinica/historia-clinica';
+import { authGuard } from './guards/auth.guard';
 
 // Rutas de la aplicación VetClinic.
 // El login va fuera del layout; las demás páginas se muestran DENTRO del Layout
@@ -15,6 +16,7 @@ export const routes: Routes = [
   {
     path: '',
     component: Layout,                                          // Layout con sidebar + topbar
+    canActivate: [authGuard],                                  // 🔒 protege todo lo de adentro: exige sesión
     children: [
       { path: 'pacientes', component: Pacientes },             // Gestión de pacientes
       { path: 'citas', component: Citas },                     // Gestión de citas
