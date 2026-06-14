@@ -6,7 +6,7 @@ const API = 'http://localhost:8080';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
   getStats(): Observable<any> { return this.http.get(`${API}/api/citaprogramada/stats`); }
   getCitasEnriquecidas(params: any = {}): Observable<any> {
