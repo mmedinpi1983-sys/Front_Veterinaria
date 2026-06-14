@@ -1,15 +1,11 @@
 import { Routes } from '@angular/router';
-import { Pacientes } from './Pages/pacientes/pacientes';
 import { Layout } from './shared/components/layout/layout';
+import { Pacientes } from './Pages/pacientes/pacientes';
+
 
 export const routes: Routes = [
 
-      {
-    path: '',
-    component: Layout,                                          // Layout con sidebar + topbar
-    children: [
-      { path: 'pacientes', component: Pacientes },             // Gestión de pacientes
-    ]
-  },
-
+   { path: '', component: Layout, children:[
+      {path:'pacientes', component: Pacientes},
+   ]}
 ];
