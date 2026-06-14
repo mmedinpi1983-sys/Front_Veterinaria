@@ -11,7 +11,15 @@
       </div>
       <div class="form-group">
         <label>Contraseña</label>
-        <input class="form-control" type="password" [(ngModel)]="contrasena" placeholder="••••••••" (keyup.enter)="ingresar()">
+        <div style="position:relative;">
+          <input class="form-control" [type]="mostrarClave ? 'text' : 'password'" [(ngModel)]="contrasena" placeholder="••••••••" (keyup.enter)="ingresar()" style="padding-right:42px;">
+          <button type="button" (click)="mostrarClave = !mostrarClave"
+            [attr.aria-label]="mostrarClave ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+            [title]="mostrarClave ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+            style="position:absolute; right:6px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:16px; line-height:1; padding:4px;">
+            {{ mostrarClave ? '🙈' : '👁️' }}
+          </button>
+        </div>
       </div>
       <div class="form-row-check">
         <label class="checkbox-row">

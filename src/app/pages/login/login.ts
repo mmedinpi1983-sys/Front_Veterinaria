@@ -15,6 +15,7 @@ export class Login {
   correo = '';
   contrasena = '';
   cargando = false; // Controla el estado del botón durante la petición
+  mostrarClave = false; // Toggle del ojito para ver/ocultar la contraseña
 
   constructor(private authService: AuthService, private router: Router) {}
 
