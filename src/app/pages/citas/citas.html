@@ -132,14 +132,28 @@
             }
           </select>
         </div>
+        <div class="form-group">
+          <label>Veterinario <span class="req">*</span></label>
+          <select class="form-control" [(ngModel)]="nuevaCita.idProgramacion" (change)="onVetOrFechaChange()">
+            <option value="">Seleccionar veterinario...</option>
+            @for (v of veterinarios; track v.idProgramacion) {
+              <option [value]="v.idProgramacion">{{v.nombreVeterinario}} — {{v.nombreTurno}} ({{v.horaInicio}}–{{v.horaFin}})</option>
+            }
+          </select>
+        </div>
         <div class="form-row">
           <div class="form-group">
             <label>Fecha <span class="req">*</span></label>
-            <input class="form-control" type="date" [(ngModel)]="nuevaCita.fecha">
+            <input class="form-control" type="date" [(ngModel)]="nuevaCita.fecha" (change)="onVetOrFechaChange()">
           </div>
           <div class="form-group">
             <label>Hora <span class="req">*</span></label>
-            <input class="form-control" type="time" [(ngModel)]="nuevaCita.hora">
+            <select class="form-control" [(ngModel)]="nuevaCita.hora" [disabled]="!nuevaCita.idProgramacion || !nuevaCita.fecha">
+              <option value="">{{ !nuevaCita.idProgramacion ? 'Elige un veterinario' : (!nuevaCita.fecha ? 'Elige una fecha' : (horasDisponibles.length ? 'Seleccionar hora...' : 'Sin horas disponibles')) }}</option>
+              @for (h of horasDisponibles; track h) {
+                <option [value]="h">{{h}}</option>
+              }
+            </select>
           </div>
         </div>
         <div class="form-group">
@@ -181,7 +195,7 @@
           </div>
           <div style="background:#F8FAFC;border-radius:8px;padding:12px;">
             <div style="font-size:11px;color:#64748B;font-weight:600;text-transform:uppercase;">Hora</div>
-            <div style="font-weight:500;margin-top:4px;">{{citaSeleccionada.horaInicio?.substring(0,5)}}</div>
+            <div style="font-weight:500;margin-top:4px;">{{citaSeleccionada.horaInicio?.substring(0,5)}}@if (citaSeleccionada.horaFin) { – {{citaSeleccionada.horaFin?.substring(0,5)}}}</div>
           </div>
         </div>
         @if (citaSeleccionada.estadoCita === 'Pendiente') {
@@ -202,15 +216,29 @@
 @if (modalReprogVisible) {
   <app-modal title="Reprogramar Cita" subtitle="Actualice los datos de la cita" size="sm" (close)="modalReprogVisible=false">
         <div class="form-group">
+          <label>Veterinario <span class="req">*</span></label>
+          <select class="form-control" [(ngModel)]="reprog.idProgramacion" (change)="onVetOrFechaChangeReprog()">
+            <option value="">Seleccionar veterinario...</option>
+            @for (v of veterinarios; track v.idProgramacion) {
+              <option [value]="v.idProgramacion">{{v.nombreVeterinario}} — {{v.nombreTurno}} ({{v.horaInicio}}–{{v.horaFin}})</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
           <label>Nueva fecha <span class="req">*</span></label>
-          <input type="date" class="form-control" [(ngModel)]="reprog.fecha">
+          <input type="date" class="form-control" [(ngModel)]="reprog.fecha" (change)="onVetOrFechaChangeReprog()">
           @if (reprog.fecha) {
             <div class="fecha-formateada">📅 {{formatFechaReprog(reprog.fecha)}}</div>
           }
         </div>
         <div class="form-group">
           <label>Nueva hora <span class="req">*</span></label>
-          <input type="time" class="form-control" [(ngModel)]="reprog.hora">
+          <select class="form-control" [(ngModel)]="reprog.hora" [disabled]="!reprog.idProgramacion || !reprog.fecha">
+            <option value="">{{ !reprog.idProgramacion ? 'Elige un veterinario' : (!reprog.fecha ? 'Elige una fecha' : (horasDisponiblesReprog.length ? 'Seleccionar hora...' : 'Sin horas disponibles')) }}</option>
+            @for (h of horasDisponiblesReprog; track h) {
+              <option [value]="h">{{h}}</option>
+            }
+          </select>
         </div>
         <div class="form-group">
           <label>Motivo de reprogramación <span class="req">*</span></label>

@@ -24,6 +24,9 @@ export class Citas implements OnInit {
   citas: any[] = [];
   citasPaginadas: any[] = [];
   servicios: any[] = [];
+  veterinarios: any[] = [];
+  horasDisponibles: string[] = [];
+  horasDisponiblesReprog: string[] = [];
 
     // Variables para la búsqueda de mascotas en tiempo real en el modal "Nueva Cita"
   mascotasBusqueda: any[] = [];
@@ -45,8 +48,8 @@ export class Citas implements OnInit {
   modalReprogVisible = false;
 
   citaSeleccionada: any = null;
-  nuevaCita = { idServicio: '', fecha: '', hora: '08:00', motivo: '' };
-  reprog = { fecha: '', hora: '', motivo: '' };
+  nuevaCita = { idProgramacion: '', idServicio: '', fecha: '', hora: '', motivo: '' };
+  reprog = { idProgramacion: '', fecha: '', hora: '', motivo: '' };
 
   constructor(
     private citaService: CitaService,
@@ -64,6 +67,7 @@ export class Citas implements OnInit {
     this.cargarStats();
     this.cargarCitas();
     this.citaService.getServicios().subscribe({ next: (r: any) => { this.servicios = r.data || []; this.cdr.detectChanges(); } });
+    this.citaService.getVeterinarios().subscribe({ next: (r: any) => { this.veterinarios = r.data || []; this.cdr.detectChanges(); } });
   }
 
   cargarStats() {
@@ -140,8 +144,49 @@ export class Citas implements OnInit {
     this.busquedaMascota = '';
     this.mascotaSeleccionada = null;
     this.mascotasBusqueda = [];
-    this.nuevaCita = { idServicio: '', fecha: '', hora: '08:00', motivo: '' };
+    this.nuevaCita = { idProgramacion: '', idServicio: '', fecha: '', hora: '', motivo: '' };
+    this.horasDisponibles = [];
     this.modalNuevaVisible = true;
+  }
+
+  // Genera franjas de 30 min dentro del turno del veterinario (ej. 08:00..12:30)
+  private generarSlots(horaInicio: string, horaFin: string): string[] {
+    const toMin = (t: string) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const slots: string[] = [];
+    for (let m = toMin(horaInicio); m < toMin(horaFin); m += 30) {
+      slots.push(`${pad(Math.floor(m / 60))}:${pad(m % 60)}`);
+    }
+    return slots;
+  }
+
+  // Suma 30 min a una hora HH:mm (para calcular la hora de fin de la cita)
+  private sumar30(hora: string): string {
+    const [h, m] = hora.split(':').map(Number);
+    const total = h * 60 + m + 30;
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${pad(Math.floor(total / 60))}:${pad(total % 60)}`;
+  }
+
+  // Al cambiar el veterinario o la fecha, recalcula las horas seleccionables:
+  // las del turno del vet menos las que ya están ocupadas ese día.
+  onVetOrFechaChange() {
+    const vet = this.veterinarios.find(v => String(v.idProgramacion) === String(this.nuevaCita.idProgramacion));
+    if (!vet || !this.nuevaCita.fecha) {
+      this.horasDisponibles = [];
+      this.nuevaCita.hora = '';
+      return;
+    }
+    const slots = this.generarSlots(vet.horaInicio, vet.horaFin);
+    this.citaService.getHorasOcupadas(vet.idProgramacion, this.nuevaCita.fecha).subscribe({
+      next: (r: any) => {
+        const ocupadas: string[] = r.data || [];
+        this.horasDisponibles = slots.filter(s => !ocupadas.includes(s));
+        if (!this.horasDisponibles.includes(this.nuevaCita.hora)) this.nuevaCita.hora = '';
+        this.cdr.detectChanges();
+      },
+      error: () => { this.horasDisponibles = slots; this.cdr.detectChanges(); }
+    });
   }
 
   getBadgeClass(estado: string): string {
@@ -172,8 +217,33 @@ export class Citas implements OnInit {
   abrirReprogramar(cita: any) {
     this.citaSeleccionada = cita;
     this.modalDetalleVisible = false;
-    this.reprog = { fecha: '', hora: '', motivo: '' };
+    // Preselecciona el veterinario actual de la cita (por nombre) para mantener su turno
+    const vet = this.veterinarios.find(v => v.nombreVeterinario?.trim() === cita.nombreVeterinario?.trim());
+    this.reprog = { idProgramacion: vet ? String(vet.idProgramacion) : '', fecha: '', hora: '', motivo: '' };
+    this.horasDisponiblesReprog = [];
     this.modalReprogVisible = true;
+  }
+
+  // Igual que en Nueva Cita, pero para el modal de Reprogramar: filtra las horas del turno
+  // del vet elegido y excluye la propia cita del cálculo de ocupadas.
+  onVetOrFechaChangeReprog() {
+    const vet = this.veterinarios.find(v => String(v.idProgramacion) === String(this.reprog.idProgramacion));
+    if (!vet || !this.reprog.fecha) {
+      this.horasDisponiblesReprog = [];
+      this.reprog.hora = '';
+      return;
+    }
+    const slots = this.generarSlots(vet.horaInicio, vet.horaFin);
+    const idExcluir = this.citaSeleccionada?.idCitaProgramada;
+    this.citaService.getHorasOcupadas(vet.idProgramacion, this.reprog.fecha, idExcluir).subscribe({
+      next: (r: any) => {
+        const ocupadas: string[] = r.data || [];
+        this.horasDisponiblesReprog = slots.filter(s => !ocupadas.includes(s));
+        if (!this.horasDisponiblesReprog.includes(this.reprog.hora)) this.reprog.hora = '';
+        this.cdr.detectChanges();
+      },
+      error: () => { this.horasDisponiblesReprog = slots; this.cdr.detectChanges(); }
+    });
   }
 
   cancelarCita(id: number) {
@@ -208,8 +278,8 @@ export class Citas implements OnInit {
   }
 
   guardarReprogramacion() {
-    if (!this.reprog.fecha || !this.reprog.hora) {
-      Swal.fire({ icon: 'warning', title: 'Completa fecha y hora', timer: 1500, showConfirmButton: false });
+    if (!this.reprog.idProgramacion || !this.reprog.fecha || !this.reprog.hora) {
+      Swal.fire({ icon: 'warning', title: 'Completa veterinario, fecha y hora', timer: 1800, showConfirmButton: false });
       return;
     }
     const d = new Date(); const hoy = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -221,8 +291,10 @@ export class Citas implements OnInit {
     this.citaService.getCita(id).subscribe({ next: (r: any) => {
       this.citaService.actualizarCita(id, {
         ...r.data,
+        idProgramacion: +this.reprog.idProgramacion,
         fecha: this.reprog.fecha,
         horaInicio: this.reprog.hora + ':00',
+        horaFin: this.sumar30(this.reprog.hora) + ':00',
         motivoReprogramacion: this.reprog.motivo
       }).subscribe({
         next: () => {
@@ -230,7 +302,10 @@ export class Citas implements OnInit {
           Swal.fire({ icon: 'success', title: 'Cita reprogramada', timer: 1500, showConfirmButton: false });
           this.cargarCitas();
         },
-        error: () => Swal.fire({ icon: 'error', title: 'Error al reprogramar' })
+        error: (err: any) => {
+          const msg = err?.error?.error || err?.error?.message;
+          Swal.fire({ icon: 'error', title: 'Error al reprogramar', text: msg || 'Intenta nuevamente.' });
+        }
       });
     }});
   }
@@ -240,8 +315,8 @@ export class Citas implements OnInit {
       Swal.fire({ icon: 'warning', title: 'Selecciona una mascota', timer: 1500, showConfirmButton: false });
       return;
     }
-    const { idServicio, fecha, hora, motivo } = this.nuevaCita;
-    if (!idServicio || !fecha || !hora || !motivo) {
+    const { idProgramacion, idServicio, fecha, hora, motivo } = this.nuevaCita;
+    if (!idProgramacion || !idServicio || !fecha || !hora || !motivo) {
       Swal.fire({ icon: 'warning', title: 'Completa todos los campos', timer: 1500, showConfirmButton: false });
       return;
     }
@@ -252,10 +327,11 @@ export class Citas implements OnInit {
     }
     this.citaService.crearCita({
       idDueno: this.mascotaSeleccionada.idDueno || 1,
-      idProgramacion: 1,
+      idProgramacion: +idProgramacion,
       idMascota: this.mascotaSeleccionada.idMascota,
       fecha,
       horaInicio: hora + ':00',
+      horaFin: this.sumar30(hora) + ':00',
       idEstadoCita: 1,
       motivo,
       idCategoria: 1,
@@ -267,7 +343,10 @@ export class Citas implements OnInit {
         this.cargarCitas();
         this.cargarStats();
       },
-      error: () => Swal.fire({ icon: 'error', title: 'Error al registrar cita' })
+      error: (err: any) => {
+        const msg = err?.error?.error || err?.error?.message;
+        Swal.fire({ icon: 'error', title: 'Error al registrar cita', text: msg || 'Intenta nuevamente.' });
+      }
     });
   }
 

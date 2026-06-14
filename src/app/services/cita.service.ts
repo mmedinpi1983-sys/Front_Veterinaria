@@ -40,6 +40,18 @@ export class CitaService {
     return this.http.get(`${API}/api/servicio`);
   }
 
+  // Lista veterinarios disponibles con su turno (para el select del modal de Nueva Cita)
+  getVeterinarios(): Observable<any> {
+    return this.http.get(`${API}/api/citaprogramada/veterinarios`);
+  }
+
+  // Horas (HH:mm) ya ocupadas por ese veterinario (programación) en una fecha.
+  // excluir: id de cita a ignorar (al reprogramar, para no contar su propio horario).
+  getHorasOcupadas(idProgramacion: number, fecha: string, excluir?: number): Observable<any> {
+    const ex = excluir ? `&excluir=${excluir}` : '';
+    return this.http.get(`${API}/api/citaprogramada/horas-ocupadas?idProgramacion=${idProgramacion}&fecha=${fecha}${ex}`);
+  }
+
   // Verifica si ya existe una atención iniciada para una cita
   getAtencionPorCita(idCita: number): Observable<any> {
     return this.http.get(`${API}/api/atencion/por-cita/${idCita}`);

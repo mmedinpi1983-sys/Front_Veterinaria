@@ -22,13 +22,22 @@ export class Atencion implements OnInit {
   toast = { visible: false, msg: '', type: 'success' };
   loading = false;
 
+  // Vista previa de receta (modal tipo documento imprimible)
+  modalPreviaReceta = false;
+  clinica = { nombre: 'Clínica Veterinaria Patitas Felices', direccion: 'Av. Primavera 123, Lima', telefono: '987 654 321' };
+
   state = { idTriaje: null as any, idAtencion: null as any, idConsulta: null as any, idMascota: null as any };
   anamnesisGuardada: any = null;
 
   triaje = { prioridad: '1', metodo: '1', temperatura: '', peso: '', alergias: '', observaciones: '' };
   anamnesis = { antecedentes: '', alergias: '0', cirugias: '0', medicamentos: '', vacunas: '', alimentacion: '', comportamiento: '', inicioSintomas: '', evolucionSintomas: '', observaciones: '' };
   consulta = { diagnostico: '', tratamiento: '', observaciones: '', requiereControl: true, fechaControl: '' };
-  recetaForm = { idMedicamento: '', dosis: '', frecuencia: '', duracion: '', instrucciones: '' };
+  recetaForm = { idMedicamento: '', dosis: '', frecuencia: '', duracion: '', instrucciones: '', via: '1' };
+  viasAdmin = [
+    { id: 1, nombre: 'Oral' }, { id: 2, nombre: 'Inyectable' }, { id: 3, nombre: 'Tópica' },
+    { id: 4, nombre: 'Subcutánea' }, { id: 5, nombre: 'Intravenosa' }, { id: 6, nombre: 'Oftálmica' },
+    { id: 7, nombre: 'Ótica' }
+  ];
 
   constructor(private route: ActivatedRoute, public router: Router, private api: ApiService, private cdr: ChangeDetectorRef) {}
 
@@ -144,6 +153,7 @@ export class Atencion implements OnInit {
   agregarMedicamento() {
     if (!this.recetaForm.idMedicamento) { this.showToast('Selecciona un medicamento', 'error'); return; }
     const med = this.medicamentos.find(m => m.idMedicamento === +this.recetaForm.idMedicamento);
+    const via = this.viasAdmin.find(v => v.id === +this.recetaForm.via);
     this.medicamentosReceta.push({
       idMedicamento: +this.recetaForm.idMedicamento,
       nombre: med?.nombreMedicamento || '',
@@ -151,9 +161,10 @@ export class Atencion implements OnInit {
       frecuencia: this.recetaForm.frecuencia,
       duracion: this.recetaForm.duracion,
       indicacionesEspecificas: this.recetaForm.instrucciones,
-      viaAdministracion: 1
+      via: via?.nombre || 'Oral',
+      viaAdministracion: +this.recetaForm.via
     });
-    this.recetaForm = { idMedicamento: '', dosis: '', frecuencia: '', duracion: '', instrucciones: '' };
+    this.recetaForm = { idMedicamento: '', dosis: '', frecuencia: '', duracion: '', instrucciones: '', via: '1' };
     this.showToast('Medicamento agregado');
     this.cdr.detectChanges();
   }
@@ -192,4 +203,22 @@ export class Atencion implements OnInit {
   }
 
   getCodigo() { return `ATC-${String(this.idCita).padStart(4,'0')}`; }
+
+  // Fecha de hoy en formato dd/mm/aaaa para la receta
+  get fechaReceta(): string {
+    const d = new Date();
+    return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+  }
+
+  // Abre la vista previa de la receta (requiere al menos un medicamento)
+  vistaPreviaReceta() {
+    if (!this.medicamentosReceta.length) { this.showToast('Agrega al menos un medicamento', 'error'); return; }
+    this.modalPreviaReceta = true;
+    this.cdr.detectChanges();
+  }
+
+  cerrarPreviaReceta() { this.modalPreviaReceta = false; this.cdr.detectChanges(); }
+
+  // Imprime / guarda como PDF la receta. El CSS @media print aísla solo el documento.
+  imprimirReceta() { window.print(); }
 }
