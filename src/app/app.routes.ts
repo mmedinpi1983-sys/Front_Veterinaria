@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { Layout } from './shared/components/layout/layout';
-import { Pacientes } from './pages/pacientes/pacientes';
+import { Pacientes } from './Pages/pacientes/pacientes';
+
 
 export const routes: Routes = [
 
