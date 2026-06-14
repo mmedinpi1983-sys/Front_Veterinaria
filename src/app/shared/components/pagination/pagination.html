@@ -1,0 +1,9 @@
+@if (totalPaginas > 1) {
+  <div class="pagination">
+    <button class="page-btn" (click)="cambiar.emit(paginaActual - 1)" [disabled]="paginaActual === 1">‹</button>
+    @for (p of paginas; track p) {
+      <button class="page-btn" [class.active]="p === paginaActual" (click)="cambiar.emit(p)">{{p}}</button>
+    }
+    <button class="page-btn" (click)="cambiar.emit(paginaActual + 1)" [disabled]="paginaActual === totalPaginas">›</button>
+  </div>
+}
