@@ -71,15 +71,15 @@
             <div class="form-group">
               <label>¿Presenta alergias?</label>
               <div class="radio-group">
-                <label><input type="radio" [(ngModel)]="anamnesis.alergias" value="1"> Sí</label>
-                <label><input type="radio" [(ngModel)]="anamnesis.alergias" value="0"> No</label>
+                <label><input type="radio" name="alergias" [(ngModel)]="anamnesis.alergias" value="1"> Sí</label>
+                <label><input type="radio" name="alergias" [(ngModel)]="anamnesis.alergias" value="0"> No</label>
               </div>
             </div>
             <div class="form-group">
               <label>¿Cirugías anteriores?</label>
               <div class="radio-group">
-                <label><input type="radio" [(ngModel)]="anamnesis.cirugias" value="1"> Sí</label>
-                <label><input type="radio" [(ngModel)]="anamnesis.cirugias" value="0"> No</label>
+                <label><input type="radio" name="cirugias" [(ngModel)]="anamnesis.cirugias" value="1"> Sí</label>
+                <label><input type="radio" name="cirugias" [(ngModel)]="anamnesis.cirugias" value="0"> No</label>
               </div>
             </div>
           </div>
@@ -110,8 +110,8 @@
           <div class="form-group">
             <label>¿Requiere control posterior?</label>
             <div class="radio-group">
-              <label><input type="radio" [(ngModel)]="consulta.requiereControl" [value]="true"> Sí</label>
-              <label><input type="radio" [(ngModel)]="consulta.requiereControl" [value]="false"> No</label>
+              <label><input type="radio" name="requiereControl" [(ngModel)]="consulta.requiereControl" [value]="true"> Sí</label>
+              <label><input type="radio" name="requiereControl" [(ngModel)]="consulta.requiereControl" [value]="false"> No</label>
             </div>
           </div>
           <div class="form-group" *ngIf="consulta.requiereControl"><label>Fecha de Próximo Control</label><input class="form-control" [(ngModel)]="consulta.fechaControl" type="date"></div>
