@@ -1,0 +1,246 @@
+    <main class="content">
+      <div class="page-header">
+        <div class="page-header-row">
+          <div>
+            <h1 class="page-title">Gestión de Pacientes</h1>
+            <p class="page-subtitle">Administra el registro de todas las mascotas y sus propietarios</p>
+          </div>
+          <button class="btn btn-primary" (click)="abrirNuevo()">+ Nuevo Paciente</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body" style="padding-bottom:0;">
+          <div class="search-bar">
+            <app-search-bar placeholder="Buscar por nombre de mascota o propietario..." [(texto)]="busqueda" (buscar)="onBusqueda()"></app-search-bar>
+            <select class="filter-select" [(ngModel)]="filtroEspecie" (change)="cargarPacientes()">
+              <option value="">Todas las especies</option>
+              <option value="Perro">Perro</option>
+              <option value="Gato">Gato</option>
+              <option value="Ave">Ave</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th><th>Mascota</th><th>Especie / Raza</th>
+                <th>Sexo</th><th>Propietario</th><th>Tamaño</th><th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (pacientesPaginados.length === 0) {
+                <tr><td colspan="7" style="text-align:center;padding:32px;color:#64748B;">No hay pacientes registrados</td></tr>
+              }
+              @for (p of pacientesPaginados; track p.idMascota; let i = $index) {
+                <tr>
+                  <td class="text-muted text-sm">{{numeroInicio + i}}</td>
+                  <td><span style="font-weight:600;">{{p.nombre}}</span></td>
+                  <td>
+                    <span>{{p.especie || '—'}}</span><br>
+                    <span class="text-muted text-sm">{{p.raza || '—'}}</span>
+                  </td>
+                  <td class="text-muted">{{p.sexo || '—'}}</td>
+                  <td>{{p.nombreDueno || '—'}}</td>
+                  <td class="text-muted">{{p.tamanio || '—'}}</td>
+                  <td>
+                    <div class="table-actions">
+                      <button class="btn btn-sm btn-secondary" (click)="verHistorial(p)" title="Ver historial">👁</button>
+                      <button class="btn btn-sm btn-secondary" (click)="abrirEditar(p)" title="Editar">✏️</button>
+                      <button class="btn btn-sm" style="background:#FEE2E2;color:#DC2626;" (click)="eliminar(p.idMascota)" title="Eliminar">🗑</button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <app-pagination [paginaActual]="paginaActual" [totalPaginas]="totalPaginas" (cambiar)="cambiarPagina($event)"></app-pagination>
+      </div>
+    </main>
+
+@if (modalNuevoVisible) {
+  <app-modal title="Registrar Nuevo Paciente" subtitle="Completa la información del paciente" size="lg" (close)="modalNuevoVisible=false">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre del Paciente <span class="req">*</span></label>
+            <input class="form-control" [(ngModel)]="nuevo.nombre" placeholder="Ej: Rocky">
+          </div>
+          <div class="form-group">
+            <label>Especie <span class="req">*</span></label>
+            <select class="form-control" [(ngModel)]="nuevo.idEspecie" (change)="onEspecieChange()">
+              <option [ngValue]="null">Seleccionar</option>
+              @for (e of especies; track e.idEspecieRaza) {
+                <option [ngValue]="e.idEspecieRaza">{{e.nombre}}</option>
+              }
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="position:relative;">
+            <label>Raza</label>
+            <input class="form-control"
+              type="text"
+              [(ngModel)]="razaInput"
+              (input)="onRazaInput()"
+              (blur)="cerrarRazas()"
+              [disabled]="!nuevo.idEspecie"
+              placeholder="{{nuevo.idEspecie ? 'Escribe para buscar...' : 'Selecciona una especie primero'}}"
+              autocomplete="off">
+            @if (mostrarRazas && razasFiltradas.length > 0) {
+              <div class="sugerencias">
+                @for (r of razasFiltradas; track r.idEspecieRaza) {
+                  <div class="sugerencia-item" (mousedown)="seleccionarRaza(r)">{{r.nombre}}</div>
+                }
+              </div>
+            }
+          </div>
+          <div class="form-group">
+            <label>Sexo</label>
+            <select class="form-control" [(ngModel)]="nuevo.sexo">
+              <option value="">Seleccionar</option>
+              <option value="Macho">Macho</option>
+              <option value="Hembra">Hembra</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Edad (años)</label>
+            <input class="form-control" [(ngModel)]="nuevo.edad" placeholder="Ej: 1">
+          </div>
+          <div class="form-group">
+            <label>Tamaño</label>
+            <select class="form-control" [(ngModel)]="nuevo.tamanio">
+              <option value="">Seleccionar</option>
+              <option value="Pequeño">Pequeño</option>
+              <option value="Mediano">Mediano</option>
+              <option value="Grande">Grande</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre del Propietario <span class="req">*</span></label>
+            <input class="form-control" [(ngModel)]="nuevo.nombreDueno" placeholder="Ej: Pedro">
+          </div>
+          <div class="form-group">
+            <label>Apellido Paterno <span class="req">*</span></label>
+            <input class="form-control" [(ngModel)]="nuevo.apellidoPaternoDueno" placeholder="Ej: Jiménez">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Apellido Materno <span class="req">*</span></label>
+            <input class="form-control" [(ngModel)]="nuevo.apellidoMaternoDueno" placeholder="Ej: García">
+          </div>
+          <div class="form-group">
+            <label>DNI <span class="req">*</span></label>
+            <input class="form-control" [(ngModel)]="nuevo.dni" placeholder="Ej: 76453278">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email</label>
+            <input class="form-control" type="email" [(ngModel)]="nuevo.email" placeholder="ejemplo@gmail.com">
+          </div>
+          <div class="form-group">
+            <label>Teléfono <span class="req">*</span></label>
+            <input class="form-control" [(ngModel)]="nuevo.telefono" placeholder="Ej: 999888777">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Notas Adicionales</label>
+          <textarea class="form-control" [(ngModel)]="nuevo.notas" placeholder="Ej: Alergias, condiciones especiales, etc."></textarea>
+        </div>
+    <div modal-footer>
+      <button class="btn btn-secondary" (click)="modalNuevoVisible=false">Cancelar</button>
+      <button class="btn btn-primary" (click)="guardarNuevo()">Registrar Paciente</button>
+    </div>
+  </app-modal>
+}
+
+<!-- MODAL EDITAR PACIENTE -->
+@if (modalEditarVisible && editando) {
+  <app-modal title="Editar Paciente" subtitle="Modificar datos del paciente y dueño" size="lg" (close)="modalEditarVisible=false">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre del Paciente <span class="req">*</span></label>
+            <input class="form-control" [(ngModel)]="editando.nombre">
+          </div>
+          <div class="form-group">
+            <label>Especie</label>
+            <input class="form-control" [value]="editando.especie || ''" readonly style="background:#F8FAFC;">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Raza</label>
+            <input class="form-control" [value]="editando.raza || ''" readonly style="background:#F8FAFC;">
+          </div>
+          <div class="form-group">
+            <label>Sexo</label>
+            <select class="form-control" [(ngModel)]="editando.sexo">
+              <option value="">Seleccionar</option>
+              <option value="Macho">Macho</option>
+              <option value="Hembra">Hembra</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Tamaño</label>
+            <select class="form-control" [(ngModel)]="editando.tamanio">
+              <option value="">Seleccionar</option>
+              <option value="Pequeño">Pequeño</option>
+              <option value="Mediano">Mediano</option>
+              <option value="Grande">Grande</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre del Dueño <span class="req">*</span></label>
+            <input class="form-control" [(ngModel)]="editando.nombreDueno">
+          </div>
+          <div class="form-group">
+            <label>Apellido Paterno <span class="req">*</span></label>
+            <input class="form-control" [(ngModel)]="editando.apellidoPaternoDueno">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Apellido Materno <span class="req">*</span></label>
+            <input class="form-control" [(ngModel)]="editando.apellidoMaternoDueno">
+          </div>
+          <div class="form-group">
+            <label>DNI <span class="req">*</span></label>
+            <input class="form-control" [(ngModel)]="editando.dni">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email</label>
+            <input class="form-control" [(ngModel)]="editando.email">
+          </div>
+          <div class="form-group">
+            <label>Teléfono <span class="req">*</span></label>
+            <input class="form-control" [(ngModel)]="editando.telefono">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Notas Adicionales</label>
+          <textarea class="form-control" [(ngModel)]="editando.notas" placeholder="Ej: Alergias, condiciones especiales, etc."></textarea>
+        </div>
+    <div modal-footer>
+      <button class="btn btn-secondary" (click)="modalEditarVisible=false">Cancelar</button>
+      <button class="btn btn-primary" (click)="guardarEdicion()">Guardar Cambios</button>
+    </div>
+  </app-modal>
+}
