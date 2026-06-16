@@ -4,7 +4,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { PacienteService } from '../../services/paciente.service';
 
-const API = 'http://localhost:8080';
+const API = 'http://localhost:8081';
 
 // Página de Historia Clínica
 // Muestra el expediente completo de una mascota: información del paciente, propietario,

@@ -3,11 +3,12 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import Swal from 'sweetalert2';
+import { CommonModule } from '@angular/common';
 
 // Página de inicio de sesión - valida credenciales y redirige al módulo de Citas
 @Component({
   selector: 'app-login',
-  imports: [FormsModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './login.html',
   styleUrl: './login.css'
 })

@@ -68,15 +68,15 @@
                   <td><app-badge [estado]="c.estadoCita"></app-badge></td>
                   <td>
                     <div class="table-actions">
-                      <button class="btn btn-sm btn-secondary" (click)="verDetalle(c)" title="Ver detalle">👁</button>
+                      <button class="btn btn-sm btn-secondary" (click)="verDetalle(c)" title="Ver detalle"><span class="material-icons">visibility</span></button>
                       <button class="btn btn-sm btn-secondary"
                         [disabled]="c.estadoCita !== 'Pendiente'"
                         [style.opacity]="c.estadoCita !== 'Pendiente' ? '0.35' : '1'"
-                        (click)="c.estadoCita === 'Pendiente' && abrirReprogramar(c)" title="Reprogramar">🔄</button>
+                        (click)="c.estadoCita === 'Pendiente' && abrirReprogramar(c)" title="Reprogramar"><span class="material-icons">edit_calendar</span></button>
                       <button class="btn btn-sm"
                         [disabled]="c.estadoCita !== 'Pendiente'"
                         [style]="c.estadoCita !== 'Pendiente' ? 'background:#F1F5F9;color:#CBD5E1;' : 'background:#FEE2E2;color:#DC2626;'"
-                        (click)="c.estadoCita === 'Pendiente' && cancelarCita(c.idCitaProgramada)" title="Cancelar">✕</button>
+                        (click)="c.estadoCita === 'Pendiente' && cancelarCita(c.idCitaProgramada)" title="Cancelar"><span class="material-icons">cancel</span></button>
                     </div>
                   </td>
                 </tr>
@@ -96,7 +96,7 @@
         <div class="form-group" style="position:relative;">
           <label>Mascota / Propietario <span class="req">*</span></label>
           <div class="search-input-wrap">
-            <span class="search-icon">🔍</span>
+            <span class="material-icons search-icon">search</span>
             <input class="form-control" type="text"
               placeholder="Buscar por nombre de mascota o propietario..."
               [(ngModel)]="busquedaMascota"
@@ -160,7 +160,7 @@
           <label>Motivo de Consulta <span class="req">*</span></label>
           <textarea class="form-control" [(ngModel)]="nuevaCita.motivo" placeholder="Describe el motivo de la consulta..."></textarea>
         </div>
-    <div modal-footer>
+    <div class="modal-footer">
       <button class="btn btn-secondary" (click)="modalNuevaVisible=false">Cancelar</button>
       <button class="btn btn-primary" (click)="guardarCita()">Guardar Cita</button>
     </div>
@@ -244,7 +244,7 @@
           <label>Motivo de reprogramación <span class="req">*</span></label>
           <textarea class="form-control" [(ngModel)]="reprog.motivo" placeholder="Explica el motivo del cambio..."></textarea>
         </div>
-    <div modal-footer>
+    <div class="modal-footer">
       <button class="btn btn-secondary" (click)="modalReprogVisible=false">Volver</button>
       <button class="btn btn-primary" (click)="guardarReprogramacion()">Guardar cambios</button>
     </div>

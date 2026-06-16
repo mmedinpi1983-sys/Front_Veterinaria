@@ -11,7 +11,7 @@ import { Modal } from '../../shared/components/modal/modal';
 import { Pagination } from '../../shared/components/pagination/pagination';
 import { SearchBar } from '../../shared/components/search-bar/search-bar';
 
-const API = 'http://localhost:8080';
+const API = 'http://localhost:8081';
 
 // Página de Gestión de Pacientes
 // Lista mascotas con sus propietarios. Permite registrar (crea Dueño + Mascota + vínculo),

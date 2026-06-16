@@ -24,7 +24,7 @@ export class Atencion implements OnInit {
 
   // Vista previa de receta (modal tipo documento imprimible)
   modalPreviaReceta = false;
-  clinica = { nombre: 'Clínica Veterinaria Patitas Felices', direccion: 'Av. Primavera 123, Lima', telefono: '987 654 321' };
+  clinica = { nombre: 'Clínica Veterinaria Vetclinic', direccion: 'Av. Primavera 123, Lima', telefono: '987 654 321' };
 
   state = { idTriaje: null as any, idAtencion: null as any, idConsulta: null as any, idMascota: null as any };
   anamnesisGuardada: any = null;

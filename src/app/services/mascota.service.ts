@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-const API = 'http://localhost:8080';
+const API = 'http://localhost:8081';
 
 // Servicio de mascotas - gestiona el CRUD de pacientes veterinarios y la búsqueda en tiempo real
 @Injectable({ providedIn: 'root' })

@@ -16,7 +16,7 @@ export const routes: Routes = [
   {
     path: '',
     component: Layout,                                          // Layout con sidebar + topbar
-    canActivate: [authGuard],                                  // 🔒 protege todo lo de adentro: exige sesión
+    canActivate: [authGuard],                                  //  protege todo lo de adentro: exige sesión
     children: [
       { path: 'pacientes', component: Pacientes },             // Gestión de pacientes
       { path: 'citas', component: Citas },                     // Gestión de citas

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-const API = 'http://localhost:8080';
+const API = 'http://localhost:8081';
 
 // Servicio de pacientes - gestiona dueños y el vínculo entre dueño y mascota
 @Injectable({ providedIn: 'root' })
