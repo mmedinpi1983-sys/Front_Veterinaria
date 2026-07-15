@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-const API = 'http://localhost:8081';
+const API = 'http://localhost:8080';
 
 // Servicio de autenticación - maneja login y sesión del usuario en localStorage
 @Injectable({ providedIn: 'root' })

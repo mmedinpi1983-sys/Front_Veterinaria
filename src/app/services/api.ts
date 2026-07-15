@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-const API = 'http://localhost:8081';
+const API = 'http://localhost:8080';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -14,17 +14,17 @@ export class ApiService {
     return this.http.get(`${API}/api/citaprogramada/enriquecida${q ? '?'+q : ''}`);
   }
   getCita(id: number): Observable<any> { return this.http.get(`${API}/api/citaprogramada/${id}`); }
-  crearCita(body: any): Observable<any> { return this.http.post(`${API}/api/citaprogramada`, body); }
+  crearCita(body: any): Observable<any> { return this.http.post(`${API}/api/citaprogramada/crear`, body); }
   actualizarCita(id: number, body: any): Observable<any> { return this.http.put(`${API}/api/citaprogramada/${id}`, body); }
   getMascotas(): Observable<any> { return this.http.get(`${API}/api/mascota`); }
   getServicios(): Observable<any> { return this.http.get(`${API}/api/servicio`); }
   getAtencionPorCita(idCita: number): Observable<any> { return this.http.get(`${API}/api/atencion/por-cita/${idCita}`); }
-  crearTriaje(body: any): Observable<any> { return this.http.post(`${API}/api/triaje`, body); }
-  crearTriajeDetalle(body: any): Observable<any> { return this.http.post(`${API}/api/triajedetalle`, body); }
-  crearAtencion(body: any): Observable<any> { return this.http.post(`${API}/api/atencion`, body); }
-  crearAtencionConsulta(body: any): Observable<any> { return this.http.post(`${API}/api/atencionconsulta`, body); }
-  crearAnamnesis(body: any): Observable<any> { return this.http.post(`${API}/api/anamnesis`, body); }
-  crearReceta(body: any): Observable<any> { return this.http.post(`${API}/api/receta`, body); }
-  crearRecetaDetalle(body: any): Observable<any> { return this.http.post(`${API}/api/recetadetalle`, body); }
+  crearTriaje(body: any): Observable<any> { return this.http.post(`${API}/api/triaje/crear`, body); }
+  crearTriajeDetalle(body: any): Observable<any> { return this.http.post(`${API}/api/triajedetalle/crear`, body); }
+  crearAtencion(body: any): Observable<any> { return this.http.post(`${API}/api/atencion/crear`, body); }
+  crearAtencionConsulta(body: any): Observable<any> { return this.http.post(`${API}/api/atencionconsulta/crear`, body); }
+  crearAnamnesis(body: any): Observable<any> { return this.http.post(`${API}/api/anamnesis/crear`, body); }
+  crearReceta(body: any): Observable<any> { return this.http.post(`${API}/api/receta/crear`, body); }
+  crearRecetaDetalle(body: any): Observable<any> { return this.http.post(`${API}/api/recetadetalle/crear`, body); }
   getMedicamentos(): Observable<any> { return this.http.get(`${API}/api/medicamentocatalogo`); }
 }

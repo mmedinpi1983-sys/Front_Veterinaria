@@ -1,18 +1,29 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { AuthService } from '../../../services/auth.service';
+import { ConfiguracionService } from '../../../services/configuracion.service';
+import { RolClinica } from '../../../pages/configuracion/configuracion.model';
 
 // Barra superior reutilizable: muestra al usuario logueado (tomado del localStorage)
+// y su rol real, consultado contra el catálogo de roles (RolesClinica) en vez de asumirlo.
 @Component({
   selector: 'app-topbar',
   imports: [],
   templateUrl: './topbar.html',
   styles: [':host { display: contents; }']
 })
-export class Topbar {
+export class Topbar implements OnInit {
   private usuario: any;
+  private roles: RolClinica[] = [];
 
-  constructor(auth: AuthService) {
+  constructor(auth: AuthService, private configService: ConfiguracionService, private cdr: ChangeDetectorRef) {
     this.usuario = auth.getSesion();
+  }
+
+  ngOnInit() {
+    this.configService.getRolesCatalogo().subscribe({ next: (r) => {
+      this.roles = r.data || [];
+      this.cdr.detectChanges();
+    }});
   }
 
   get nombre(): string {
@@ -21,7 +32,7 @@ export class Topbar {
   }
 
   get rol(): string {
-    return this.usuario?.idRolesClinica === 1 ? 'Administrador' : 'Usuario';
+    return this.roles.find(r => r.idRoles === this.usuario?.idRolesClinica)?.nombreRol || '—';
   }
 
   get iniciales(): string {

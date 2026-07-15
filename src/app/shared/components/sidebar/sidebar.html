@@ -3,9 +3,18 @@
     <img src="IMG.png" alt="VetClinic" style="width:130px;display:block;margin:0 auto;filter:invert(1) contrast(4);mix-blend-mode:screen;">
   </div>
   <nav class="sidebar-nav">
-    <div class="nav-item" routerLink="/pacientes" routerLinkActive="active"><span class="material-icons">pets</span> Pacientes</div>
-    <div class="nav-item" routerLink="/citas" routerLinkActive="active"><span class="material-icons">calendar_month</span> Citas</div>
-    <div class="nav-item" style="opacity:0.5;cursor:default;"><span class="material-icons">local_hospital</span> Atención Clínica</div>
+    @if (acceso?.superAdmin || acceso?.modulos?.includes('pacientes')) {
+      <div class="nav-item" routerLink="/pacientes" routerLinkActive="active"><span class="material-icons">pets</span> Pacientes</div>
+    }
+    @if (acceso?.superAdmin || acceso?.modulos?.includes('citas')) {
+      <div class="nav-item" routerLink="/citas" routerLinkActive="active"><span class="material-icons">calendar_month</span> Citas</div>
+    }
+    @if (acceso?.superAdmin || acceso?.modulos?.includes('atencion clinica')) {
+      <div class="nav-item" style="opacity:0.5;cursor:default;"><span class="material-icons">local_hospital</span> Atención Clínica</div>
+    }
+    @if (acceso?.superAdmin || acceso?.modulos?.includes('configuracion')) {
+      <div class="nav-item" routerLink="/configuracion" routerLinkActive="active"><span class="material-icons">settings</span> Configuración</div>
+    }
   </nav>
   <div class="sidebar-footer">
     <div class="nav-item" (click)="cerrarSesion()" style="cursor:pointer;"><span class="material-icons">logout</span> Cerrar Sesión</div>

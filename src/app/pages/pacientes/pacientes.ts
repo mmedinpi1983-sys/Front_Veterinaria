@@ -5,26 +5,32 @@ import { Router } from '@angular/router';
 import { MascotaService } from '../../services/mascota.service';
 import { PacienteService } from '../../services/paciente.service';
 import { HttpClient } from '@angular/common/http';
-import { lastValueFrom } from 'rxjs';
+import { forkJoin, lastValueFrom } from 'rxjs';
 import Swal from 'sweetalert2';
 import { Modal } from '../../shared/components/modal/modal';
 import { Pagination } from '../../shared/components/pagination/pagination';
 import { SearchBar } from '../../shared/components/search-bar/search-bar';
+import { Tabs } from '../../shared/components/tabs/tabs';
 
-const API = 'http://localhost:8081';
+const API = 'http://localhost:8080';
 
 // Página de Gestión de Pacientes
 // Lista mascotas con sus propietarios. Permite registrar (crea Dueño + Mascota + vínculo),
 // editar y eliminar pacientes. Protege el eliminado si hay citas pendientes.
 @Component({
   selector: 'app-pacientes',
-  imports: [CommonModule, FormsModule, Modal, Pagination, SearchBar],
+  imports: [CommonModule, FormsModule, Modal, Pagination, SearchBar, Tabs],
   templateUrl: './pacientes.html',
   styleUrl: './pacientes.css'
 })
 export class Pacientes implements OnInit {
   pacientes: any[] = [];
   pacientesPaginados: any[] = [];
+
+  // Pestañas de los formularios de registro/edición: separan datos del paciente y del propietario
+  tabsFormulario = [{ id: 'paciente', label: 'Datos del Paciente' }, { id: 'propietario', label: 'Datos del Propietario' }];
+  tabNuevo = 'paciente';
+  tabEditar = 'paciente';
 
   busqueda = '';
   filtroEspecie = '';
@@ -65,11 +71,13 @@ export class Pacientes implements OnInit {
 
   ngOnInit() {
     this.cargarPacientes();
-    // Carga todas las especies y razas de la tabla EspecieRaza (tabla autoreferida)
-    this.pacienteService.getEspeciesRazas().subscribe({ next: (r: any) => {
-      this.especiesRazas = r.data || [];
-      // Los registros sin idEspecie son las especies principales
-      this.especies = this.especiesRazas.filter((e: any) => !e.idEspecie);
+    // Carga especies y razas (tabla EspecieRaza autoreferida, expuesta por separado en el backend)
+    forkJoin({
+      especies: this.pacienteService.getEspecies(),
+      razas: this.pacienteService.getRazas()
+    }).subscribe({ next: ({ especies, razas }: any) => {
+      this.especies = especies.data || [];
+      this.especiesRazas = razas.data || [];
       this.cdr.detectChanges();
     }});
   }
@@ -155,10 +163,12 @@ export class Pacientes implements OnInit {
     this.razaInput = '';
     this.razasFiltradas = [];
     this.mostrarRazas = false;
+    this.tabNuevo = 'paciente';
     this.modalNuevoVisible = true;
   }
 
   abrirEditar(p: any) {
+    this.tabEditar = 'paciente';
     this.editando = {
       idMascota: p.idMascota, nombre: p.nombre, especie: p.especie || '',
       raza: p.raza || '', sexo: p.sexo || '', tamanio: p.tamanio || '', notas: '',
@@ -184,7 +194,7 @@ export class Pacientes implements OnInit {
   }
 
   async guardarNuevo() {
-    if (!this.nuevo.nombre || !this.nuevo.idEspecie || !this.nuevo.nombreDueno || !this.nuevo.apellidoPaternoDueno || !this.nuevo.apellidoMaternoDueno || !this.nuevo.dni || !this.nuevo.telefono) {
+    if (!this.nuevo.nombre || !this.nuevo.idEspecie || !this.nuevo.idRaza || !this.nuevo.nombreDueno || !this.nuevo.apellidoPaternoDueno || !this.nuevo.apellidoMaternoDueno || !this.nuevo.dni || !this.nuevo.telefono) {
       Swal.fire({ icon: 'warning', title: 'Completa todos los campos obligatorios (*)', timer: 2000, showConfirmButton: false });
       return;
     }
@@ -236,7 +246,9 @@ export class Pacientes implements OnInit {
           + '</ul>';
       }
     }
-    return err?.message || err?.error || generico;
+    // err.error trae el detalle real de excepciones no controladas (500);
+    // err.message es un texto fijo genérico en ese caso, así que se revisa después.
+    return err?.error || err?.message || generico;
   }
 
   async guardarEdicion() {

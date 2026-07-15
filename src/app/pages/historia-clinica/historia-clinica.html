@@ -12,7 +12,7 @@
         <div class="hc-left">
           <!-- Mascota -->
           <div class="card" style="margin-bottom:16px;">
-            <div class="card-header"><span class="card-title">🐾 Información del Paciente</span></div>
+            <div class="card-header"><span class="card-title" style="display:inline-flex;align-items:center;gap:6px;"><span class="material-icons" style="font-size:18px;">pets</span>Información del Paciente</span></div>
             <div class="card-body">
               @if (mascota) {
                 <div class="info-grid">
@@ -30,7 +30,7 @@
 
           <!-- Dueño -->
           <div class="card">
-            <div class="card-header"><span class="card-title">👤 Información del Propietario</span></div>
+            <div class="card-header"><span class="card-title" style="display:inline-flex;align-items:center;gap:6px;"><span class="material-icons" style="font-size:18px;">person</span>Información del Propietario</span></div>
             <div class="card-body">
               @if (dueno) {
                 <div class="info-grid">
@@ -50,8 +50,8 @@
         <div class="card">
           <div class="card-body" style="padding-bottom:0;">
             <div class="tabs">
-              <div class="tab-item" [class.active]="tabActivo==='historial'" (click)="tabActivo='historial'">📋 Historial</div>
-              <div class="tab-item" [class.active]="tabActivo==='citas'" (click)="tabActivo='citas'">📅 Citas</div>
+              <div class="tab-item" [class.active]="tabActivo==='historial'" (click)="tabActivo='historial'" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;"><span class="material-icons" style="font-size:16px;">history</span>Historial</div>
+              <div class="tab-item" [class.active]="tabActivo==='citas'" (click)="tabActivo='citas'" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;"><span class="material-icons" style="font-size:16px;">calendar_month</span>Citas</div>
             </div>
           </div>
 
@@ -80,7 +80,7 @@
                     </div>
                   }
                   @if (h.fechaProximoControl) {
-                    <div style="font-size:12px;color:#64748B;margin-top:6px;">📅 Próximo control: {{h.fechaProximoControl}}</div>
+                    <div style="font-size:12px;color:#64748B;margin-top:6px;display:flex;align-items:center;gap:4px;"><span class="material-icons" style="font-size:14px;">event</span>Próximo control: {{h.fechaProximoControl}}</div>
                   }
                 </div>
               }

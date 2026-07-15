@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-const API = 'http://localhost:8081';
+const API = 'http://localhost:8080';
 
 // Servicio de mascotas - gestiona el CRUD de pacientes veterinarios y la búsqueda en tiempo real
 @Injectable({ providedIn: 'root' })
@@ -27,7 +27,7 @@ export class MascotaService {
 
   // Registra una nueva mascota
   crearMascota(body: any): Observable<any> {
-    return this.http.post(`${API}/api/mascota`, body);
+    return this.http.post(`${API}/api/mascota/crear`, body);
   }
 
   // Actualiza los datos de una mascota existente
@@ -37,6 +37,6 @@ export class MascotaService {
 
   // Eliminación lógica de una mascota (soft delete)
   eliminarMascota(id: number): Observable<any> {
-    return this.http.delete(`${API}/api/mascota/${id}`);
+    return this.http.delete(`${API}/api/mascota/${id}`, { body: { idMascota: id } });
   }
 }

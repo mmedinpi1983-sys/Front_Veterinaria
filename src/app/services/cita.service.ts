@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-const API = 'http://localhost:8081';
+const API = 'http://localhost:8080';
 
 // Servicio de citas - centraliza todas las llamadas a la API relacionadas con citas y atención clínica
 @Injectable({ providedIn: 'root' })
@@ -27,7 +27,7 @@ export class CitaService {
 
   // Registra una nueva cita
   crearCita(body: any): Observable<any> {
-    return this.http.post(`${API}/api/citaprogramada`, body);
+    return this.http.post(`${API}/api/citaprogramada/crear`, body);
   }
 
   // Actualiza una cita (cancelar = idEstadoCita:3, reprogramar = nueva fecha)
@@ -61,37 +61,37 @@ export class CitaService {
 
   // Registra el triaje (datos vitales: temperatura, peso, etc.)
   crearTriaje(body: any): Observable<any> {
-    return this.http.post(`${API}/api/triaje`, body);
+    return this.http.post(`${API}/api/triaje/crear`, body);
   }
 
   // Registra el detalle del triaje
   crearTriajeDetalle(body: any): Observable<any> {
-    return this.http.post(`${API}/api/triajedetalle`, body);
+    return this.http.post(`${API}/api/triajedetalle/crear`, body);
   }
 
   // Crea el registro principal de la atención
   crearAtencion(body: any): Observable<any> {
-    return this.http.post(`${API}/api/atencion`, body);
+    return this.http.post(`${API}/api/atencion/crear`, body);
   }
 
   // Registra el diagnóstico y tratamiento de la consulta
   crearAtencionConsulta(body: any): Observable<any> {
-    return this.http.post(`${API}/api/atencionconsulta`, body);
+    return this.http.post(`${API}/api/atencionconsulta/crear`, body);
   }
 
   // Registra el historial médico del paciente
   crearAnamnesis(body: any): Observable<any> {
-    return this.http.post(`${API}/api/anamnesis`, body);
+    return this.http.post(`${API}/api/anamnesis/crear`, body);
   }
 
   // Crea la receta médica
   crearReceta(body: any): Observable<any> {
-    return this.http.post(`${API}/api/receta`, body);
+    return this.http.post(`${API}/api/receta/crear`, body);
   }
 
   // Agrega un medicamento a la receta
   crearRecetaDetalle(body: any): Observable<any> {
-    return this.http.post(`${API}/api/recetadetalle`, body);
+    return this.http.post(`${API}/api/recetadetalle/crear`, body);
   }
 
   // Lista medicamentos disponibles en el catálogo

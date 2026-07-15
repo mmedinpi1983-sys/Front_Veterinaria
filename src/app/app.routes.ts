@@ -5,7 +5,9 @@ import { Citas } from './pages/citas/citas';
 import { Pacientes } from './pages/pacientes/pacientes';
 import { Atencion } from './pages/atencion/atencion';
 import { HistoriaClinica } from './pages/historia-clinica/historia-clinica';
+import { Configuracion } from './pages/configuracion/configuracion';
 import { authGuard } from './guards/auth.guard';
+import { moduloGuard } from './guards/modulo.guard';
 
 // Rutas de la aplicación VetClinic.
 // El login va fuera del layout; las demás páginas se muestran DENTRO del Layout
@@ -18,10 +20,11 @@ export const routes: Routes = [
     component: Layout,                                          // Layout con sidebar + topbar
     canActivate: [authGuard],                                  //  protege todo lo de adentro: exige sesión
     children: [
-      { path: 'pacientes', component: Pacientes },             // Gestión de pacientes
-      { path: 'citas', component: Citas },                     // Gestión de citas
-      { path: 'historia-clinica/:idMascota', component: HistoriaClinica }, // Expediente clínico
-      { path: 'atencion/:idCita', component: Atencion },       // Atención clínica
+      { path: 'pacientes', component: Pacientes, canActivate: [moduloGuard('pacientes')] },             // Gestión de pacientes
+      { path: 'citas', component: Citas, canActivate: [moduloGuard('citas')] },                     // Gestión de citas
+      { path: 'historia-clinica/:idMascota', component: HistoriaClinica, canActivate: [moduloGuard('pacientes')] }, // Expediente clínico
+      { path: 'atencion/:idCita', component: Atencion, canActivate: [moduloGuard('atencion clinica')] },       // Atención clínica
+      { path: 'configuracion', component: Configuracion, canActivate: [moduloGuard('configuracion')] },     // Configuración del sistema
     ]
   },
   { path: '**', redirectTo: 'login' }                          // Ruta no encontrada → login

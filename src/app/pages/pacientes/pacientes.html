@@ -68,6 +68,9 @@
 
 @if (modalNuevoVisible) {
   <app-modal title="Registrar Nuevo Paciente" subtitle="Completa la información del paciente" size="lg" (close)="modalNuevoVisible=false">
+    <app-tabs [tabs]="tabsFormulario" [activo]="tabNuevo" (activoChange)="tabNuevo=$event"></app-tabs>
+
+    @if (tabNuevo === 'paciente') {
         <div class="form-row">
           <div class="form-group">
             <label>Nombre del Paciente <span class="req">*</span></label>
@@ -85,7 +88,7 @@
         </div>
         <div class="form-row">
           <div class="form-group" style="position:relative;">
-            <label>Raza</label>
+            <label>Raza <span class="req">*</span></label>
             <input class="form-control"
               type="text"
               [(ngModel)]="razaInput"
@@ -126,7 +129,13 @@
             </select>
           </div>
         </div>
+        <div class="form-group">
+          <label>Notas Adicionales</label>
+          <textarea class="form-control" [(ngModel)]="nuevo.notas" placeholder="Ej: Alergias, condiciones especiales, etc."></textarea>
+        </div>
+    }
 
+    @if (tabNuevo === 'propietario') {
         <div class="form-row">
           <div class="form-group">
             <label>Nombre del Propietario <span class="req">*</span></label>
@@ -157,10 +166,7 @@
             <input class="form-control" [(ngModel)]="nuevo.telefono" placeholder="Ej: 999888777">
           </div>
         </div>
-        <div class="form-group">
-          <label>Notas Adicionales</label>
-          <textarea class="form-control" [(ngModel)]="nuevo.notas" placeholder="Ej: Alergias, condiciones especiales, etc."></textarea>
-        </div>
+    }
     <div class="modal-footer">
       <button class="btn btn-secondary" (click)="modalNuevoVisible=false">Cancelar</button>
       <button class="btn btn-primary" (click)="guardarNuevo()">Registrar Paciente</button>
@@ -171,6 +177,9 @@
 <!-- MODAL EDITAR PACIENTE -->
 @if (modalEditarVisible && editando) {
   <app-modal title="Editar Paciente" subtitle="Modificar datos del paciente y dueño" size="lg" (close)="modalEditarVisible=false">
+    <app-tabs [tabs]="tabsFormulario" [activo]="tabEditar" (activoChange)="tabEditar=$event"></app-tabs>
+
+    @if (tabEditar === 'paciente') {
         <div class="form-row">
           <div class="form-group">
             <label>Nombre del Paciente <span class="req">*</span></label>
@@ -206,7 +215,13 @@
             </select>
           </div>
         </div>
+        <div class="form-group">
+          <label>Notas Adicionales</label>
+          <textarea class="form-control" [(ngModel)]="editando.notas" placeholder="Ej: Alergias, condiciones especiales, etc."></textarea>
+        </div>
+    }
 
+    @if (tabEditar === 'propietario') {
         <div class="form-row">
           <div class="form-group">
             <label>Nombre del Dueño <span class="req">*</span></label>
@@ -237,10 +252,7 @@
             <input class="form-control" [(ngModel)]="editando.telefono">
           </div>
         </div>
-        <div class="form-group">
-          <label>Notas Adicionales</label>
-          <textarea class="form-control" [(ngModel)]="editando.notas" placeholder="Ej: Alergias, condiciones especiales, etc."></textarea>
-        </div>
+    }
     <div class="modal-footer">
       <button class="btn btn-secondary" (click)="modalEditarVisible=false">Cancelar</button>
       <button class="btn btn-primary" (click)="guardarEdicion()">Guardar Cambios</button>
