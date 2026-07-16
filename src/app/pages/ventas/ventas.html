@@ -1,0 +1,253 @@
+<main class="content" style="padding:16px 24px;">
+
+  <!-- POS / Registro -->
+  @if (vista === 'pos') {
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div>
+        <h1 class="page-title">Registro de Venta</h1>
+        <p class="page-subtitle">Selecciona los productos o servicios</p>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-secondary" (click)="abrirModalCliente()">👤 Registrar Cliente</button>
+        <button class="btn btn-secondary" (click)="irHistorial()">📋 Historial</button>
+      </div>
+    </div>
+
+    <div class="pos-layout">
+      <!-- PRODUCTOS -->
+      <div class="pos-products">
+        <div class="search-bar" style="margin-bottom:12px;">
+          <div class="search-input-wrap" style="flex:1;">
+            <span class="search-icon">🔍</span>
+            <input type="text" placeholder="Buscar producto..." [(ngModel)]="busquedaProducto">
+          </div>
+          <select class="filter-select" [(ngModel)]="filtroCategoria">
+            <option value="">Todas las categorías</option>
+            @for (c of categorias; track c) { <option [value]="c">{{ c }}</option> }
+          </select>
+        </div>
+
+        <div class="product-grid">
+          @for (p of productosFiltrados; track p.idProducto) {
+            <div class="product-card" [class.selected]="cantidadEnCarrito(p.idProducto) > 0">
+              <div class="product-icon">{{ icono(p) }}</div>
+              <div class="product-name">{{ p.nombre }}</div>
+              <div class="product-price">S/ {{ (p.precioVenta || 0) | number:'1.2-2' }}</div>
+              <div class="product-qty-control">
+                <div class="qty-btn" (click)="cambiarCantidad(p, -1)">−</div>
+                <span style="font-size:14px;font-weight:600;">{{ cantidadEnCarrito(p.idProducto) }}</span>
+                <div class="qty-btn" (click)="cambiarCantidad(p, 1)">+</div>
+              </div>
+            </div>
+          }
+          @if (!productosFiltrados.length) {
+            <div style="grid-column:1/-1;text-align:center;color:#94A3B8;padding:40px;">No hay productos disponibles.</div>
+          }
+        </div>
+      </div>
+
+      <!-- CHECKOUT -->
+      <div class="pos-checkout">
+        <div class="checkout-header">
+          <div style="font-weight:700;font-size:15px;margin-bottom:6px;">Resumen de Venta</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="cli-avatar">👤</div>
+            <div>
+              <div style="font-size:13px;font-weight:600;">{{ cliente.nombre || 'Cliente general' }}</div>
+              <div style="font-size:11px;color:#64748B;">{{ cliente.dni ? 'DNI: ' + cliente.dni : 'Sin identificar' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="checkout-items">
+          @for (i of carrito; track i.idProducto) {
+            <div class="checkout-item">
+              <div class="ci-icon">{{ i.icon }}</div>
+              <div style="flex:1;">
+                <div style="font-weight:600;font-size:13.5px;">{{ i.nombre }}</div>
+                <div style="font-size:12px;color:#64748B;">{{ i.cantidad }} × S/{{ i.precioUnitario | number:'1.2-2' }}</div>
+              </div>
+              <div style="font-weight:600;font-size:13.5px;">S/{{ i.precioUnitario * i.cantidad | number:'1.2-2' }}</div>
+              <button class="ci-remove" (click)="quitar(i)">×</button>
+            </div>
+          }
+          @if (!carrito.length) {
+            <div style="text-align:center;color:#94A3B8;padding:24px 0;font-size:13px;">Aún no agregas productos.</div>
+          }
+        </div>
+
+        <div class="checkout-footer">
+          <div style="margin-bottom:12px;">
+            <div style="font-weight:600;font-size:13px;margin-bottom:8px;">Método de Pago</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              @for (m of metodosPago; track m.idMetodoPago) {
+                <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;">
+                  <input type="radio" name="pago" [value]="m.idMetodoPago" [(ngModel)]="idMetodoPago"> {{ m.nombre }}
+                </label>
+              }
+            </div>
+          </div>
+
+          <div class="form-row" style="gap:10px;margin-bottom:10px;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="font-size:12px;">Comprobante</label>
+              <select class="form-control" [(ngModel)]="tipoComprobante">
+                <option value="Boleta">Boleta</option>
+                <option value="Factura">Factura</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="font-size:12px;">Recibe (efectivo)</label>
+              <input class="form-control" type="number" min="0" placeholder="S/ 0.00" [(ngModel)]="montoRecibido">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:10px;">
+            <label style="font-size:12px;">Descuento (S/)</label>
+            <input class="form-control" type="number" min="0" placeholder="0.00" [(ngModel)]="descuento">
+          </div>
+
+          <div class="total-row"><span>Subtotal:</span><span>S/{{ base | number:'1.2-2' }}</span></div>
+          <div class="total-row"><span>IGV (18%):</span><span>S/{{ igv | number:'1.2-2' }}</span></div>
+          <div class="total-row"><span>Descuento:</span><span>S/{{ (descuento || 0) | number:'1.2-2' }}</span></div>
+          <div class="total-row"><span>Vuelto:</span><span>S/{{ vuelto | number:'1.2-2' }}</span></div>
+          <div class="total-row grand"><span>Total:</span><span>S/{{ total | number:'1.2-2' }}</span></div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">
+            <button class="btn btn-secondary" (click)="cancelarVenta()">Cancelar</button>
+            <button class="btn btn-primary" (click)="confirmarVenta()">Confirmar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Historial -->
+  @if (vista === 'historial') {
+    <div class="page-header">
+      <div class="page-header-row">
+        <div>
+          <h1 class="page-title">Historial de Ventas</h1>
+          <p class="page-subtitle">Registro de todas las transacciones</p>
+        </div>
+        <div class="page-header-actions">
+          <button class="btn btn-primary" (click)="irPos()">+ Nueva Venta</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body" style="padding-bottom:0;">
+        <div class="search-bar" style="margin-bottom:0;">
+          <div class="search-input-wrap" style="flex:2;">
+            <span class="search-icon">🔍</span>
+            <input type="text" placeholder="Buscar por cliente o comprobante..." [(ngModel)]="filtro.q" (ngModelChange)="onFiltroChange()">
+          </div>
+          <select class="filter-select" [(ngModel)]="filtro.tipoComprobante" (ngModelChange)="onFiltroChange()">
+            <option value="">Todos los comprobantes</option>
+            <option value="Boleta">Boleta</option>
+            <option value="Factura">Factura</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Código</th><th>Fecha</th><th>Cliente</th><th>Comprobante</th>
+              <th>Método</th><th>Total</th><th>Estado</th><th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (v of ventasPaginadas; track v.idVenta) {
+              <tr>
+                <td class="text-muted text-sm">{{ v.codigoVenta }}</td>
+                <td class="text-muted text-sm">{{ v.fechaVenta | date:'dd/MM/yyyy' }}</td>
+                <td><span style="font-weight:600;">{{ v.cliente || 'Cliente general' }}</span></td>
+                <td class="text-muted text-sm">{{ v.tipoComprobante }}</td>
+                <td class="text-muted text-sm">{{ v.metodoPago }}</td>
+                <td style="font-weight:600;">S/ {{ v.total | number:'1.2-2' }}</td>
+                <td><app-badge [estado]="estadoTexto(v.estadoVenta)"></app-badge></td>
+                <td>
+                  <div class="table-actions">
+                    <button class="btn btn-sm btn-secondary" title="Ver" (click)="verDetalle(v)">👁</button>
+                    <button class="btn btn-sm btn-secondary" title="Imprimir" (click)="imprimir(v)">🖨</button>
+                    @if (v.estadoVenta === 1) {
+                      <button class="btn btn-sm" style="background:#FEE2E2;color:#DC2626;" title="Anular" (click)="anular(v)">🗑</button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+            @if (!ventasPaginadas.length) {
+              <tr><td colspan="8" style="text-align:center;color:#94A3B8;padding:32px;">No hay ventas registradas.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    @if (totalPaginas > 1) {
+      <app-pagination [paginaActual]="paginaActual" [totalPaginas]="totalPaginas" (cambiar)="cambiarPagina($event)"></app-pagination>
+    }
+  }
+</main>
+
+<!-- MODAL: REGISTRAR CLIENTE -->
+@if (modalClienteVisible) {
+  <app-modal title="Registrar Cliente" size="sm" (close)="modalClienteVisible=false">
+    <div class="form-group">
+      <label>Nombre completo <span class="req">*</span></label>
+      <input class="form-control" placeholder="Nombre del cliente" [(ngModel)]="nuevoCliente.nombre">
+    </div>
+    <div class="form-group">
+      <label>DNI <span class="req">*</span></label>
+      <input class="form-control" placeholder="Ej: 75897634" [(ngModel)]="nuevoCliente.dni">
+    </div>
+    <div class="form-group">
+      <label>Teléfono</label>
+      <input class="form-control" placeholder="Ej: 999888777" [(ngModel)]="nuevoCliente.telefono">
+    </div>
+    <div modal-footer>
+      <button class="btn btn-secondary" (click)="modalClienteVisible=false">Cancelar</button>
+      <button class="btn btn-primary" (click)="guardarCliente()">Guardar</button>
+    </div>
+  </app-modal>
+}
+
+<!-- MODAL: DETALLE DE VENTA -->
+@if (modalDetalleVisible && ventaDetalle) {
+  <app-modal [title]="'Venta ' + ventaDetalle.codigoVenta" [subtitle]="ventaDetalle.tipoComprobante" (close)="modalDetalleVisible=false">
+    <div class="detalle-venta">
+      <div class="dv-row"><span>Cliente</span><b>{{ ventaDetalle.nombreComprador || 'Cliente general' }}</b></div>
+      <div class="dv-row"><span>DNI</span><b>{{ ventaDetalle.dniComprador || '—' }}</b></div>
+      <div class="dv-row"><span>Fecha</span><b>{{ ventaDetalle.fechaVenta | date:'dd/MM/yyyy HH:mm' }}</b></div>
+      <div class="dv-row"><span>Método de pago</span><b>{{ ventaDetalle.metodoPago }}</b></div>
+    </div>
+    <div class="table-wrap" style="margin-top:10px;">
+      <table>
+        <thead><tr><th>Ítem</th><th>Tipo</th><th>Cant.</th><th>P. Unit.</th><th>Subtotal</th></tr></thead>
+        <tbody>
+          @for (l of ventaDetalle.items; track l.idVentaDetalle) {
+            <tr>
+              <td>{{ l.nombreItem }}</td>
+              <td class="text-muted text-sm">{{ l.tipo }}</td>
+              <td>{{ l.cantidad }}</td>
+              <td>S/ {{ l.precioUnitario | number:'1.2-2' }}</td>
+              <td>S/ {{ l.subtotal | number:'1.2-2' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="detalle-venta" style="margin-top:10px;">
+      <div class="dv-row"><span>Subtotal</span><b>S/ {{ ventaDetalle.subTotal | number:'1.2-2' }}</b></div>
+      <div class="dv-row"><span>IGV</span><b>S/ {{ ventaDetalle.igv | number:'1.2-2' }}</b></div>
+      <div class="dv-row"><span>Descuento</span><b>S/ {{ ventaDetalle.descuento | number:'1.2-2' }}</b></div>
+      <div class="dv-row grand"><span>Total</span><b>S/ {{ ventaDetalle.total | number:'1.2-2' }}</b></div>
+    </div>
+    <div modal-footer>
+      <button class="btn btn-secondary" (click)="modalDetalleVisible=false">Cerrar</button>
+    </div>
+  </app-modal>
+}
