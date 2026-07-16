@@ -1,0 +1,188 @@
+<main class="content">
+  <div class="page-header">
+    <div class="page-header-row">
+      <div>
+        <h1 class="page-title">Gestión de Inventario</h1>
+        <p class="page-subtitle">Controla el stock de medicinas y productos</p>
+      </div>
+      <div class="page-header-actions">
+        @if (tab === 'productos') { <button class="btn btn-primary" (click)="abrirNuevoProd()">+ Nuevo Producto</button> }
+        @if (tab === 'movimientos') { <button class="btn btn-primary" (click)="abrirNuevoMov()">+ Agregar Movimiento</button> }
+      </div>
+    </div>
+  </div>
+
+  <div class="inv-tabs">
+    <button class="btn btn-sm" [class.btn-navy]="tab==='productos'" [class.btn-secondary]="tab!=='productos'" (click)="cambiarTab('productos')">Productos</button>
+    <button class="btn btn-sm" [class.btn-navy]="tab==='movimientos'" [class.btn-secondary]="tab!=='movimientos'" (click)="cambiarTab('movimientos')">Movimientos</button>
+  </div>
+
+  <!-- Productos -->
+  @if (tab === 'productos') {
+    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;">
+      <div class="stat-card"><div class="stat-label">Items en Inventario</div><div class="stat-value">{{ stats.items }}</div><div class="stat-sub">{{ stats.categorias }} categorías</div></div>
+      <div class="stat-card"><div class="stat-label">Bajo Stock</div><div class="stat-value stat-danger">{{ stats.bajoStock }}</div><div class="stat-sub">Requieren reposición</div></div>
+      <div class="stat-card"><div class="stat-label">Valor Total</div><div class="stat-value stat-success">S/ {{ stats.valorTotal | number:'1.2-2' }}</div><div class="stat-sub">Valor total inventario</div></div>
+    </div>
+
+    @if (stats.bajoStock > 0) {
+      <div class="inv-alert">⚠️ <span><strong>Alerta de Stock Bajo:</strong> {{ stats.bajoStock }} producto(s) por debajo del stock mínimo requerido.</span></div>
+    }
+
+    <div class="card">
+      <div class="card-body" style="padding-bottom:0;">
+        <div class="search-bar" style="margin-bottom:0;">
+          <div class="search-input-wrap" style="flex:2;">
+            <span class="search-icon">🔍</span>
+            <input type="text" placeholder="Buscar producto..." [(ngModel)]="filtroProd.q" (ngModelChange)="onFiltroProd()">
+          </div>
+          <select class="filter-select" [(ngModel)]="filtroProd.idCategoria" (ngModelChange)="cargarProductos()">
+            <option value="">Todas las categorías</option>
+            @for (c of categorias; track c.idCategoria) { <option [value]="c.idCategoria">{{ c.nombreCategoria }}</option> }
+          </select>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Producto</th><th>Categoría</th><th>Stock</th><th>Precio</th><th>Proveedor</th><th>Vencimiento</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody>
+            @for (p of productosPag; track p.idProducto) {
+              <tr>
+                <td><div style="font-weight:600;">{{ p.nombre }}</div></td>
+                <td class="text-muted text-sm">{{ p.categoria || '—' }}</td>
+                <td>
+                  <div style="font-size:13px;"><span [style.color]="claseStock(p)==='danger' ? '#DC2626' : (claseStock(p)==='warning' ? '#D97706' : '#16A34A')" style="font-weight:600;">{{ p.stock }}</span> / Min: {{ p.cantidadMinima }}</div>
+                  <div class="progress-bar" style="margin-top:4px;"><div class="progress-fill" [class.danger]="claseStock(p)==='danger'" [class.warning]="claseStock(p)==='warning'" [class.success]="claseStock(p)==='success'" [style.width.%]="porcentajeStock(p)"></div></div>
+                </td>
+                <td style="font-weight:600;">S/ {{ p.precioVenta | number:'1.2-2' }}</td>
+                <td class="text-muted text-sm">{{ p.proveedor || '—' }}</td>
+                <td class="text-muted text-sm">{{ p.fechaVencimiento ? (p.fechaVencimiento | date:'dd/MM/yyyy') : 'Sin venc.' }}</td>
+                <td><app-badge [estado]="badgeStock(p)"></app-badge></td>
+                <td><div class="table-actions">
+                  <button class="btn btn-sm btn-secondary" (click)="abrirEditarProd(p)">✏️</button>
+                  <button class="btn btn-sm" style="background:#FEE2E2;color:#DC2626;" (click)="eliminarProd(p)">🗑</button>
+                </div></td>
+              </tr>
+            }
+            @if (!productos.length) { <tr><td colspan="8" style="text-align:center;color:#94A3B8;padding:28px;">No hay productos registrados.</td></tr> }
+          </tbody>
+        </table>
+      </div>
+    </div>
+    @if (totalPagProd > 1) {
+      <app-pagination [paginaActual]="pagProd" [totalPaginas]="totalPagProd" (cambiar)="cambiarPagProd($event)"></app-pagination>
+    }
+  }
+
+  <!-- Movimientos -->
+  @if (tab === 'movimientos') {
+    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;">
+      <div class="stat-card"><div class="stat-label">Entradas (mes)</div><div class="stat-value stat-success">{{ movStats.entradas }}</div><div class="stat-sub">Ingreso stock</div></div>
+      <div class="stat-card"><div class="stat-label">Salidas (mes)</div><div class="stat-value stat-danger">{{ movStats.salidas }}</div><div class="stat-sub">Uso y despacho</div></div>
+      <div class="stat-card"><div class="stat-label">Ajustes (mes)</div><div class="stat-value stat-warning">{{ movStats.ajustes }}</div><div class="stat-sub">Correcciones</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-body" style="padding-bottom:0;">
+        <div class="search-bar" style="margin-bottom:0;">
+          <div class="search-input-wrap" style="flex:2;">
+            <span class="search-icon">🔍</span>
+            <input type="text" placeholder="Buscar producto..." [(ngModel)]="filtroMov.q" (ngModelChange)="onFiltroMov()">
+          </div>
+          <select class="filter-select" [(ngModel)]="filtroMov.idClaseMovimiento" (ngModelChange)="cargarMovimientos()">
+            <option value="">Todos los tipos</option>
+            @for (c of clases; track c.idClaseMovimiento) { <option [value]="c.idClaseMovimiento">{{ c.descripcion }}</option> }
+          </select>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Fecha</th><th>Producto</th><th>Tipo</th><th>Cantidad</th><th>Stock Ant.</th><th>Stock Nuevo</th><th>Motivo</th><th>Empleado</th></tr></thead>
+          <tbody>
+            @for (m of movimientosPag; track m.idMovimiento) {
+              <tr>
+                <td class="text-muted text-sm">{{ m.fecha | date:'dd/MM/yyyy' }}</td>
+                <td style="font-weight:600;">{{ m.producto }}</td>
+                <td><app-badge [estado]="badgeTipo(m.tipo)"></app-badge></td>
+                <td [style.color]="signo(m.tipo)==='-' ? '#DC2626' : '#16A34A'" style="font-weight:600;">{{ signo(m.tipo) }}{{ m.cantidad }}</td>
+                <td class="text-muted">{{ m.stockAnterior }}</td>
+                <td style="font-weight:600;">{{ m.stockNuevo }}</td>
+                <td class="text-muted text-sm">{{ m.motivo }}</td>
+                <td class="text-muted text-sm">{{ m.empleado }}</td>
+              </tr>
+            }
+            @if (!movimientos.length) { <tr><td colspan="8" style="text-align:center;color:#94A3B8;padding:28px;">No hay movimientos registrados.</td></tr> }
+          </tbody>
+        </table>
+      </div>
+    </div>
+    @if (totalPagMov > 1) {
+      <app-pagination [paginaActual]="pagMov" [totalPaginas]="totalPagMov" (cambiar)="cambiarPagMov($event)"></app-pagination>
+    }
+  }
+</main>
+
+<!-- MODAL: PRODUCTO -->
+@if (modalProdVisible) {
+  <app-modal [title]="editandoProd ? 'Editar Producto' : 'Nuevo Producto'" subtitle="Datos del producto" (close)="modalProdVisible=false">
+    <div class="form-group"><label>Nombre del Producto <span class="req">*</span></label><input class="form-control" [(ngModel)]="formProd.nombre"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Categoría <span class="req">*</span></label>
+        <select class="form-control" [(ngModel)]="formProd.idCategoria">
+          <option value="">Seleccionar</option>
+          @for (c of categorias; track c.idCategoria) { <option [value]="c.idCategoria">{{ c.nombreCategoria }}</option> }
+        </select>
+      </div>
+      <div class="form-group"><label>Concentración / Unidad</label><input class="form-control" [(ngModel)]="formProd.concentracion" placeholder="Ej: Cápsulas"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Stock Actual <span class="req">*</span></label><input class="form-control" type="number" [(ngModel)]="formProd.cantidadIngreso"></div>
+      <div class="form-group"><label>Stock Mínimo <span class="req">*</span></label><input class="form-control" type="number" [(ngModel)]="formProd.cantidadMinima"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Precio Venta <span class="req">*</span></label><input class="form-control" type="number" [(ngModel)]="formProd.precioVenta"></div>
+      <div class="form-group"><label>Precio Compra</label><input class="form-control" type="number" [(ngModel)]="formProd.precioCompra"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Proveedor</label><input class="form-control" [(ngModel)]="formProd.proveedor"></div>
+      <div class="form-group"><label>Fecha de Vencimiento</label><input class="form-control" type="date" [(ngModel)]="formProd.fechaVencimiento"></div>
+    </div>
+    <div class="form-group"><label>Notas</label><textarea class="form-control" [(ngModel)]="formProd.notas"></textarea></div>
+    <div modal-footer>
+      <button class="btn btn-secondary" (click)="modalProdVisible=false">Cancelar</button>
+      <button class="btn btn-primary" (click)="guardarProd()">{{ editandoProd ? 'Guardar Cambios' : 'Crear Producto' }}</button>
+    </div>
+  </app-modal>
+}
+
+<!-- MODAL: MOVIMIENTO -->
+@if (modalMovVisible) {
+  <app-modal title="Registrar Movimiento" subtitle="Entrada, salida o ajuste de stock" (close)="modalMovVisible=false">
+    <div class="form-group"><label>Producto <span class="req">*</span></label>
+      <select class="form-control" [(ngModel)]="formMov.idProducto">
+        <option value="">Seleccionar producto</option>
+        @for (p of catalogoProd; track p.idProducto) { <option [value]="p.idProducto">{{ p.nombre }} (stock: {{ p.stock }})</option> }
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Tipo de Movimiento <span class="req">*</span></label>
+        <select class="form-control" [(ngModel)]="formMov.idClaseMovimiento">
+          <option value="">Seleccionar</option>
+          @for (c of clases; track c.idClaseMovimiento) { <option [value]="c.idClaseMovimiento">{{ c.descripcion }}</option> }
+        </select>
+      </div>
+      <div class="form-group"><label>Cantidad <span class="req">*</span></label><input class="form-control" type="number" min="1" [(ngModel)]="formMov.cantidad"></div>
+    </div>
+    <div class="form-group"><label>Motivo <span class="req">*</span></label>
+      <select class="form-control" [(ngModel)]="formMov.idMotivoMovimiento">
+        <option value="">Seleccionar motivo</option>
+        @for (mo of motivos; track mo.idMotivoMovimiento) { <option [value]="mo.idMotivoMovimiento">{{ mo.descripcion }}</option> }
+      </select>
+    </div>
+    <div class="form-group"><label>Observaciones</label><textarea class="form-control" [(ngModel)]="formMov.observaciones"></textarea></div>
+    <div modal-footer>
+      <button class="btn btn-secondary" (click)="modalMovVisible=false">Cancelar</button>
+      <button class="btn btn-primary" (click)="guardarMov()">Guardar Movimiento</button>
+    </div>
+  </app-modal>
+}

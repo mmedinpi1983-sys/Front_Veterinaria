@@ -3,6 +3,9 @@
     <img src="IMG.png" alt="VetClinic" style="width:130px;display:block;margin:0 auto;filter:invert(1) contrast(4);mix-blend-mode:screen;">
   </div>
   <nav class="sidebar-nav">
+    @if (acceso?.superAdmin || acceso?.modulos?.includes('dashboard')) {
+      <div class="nav-item" routerLink="/dashboard" routerLinkActive="active"><span class="material-icons">dashboard</span> Dashboard</div>
+    }
     @if (acceso?.superAdmin || acceso?.modulos?.includes('pacientes')) {
       <div class="nav-item" routerLink="/pacientes" routerLinkActive="active"><span class="material-icons">pets</span> Pacientes</div>
     }
@@ -11,6 +14,9 @@
     }
     @if (acceso?.superAdmin || acceso?.modulos?.includes('atencion clinica')) {
       <div class="nav-item" style="opacity:0.5;cursor:default;"><span class="material-icons">local_hospital</span> Atención Clínica</div>
+    }
+    @if (acceso?.superAdmin || acceso?.modulos?.includes('ventas')) {
+      <div class="nav-item" routerLink="/ventas" routerLinkActive="active"><span class="material-icons">shopping_cart</span> Ventas</div>
     }
     @if (acceso?.superAdmin || acceso?.modulos?.includes('configuracion')) {
       <div class="nav-item" routerLink="/configuracion" routerLinkActive="active"><span class="material-icons">settings</span> Configuración</div>

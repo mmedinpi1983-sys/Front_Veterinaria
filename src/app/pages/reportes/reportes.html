@@ -1,0 +1,152 @@
+<main class="content">
+  <div class="page-header">
+    <div class="page-header-row">
+      <div>
+        <h1 class="page-title">Reportes y Estadísticas</h1>
+        <p class="page-subtitle">Análisis y métricas de la clínica</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-secondary" (click)="abrirFiltros()">🔧 Filtros / Generar Reporte</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid" style="margin-bottom:20px;">
+    <div class="stat-card">
+      <div class="stat-label">Ingresos del Mes</div>
+      <div class="stat-value stat-success">S/ {{ resumen.ingresosMes | number:'1.2-2' }}</div>
+      <div class="stat-sub">{{ variacion(resumen.ingresosMes, resumen.ingresosMesAnterior) === null ? 'Sin datos previos' : (variacion(resumen.ingresosMes, resumen.ingresosMesAnterior)! >= 0 ? '+' : '') + variacion(resumen.ingresosMes, resumen.ingresosMesAnterior) + '% vs mes anterior' }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Citas Atendidas</div>
+      <div class="stat-value stat-accent">{{ resumen.citasAtendidas }}</div>
+      <div class="stat-sub">{{ variacion(resumen.citasAtendidas, resumen.citasAtendidasAnterior) === null ? 'Sin datos previos' : (variacion(resumen.citasAtendidas, resumen.citasAtendidasAnterior)! >= 0 ? '+' : '') + variacion(resumen.citasAtendidas, resumen.citasAtendidasAnterior) + '% vs mes anterior' }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Productos Vendidos</div>
+      <div class="stat-value">{{ resumen.productosVendidos }}</div>
+      <div class="stat-sub">{{ variacion(resumen.productosVendidos, resumen.productosVendidosAnterior) === null ? 'Sin datos previos' : (variacion(resumen.productosVendidos, resumen.productosVendidosAnterior)! >= 0 ? '+' : '') + variacion(resumen.productosVendidos, resumen.productosVendidosAnterior) + '% vs mes anterior' }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Pacientes Nuevos</div>
+      <div class="stat-value stat-warning">{{ resumen.pacientesNuevos }}</div>
+      <div class="stat-sub">{{ variacion(resumen.pacientesNuevos, resumen.pacientesNuevosAnterior) === null ? 'Sin datos previos' : (variacion(resumen.pacientesNuevos, resumen.pacientesNuevosAnterior)! >= 0 ? '+' : '') + variacion(resumen.pacientesNuevos, resumen.pacientesNuevosAnterior) + ' vs mes anterior' }}</div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:20px;">
+    <!-- CITAS POR DIA -->
+    <div class="card">
+      <div class="card-header"><span class="card-title">📅 Citas por día (semana actual)</span></div>
+      <div class="card-body">
+        <div class="bar-chart">
+          @for (d of citasSemana; track d.etiqueta) {
+            <div class="bar-col">
+              <div class="bar-stack">
+                <div class="bar bar-a" [style.height.%]="altura(d.atendidas, maxSemana)" [title]="d.atendidas + ' atendidas'"></div>
+                <div class="bar bar-c" [style.height.%]="altura(d.canceladas, maxSemana)" [title]="d.canceladas + ' canceladas'"></div>
+              </div>
+              <div class="bar-label">{{ d.etiqueta }}</div>
+            </div>
+          }
+        </div>
+        <div class="leyenda"><span><i class="dot dot-a"></i> Atendidas</span><span><i class="dot dot-c"></i> Canceladas</span></div>
+      </div>
+    </div>
+
+    <!-- INGRESOS POR CATEGORIA -->
+    <div class="card">
+      <div class="card-header"><span class="card-title">💰 Ingresos por categoría</span></div>
+      <div class="card-body" style="display:flex;align-items:center;gap:20px;">
+        <div class="dona" [style.background]="gradiente"><div class="dona-hole"></div></div>
+        <div style="flex:1;">
+          @for (c of ingresosCategoria; track c.categoria; let i = $index) {
+            <div class="cat-row">
+              <span class="dot" [style.background]="colores[i % colores.length]"></span>
+              <span style="flex:1;">{{ c.categoria }}</span>
+              <span style="font-weight:600;">S/ {{ c.total | number:'1.2-2' }}</span>
+              <span style="color:#64748B;font-size:12px;">{{ pct(c.total) }}%</span>
+            </div>
+          }
+          @if (!ingresosCategoria.length) { <div style="color:#94A3B8;font-size:13px;">Sin ventas registradas.</div> }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- PRODUCTOS MAS VENDIDOS -->
+    <div class="card">
+      <div class="card-header"><span class="card-title">🏆 Productos más vendidos</span></div>
+      <div class="card-body">
+        @for (p of productosTop; track p.nombre) {
+          <div class="hbar-row">
+            <div class="hbar-label">{{ p.nombre }}</div>
+            <div class="hbar-track"><div class="hbar-fill" [style.width.%]="altura(p.cantidad, maxTop)"></div></div>
+            <div class="hbar-val">{{ p.cantidad }}</div>
+          </div>
+        }
+        @if (!productosTop.length) { <div style="color:#94A3B8;font-size:13px;text-align:center;padding:16px;">Sin productos vendidos aún.</div> }
+      </div>
+    </div>
+
+    <!-- PACIENTES NUEVOS -->
+    <div class="card">
+      <div class="card-header"><span class="card-title">🐾 Pacientes nuevos por mes</span></div>
+      <div class="card-body">
+        <div class="bar-chart">
+          @for (m of pacientesMes; track m.etiqueta) {
+            <div class="bar-col">
+              <div class="bar-value">{{ m.cantidad }}</div>
+              <div class="bar bar-a" [style.height.%]="altura(m.cantidad, maxMes)"></div>
+              <div class="bar-label">{{ m.etiqueta }}</div>
+            </div>
+          }
+          @if (!pacientesMes.length) { <div style="color:#94A3B8;font-size:13px;">Sin datos.</div> }
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- MODAL: FILTROS / DETALLE -->
+@if (modalFiltrosVisible) {
+  <app-modal title="Filtros y Generación de Reporte" subtitle="Aplica filtros para ver el detalle de ventas" size="lg" (close)="modalFiltrosVisible=false">
+    <div class="form-row" style="grid-template-columns:1fr 1fr 1fr;">
+      <div class="form-group"><label>Fecha Inicio</label><input class="form-control" type="date" [(ngModel)]="filtro.fechaInicio"></div>
+      <div class="form-group"><label>Fecha Fin</label><input class="form-control" type="date" [(ngModel)]="filtro.fechaFin"></div>
+      <div class="form-group"><label>Tipo de reporte</label>
+        <select class="form-control" [(ngModel)]="filtro.tipo"><option>Todo</option><option>Ventas</option></select>
+      </div>
+    </div>
+    <div style="background:#F8FAFC;border-radius:8px;padding:14px;">
+      <div style="font-weight:600;color:#1E293B;margin-bottom:8px;font-size:13px;">Resultados · {{ detalle.length }} registro(s)</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Fecha</th><th>Cliente</th><th>Ítem</th><th>Vendedor</th><th style="text-align:right;">Total</th></tr></thead>
+          <tbody>
+            @for (r of detallePag; track $index) {
+              <tr>
+                <td class="text-sm">{{ r.fecha | date:'dd/MM/yyyy' }}</td>
+                <td class="text-sm">{{ r.cliente || 'Cliente general' }}</td>
+                <td class="text-sm">{{ r.item }}</td>
+                <td class="text-sm">{{ r.vendedor }}</td>
+                <td class="text-sm" style="text-align:right;">S/ {{ r.total | number:'1.2-2' }}</td>
+              </tr>
+            }
+            @if (!detalle.length) { <tr><td colspan="5" style="text-align:center;color:#94A3B8;padding:20px;">Sin registros en el rango.</td></tr> }
+          </tbody>
+        </table>
+      </div>
+      @if (totalPagDet > 1) {
+        <app-pagination [paginaActual]="pagDet" [totalPaginas]="totalPagDet" (cambiar)="cambiarPagDet($event)"></app-pagination>
+      }
+    </div>
+    <div modal-footer>
+      <button class="btn btn-secondary" (click)="limpiar()">Limpiar Filtros</button>
+      <button class="btn btn-secondary" (click)="modalFiltrosVisible=false">Cerrar</button>
+      <button class="btn btn-primary" (click)="generar()">Generar Reporte</button>
+    </div>
+  </app-modal>
+}

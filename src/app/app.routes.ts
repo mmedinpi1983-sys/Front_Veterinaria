@@ -1,10 +1,12 @@
 import { Routes } from '@angular/router';
 import { Login } from './pages/login/login';
 import { Layout } from './shared/components/layout/layout';
+import { Dashboard } from './pages/dashboard/dashboard';
 import { Citas } from './pages/citas/citas';
 import { Pacientes } from './pages/pacientes/pacientes';
 import { Atencion } from './pages/atencion/atencion';
 import { HistoriaClinica } from './pages/historia-clinica/historia-clinica';
+import { Ventas } from './pages/ventas/ventas';
 import { Configuracion } from './pages/configuracion/configuracion';
 import { authGuard } from './guards/auth.guard';
 import { moduloGuard } from './guards/modulo.guard';
@@ -20,10 +22,12 @@ export const routes: Routes = [
     component: Layout,                                          // Layout con sidebar + topbar
     canActivate: [authGuard],                                  //  protege todo lo de adentro: exige sesión
     children: [
+      { path: 'dashboard', component: Dashboard, canActivate: [moduloGuard('dashboard')] },            // Panel de indicadores
       { path: 'pacientes', component: Pacientes, canActivate: [moduloGuard('pacientes')] },             // Gestión de pacientes
       { path: 'citas', component: Citas, canActivate: [moduloGuard('citas')] },                     // Gestión de citas
       { path: 'historia-clinica/:idMascota', component: HistoriaClinica, canActivate: [moduloGuard('pacientes')] }, // Expediente clínico
       { path: 'atencion/:idCita', component: Atencion, canActivate: [moduloGuard('atencion clinica')] },       // Atención clínica
+      { path: 'ventas', component: Ventas, canActivate: [moduloGuard('ventas')] },                   // Ventas (POS + historial)
       { path: 'configuracion', component: Configuracion, canActivate: [moduloGuard('configuracion')] },     // Configuración del sistema
     ]
   },
