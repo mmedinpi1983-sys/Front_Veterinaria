@@ -22,13 +22,13 @@ export const routes: Routes = [
     component: Layout,                                          // Layout con sidebar + topbar
     canActivate: [authGuard],                                  //  protege todo lo de adentro: exige sesión
     children: [
-      { path: 'dashboard', component: Dashboard, canActivate: [moduloGuard('dashboard')] },            // Panel de indicadores
-      { path: 'pacientes', component: Pacientes, canActivate: [moduloGuard('pacientes')] },             // Gestión de pacientes
-      { path: 'citas', component: Citas, canActivate: [moduloGuard('citas')] },                     // Gestión de citas
-      { path: 'historia-clinica/:idMascota', component: HistoriaClinica, canActivate: [moduloGuard('pacientes')] }, // Expediente clínico
-      { path: 'atencion/:idCita', component: Atencion, canActivate: [moduloGuard('atencion clinica')] },       // Atención clínica
-      { path: 'ventas', component: Ventas, canActivate: [moduloGuard('ventas')] },                   // Ventas (POS + historial)
-      { path: 'configuracion', component: Configuracion, canActivate: [moduloGuard('configuracion')] },     // Configuración del sistema
+      { path: 'dashboard', component: Dashboard, canActivate: [moduloGuard('dashboard')] },                           // Panel de indicadores
+      { path: 'pacientes', component: Pacientes, canActivate: [moduloGuard('pacientes')] },                          // Gestión de pacientes
+      { path: 'citas', component: Citas, canActivate: [moduloGuard('citas')] },                                      // Gestión de citas
+      { path: 'historia-clinica/:idMascota', component: HistoriaClinica, canActivate: [moduloGuard('pacientes')] },  // Expediente clínico
+      { path: 'atencion/:idCita', component: Atencion, canActivate: [moduloGuard('atencion clinica')] },             // Atención clínica
+      { path: 'ventas', component: Ventas, canActivate: [moduloGuard('ventas')] },                                   // Ventas (POS + historial)
+      { path: 'configuracion', component: Configuracion, canActivate: [moduloGuard('configuracion')] },              // Configuración del sistema
     ]
   },
   { path: '**', redirectTo: 'login' }                          // Ruta no encontrada → login

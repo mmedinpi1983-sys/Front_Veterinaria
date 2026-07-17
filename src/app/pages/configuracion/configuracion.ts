@@ -12,6 +12,7 @@ import {
   Medicamento, MedicamentoForm, Diagnostico, DiagnosticoForm, UsuarioForm, ConfiguracionSistemaForm
 } from './configuracion.model';
 
+
 function usuarioFormVacio(): UsuarioForm {
   return {
     nombreEmpleado: '', apellidoPaterno: '', apellidoMaterno: '', nroDocumento: '',
@@ -79,9 +80,9 @@ export class Configuracion implements OnInit {
   sistemaId: number | null = null;
 
   constructor(
-    private configService: ConfiguracionService,
-    private authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private readonly configService: ConfiguracionService,
+    private readonly authService: AuthService,
+    private readonly cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {

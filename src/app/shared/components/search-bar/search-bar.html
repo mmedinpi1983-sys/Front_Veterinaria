@@ -1,4 +1,4 @@
-<div class="search-input-wrap" style="flex:2;">
-  <span class="material-icons search-icon" >search</span>
-  <input type="text" [placeholder]="placeholder" [value]="texto" #inp (input)="onInput(inp.value)">
+<div class="search-input-wrap search-input-wrap-wide">
+  <span class="material-icons search-icon">search</span>
+  <input type="text" [placeholder]="placeholder" [attr.aria-label]="placeholder" [value]="texto" #inp (input)="onInput(inp.value)">
 </div>

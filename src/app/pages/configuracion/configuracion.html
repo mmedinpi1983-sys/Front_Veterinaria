@@ -3,34 +3,50 @@
     <h1 class="page-title">Configuración del Sistema</h1>
   </div>
 
-  <div style="margin-bottom:20px;">
+  <div class="tabs-wrap">
     <app-tabs [tabs]="tabsPrincipal" [activo]="tabActivo" (activoChange)="tabActivo=$event"></app-tabs>
   </div>
 
   <!-- ================= VETERINARIA ================= -->
+
   @if (tabActivo === 'veterinaria' && veterinaria) {
-    <div class="card" style="max-width:680px;">
-      <div class="card-header"><span class="card-title" style="display:inline-flex;align-items:center;gap:6px;"><span class="material-icons" style="font-size:18px;">local_hospital</span>Datos de la Veterinaria</span></div>
+    <div class="card card-veterinaria">
+      <div class="card-header"><span class="card-title"><span class="material-icons">local_hospital</span>Datos de la Veterinaria</span></div>
       <div class="card-body">
         <div class="form-row">
-          <div class="form-group"><label>Nombre de Veterinaria</label><input class="form-control" [(ngModel)]="veterinaria.nombre" placeholder="Ej: VetClinic"></div>
-          <div class="form-group"><label>RUC</label><input class="form-control" [(ngModel)]="veterinaria.ruc" placeholder="Ej: 20146512871"></div>
+          <div class="form-group" id="nombreVeterinaria">
+            <label for="nombreVeterinariaInput">Nombre de Veterinaria</label>
+            <input class="form-control" id="nombreVeterinariaInput" [(ngModel)]="veterinaria.nombre" placeholder="Ej: VetClinic">
+          </div>
+          <div class="form-group" id="ruc">
+            <label for="rucInput">RUC</label>
+            <input class="form-control" id="rucInput" [(ngModel)]="veterinaria.ruc" placeholder="Ej: 20146512871">
+          </div>
         </div>
         <div class="form-row">
-          <div class="form-group"><label>Correo Electrónico</label><input class="form-control" [(ngModel)]="veterinaria.correoElectronico" placeholder="vetclinic@vetclinic.com"></div>
-          <div class="form-group"><label>Teléfono</label><input class="form-control" [(ngModel)]="veterinaria.nroTelefono" placeholder="(01)2354-123"></div>
+          <div class="form-group" id="correoElectronico">
+            <label for="correoElectronicoInput">Correo Electrónico</label>
+            <input class="form-control" id="correoElectronicoInput" [(ngModel)]="veterinaria.correoElectronico" placeholder="vetclinic@vetclinic.com">
+          </div>
+          <div class="form-group" id="telefono">
+            <label for="telefonoInput">Teléfono</label>
+            <input class="form-control" id="telefonoInput" [(ngModel)]="veterinaria.nroTelefono" placeholder="(01)2354-123">
+          </div>
         </div>
-        <div class="form-group"><label>Dirección</label><input class="form-control" [(ngModel)]="veterinaria.direccion" placeholder="Ej: Av. Lima"></div>
+        <div class="form-group" id="direccion">
+          <label for="direccionInput">Dirección</label>
+          <input class="form-control" id="direccionInput" [(ngModel)]="veterinaria.direccion" placeholder="Ej: Av. Lima">
+        </div>
         <div class="form-group">
-          <label>Días de atención</label>
-          <select class="form-control" [(ngModel)]="veterinaria.diasAtencion">
+          <label for="diasAtencionInput">Días de atención</label>
+          <select class="form-control" id="diasAtencionInput" [(ngModel)]="veterinaria.diasAtencion">
             <option value="">Seleccionar</option>
             <option value="Lunes a Viernes">Lunes a Viernes</option>
             <option value="Lunes a Sábado">Lunes a Sábado</option>
             <option value="Todos los días">Todos los días</option>
           </select>
         </div>
-        <div style="display:flex;justify-content:flex-end;">
+        <div class="actions-end">
           <button class="btn btn-primary" (click)="guardarVeterinaria()">Guardar Configuración</button>
         </div>
       </div>
@@ -38,10 +54,11 @@
   }
 
   <!-- ================= USUARIOS ================= -->
+
   @if (tabActivo === 'usuarios') {
-    <div class="card" style="margin-bottom:20px;">
+    <div class="card card-mb">
       <div class="card-header">
-        <span class="card-title" style="display:inline-flex;align-items:center;gap:6px;"><span class="material-icons" style="font-size:18px;">group</span>Administra usuarios y permisos del sistema</span>
+        <span class="card-title"><span class="material-icons">group</span>Administra usuarios y permisos del sistema</span>
         <button class="btn btn-primary btn-sm" (click)="abrirNuevoUsuario()">+ Nuevo Usuario</button>
       </div>
       <div class="table-wrap">
@@ -49,7 +66,7 @@
           <thead><tr><th>Nombre</th><th>Apellidos</th><th>Email</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
           <tbody>
             @if (empleados.length === 0) {
-              <tr><td colspan="6" style="text-align:center;padding:32px;color:#64748B;">No hay usuarios registrados</td></tr>
+              <tr><td colspan="6" class="empty-row">No hay usuarios registrados</td></tr>
             }
             @for (e of empleados; track e.idEmpleadoAsociado) {
               <tr>
@@ -59,11 +76,11 @@
                 <td><span class="badge" [ngClass]="claseRol(e.idRolesClinica)">{{nombreRol(e.idRolesClinica)}}</span></td>
                 <td>
                   <label class="toggle"><input type="checkbox" [checked]="e.estado" (change)="toggleEstadoUsuario(e)"><span class="toggle-slider"></span></label>
-                  <span [style.color]="e.estado ? '#16A34A' : '#DC2626'" style="font-size:12px;margin-left:6px;">{{e.estado ? 'Activo' : 'Inactivo'}}</span>
+                  <span class="estado-label" [class.activo]="e.estado" [class.inactivo]="!e.estado">{{e.estado ? 'Activo' : 'Inactivo'}}</span>
                 </td>
                 <td><div class="table-actions">
                   <button class="btn btn-sm btn-secondary" (click)="abrirEditarUsuario(e)" title="Editar"><span class="material-icons">edit_note</span></button>
-                  <button class="btn btn-sm" style="background:#FEE2E2;color:#DC2626;" (click)="eliminarUsuario(e)" title="Eliminar"><span class="material-icons">delete</span></button>
+                  <button class="btn btn-sm btn-danger-soft" (click)="eliminarUsuario(e)" title="Eliminar"><span class="material-icons">delete</span></button>
                 </div></td>
               </tr>
             }
@@ -74,13 +91,13 @@
 
     <div class="card">
       <div class="card-header">
-        <span class="card-title" style="display:inline-flex;align-items:center;gap:6px;"><span class="material-icons" style="font-size:18px;">lock</span>Permisos por Perfil</span>
-        <div style="display:flex;gap:8px;">
+        <span class="card-title"><span class="material-icons">lock</span>Permisos por Perfil</span>
+        <div class="role-actions">
           <button class="btn btn-secondary btn-sm" (click)="agregarRol()">+ Nuevo Rol</button>
           <button class="btn btn-secondary btn-sm" (click)="agregarModulo()">+ Nuevo Módulo</button>
         </div>
       </div>
-      <div class="card-body" style="padding:0;">
+      <div class="card-body card-body-flush">
         <div class="table-wrap">
           <table>
             <thead>
@@ -91,14 +108,16 @@
             </thead>
             <tbody>
               @if (permisos.length === 0) {
-                <tr><td [attr.colspan]="1 + roles.length" style="text-align:center;padding:24px;color:#64748B;">Todavía no hay módulos. Usa "+ Nuevo Módulo" para crear el primero.</td></tr>
+                <tr><td [attr.colspan]="1 + roles.length" class="empty-row-sm">Todavía no hay módulos. Usa "+ Nuevo Módulo" para crear el primero.</td></tr>
               }
               @for (p of permisos; track p.idPermiso) {
                 <tr>
-                  <td style="padding:10px 14px;font-size:13.5px;">{{p.nombrePermiso}}</td>
+                  <td class="permiso-name">{{p.nombrePermiso}}</td>
                   @for (rol of roles; track rol.idRoles) {
-                    <td style="padding:10px 14px;">
-                      <label class="toggle"><input type="checkbox" [checked]="tienePermiso(rol.idRoles, p.idPermiso)" (change)="toggleCelda(rol.idRoles, p.idPermiso)"><span class="toggle-slider"></span></label>
+                    <td class="permiso-cell">
+                      <label class="toggle">
+                        <input type="checkbox" [checked]="tienePermiso(rol.idRoles, p.idPermiso)" (change)="toggleCelda(rol.idRoles, p.idPermiso)"><span class="toggle-slider"></span>
+                      </label>
                     </td>
                   }
                 </tr>
@@ -112,14 +131,14 @@
 
   <!-- ================= CATÁLOGOS ================= -->
   @if (tabActivo === 'catalogos') {
-    <div style="margin-bottom:16px;">
+    <div class="tabs-wrap-sm">
       <app-tabs [tabs]="tabsCatalogo" [activo]="tabCatalogoActivo" (activoChange)="tabCatalogoActivo=$event"></app-tabs>
     </div>
 
     @if (tabCatalogoActivo === 'medicamentos') {
       <div class="card">
         <div class="card-header">
-          <span class="card-title" style="display:inline-flex;align-items:center;gap:6px;"><span class="material-icons" style="font-size:18px;">medication</span>Catálogo de Medicamentos</span>
+          <span class="card-title"><span class="material-icons">medication</span>Catálogo de Medicamentos</span>
           <button class="btn btn-primary btn-sm" (click)="abrirNuevoMed()">+ Nuevo Medicamento</button>
         </div>
         <div class="table-wrap">
@@ -127,7 +146,7 @@
             <thead><tr><th>Código</th><th>Nombre</th><th>Descripción</th><th>Acciones</th></tr></thead>
             <tbody>
               @if (medicamentos.length === 0) {
-                <tr><td colspan="4" style="text-align:center;padding:32px;color:#64748B;">No hay medicamentos registrados</td></tr>
+                <tr><td colspan="4" class="empty-row">No hay medicamentos registrados</td></tr>
               }
               @for (m of medicamentos; track m.idMedicamento) {
                 <tr>
@@ -136,7 +155,7 @@
                   <td class="text-muted text-sm">{{m.descripcion}}</td>
                   <td><div class="table-actions">
                     <button class="btn btn-sm btn-secondary" (click)="abrirEditarMed(m)"><span class="material-icons">edit_note</span></button>
-                    <button class="btn btn-sm" style="background:#FEE2E2;color:#DC2626;" (click)="eliminarMed(m)"><span class="material-icons">delete</span></button>
+                    <button class="btn btn-sm btn-danger-soft" (click)="eliminarMed(m)"><span class="material-icons">delete</span></button>
                   </div></td>
                 </tr>
               }
@@ -149,7 +168,7 @@
     @if (tabCatalogoActivo === 'diagnosticos') {
       <div class="card">
         <div class="card-header">
-          <span class="card-title" style="display:inline-flex;align-items:center;gap:6px;"><span class="material-icons" style="font-size:18px;">medical_services</span>Catálogo de Diagnóstico</span>
+          <span class="card-title"><span class="material-icons">medical_services</span>Catálogo de Diagnóstico</span>
           <button class="btn btn-primary btn-sm" (click)="abrirNuevoDiag()">+ Nuevo Diagnóstico</button>
         </div>
         <div class="table-wrap">
@@ -157,7 +176,7 @@
             <thead><tr><th>Código</th><th>Nombre</th><th>Descripción</th><th>Acciones</th></tr></thead>
             <tbody>
               @if (diagnosticos.length === 0) {
-                <tr><td colspan="4" style="text-align:center;padding:32px;color:#64748B;">No hay diagnósticos registrados</td></tr>
+                <tr><td colspan="4" class="empty-row">No hay diagnósticos registrados</td></tr>
               }
               @for (d of diagnosticos; track d.idDiagnosticoCatalogo) {
                 <tr>
@@ -166,7 +185,7 @@
                   <td class="text-muted text-sm">{{d.descripcion}}</td>
                   <td><div class="table-actions">
                     <button class="btn btn-sm btn-secondary" (click)="abrirEditarDiag(d)"><span class="material-icons">edit_note</span></button>
-                    <button class="btn btn-sm" style="background:#FEE2E2;color:#DC2626;" (click)="eliminarDiag(d)"><span class="material-icons">delete</span></button>
+                    <button class="btn btn-sm btn-danger-soft" (click)="eliminarDiag(d)"><span class="material-icons">delete</span></button>
                   </div></td>
                 </tr>
               }
@@ -179,31 +198,31 @@
 
   <!-- ================= SISTEMA ================= -->
   @if (tabActivo === 'sistema') {
-    <div class="card" style="max-width:540px;">
-      <div class="card-header"><span class="card-title" style="display:inline-flex;align-items:center;gap:6px;"><span class="material-icons" style="font-size:18px;">tune</span>Configuración del Sistema</span></div>
+    <div class="card card-sistema">
+      <div class="card-header"><span class="card-title"><span class="material-icons">tune</span>Configuración del Sistema</span></div>
       <div class="card-body">
         <div class="form-group">
-          <label>Zona Horaria</label>
-          <select class="form-control" [(ngModel)]="sistema.zonaHoraria">
+          <label for="zonaHoraria">Zona Horaria</label>
+          <select class="form-control" id="zonaHoraria" [(ngModel)]="sistema.zonaHoraria">
             <option value="GMT-5 (Lima)">GMT-5 (Lima)</option>
             <option value="GMT-3 (Buenos Aires)">GMT-3 (Buenos Aires)</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Formato de Fecha</label>
-          <select class="form-control" [(ngModel)]="sistema.formatoFecha">
+          <label for="formatoFecha">Formato de Fecha</label>
+          <select class="form-control" id="formatoFecha" [(ngModel)]="sistema.formatoFecha">
             <option value="DD/MM/YYYY">DD/MM/YYYY</option>
             <option value="MM/DD/YYYY">MM/DD/YYYY</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Moneda</label>
-          <select class="form-control" [(ngModel)]="sistema.moneda">
+          <label for="moneda">Moneda</label>
+          <select class="form-control" id="moneda" [(ngModel)]="sistema.moneda">
             <option value="Soles (S/)">Soles (S/)</option>
             <option value="Dólares (US$)">Dólares (US$)</option>
           </select>
         </div>
-        <div style="display:flex;justify-content:flex-end;"><button class="btn btn-primary" (click)="guardarSistema()">Guardar</button></div>
+        <div class="actions-end"><button class="btn btn-primary" (click)="guardarSistema()">Guardar</button></div>
       </div>
     </div>
   }
@@ -212,42 +231,72 @@
 <!-- MODAL: NUEVO USUARIO -->
 @if (modalNuevoUsuario) {
   <app-modal title="Nuevo Usuario" subtitle="Ingresa los datos del nuevo usuario" size="lg" (close)="modalNuevoUsuario=false">
-    <div style="font-weight:600;font-size:13px;color:#64748B;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.4px;">Datos Personales</div>
+    <div class="section-label">Datos Personales</div>
     <div class="form-row">
-      <div class="form-group"><label>Nombre <span class="req">*</span></label><input class="form-control" [(ngModel)]="nuevoUsuario.nombreEmpleado" placeholder="Ej: Carlos"></div>
-      <div class="form-group"><label>Apellido Paterno <span class="req">*</span></label><input class="form-control" [(ngModel)]="nuevoUsuario.apellidoPaterno" placeholder="Ej: Pérez"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>Apellido Materno <span class="req">*</span></label><input class="form-control" [(ngModel)]="nuevoUsuario.apellidoMaterno" placeholder="Ej: García"></div>
-      <div class="form-group"><label>DNI <span class="req">*</span></label><input class="form-control" [(ngModel)]="nuevoUsuario.nroDocumento" placeholder="Ej: 76453278"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>Fecha de Nacimiento <span class="req">*</span></label><input class="form-control" type="date" [(ngModel)]="nuevoUsuario.fechaNacimiento"></div>
       <div class="form-group">
-        <label>Tipo de Documento <span class="req">*</span></label>
-        <select class="form-control" [(ngModel)]="nuevoUsuario.idDocumentoIdentidad">
+        <label for="nombreInput">Nombre <span class="req">*</span></label>
+        <input class="form-control" id="nombreInput" [(ngModel)]="nuevoUsuario.nombreEmpleado" placeholder="Ej: Carlos">
+      </div>
+      <div class="form-group">
+        <label for="apellidoPaternoInput">Apellido Paterno <span class="req">*</span></label>
+        <input class="form-control" id="apellidoPaternoInput" [(ngModel)]="nuevoUsuario.apellidoPaterno" placeholder="Ej: Pérez">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="apellidoMaternoInput">Apellido Materno <span class="req">*</span></label>
+        <input class="form-control" id="apellidoMaternoInput" [(ngModel)]="nuevoUsuario.apellidoMaterno" placeholder="Ej: García">
+      </div>
+      <div class="form-group">
+        <label for="dniInput">DNI <span class="req">*</span></label>
+        <input class="form-control" id="dniInput" [(ngModel)]="nuevoUsuario.nroDocumento" placeholder="Ej: 76453278">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="fechaNacimientoInput">Fecha de Nacimiento <span class="req">*</span></label>
+        <input class="form-control" id="fechaNacimientoInput" type="date" [(ngModel)]="nuevoUsuario.fechaNacimiento">
+      </div>
+      <div class="form-group">
+        <label for="idDocumentoIdentidadInput">Tipo de Documento <span class="req">*</span></label>
+        <select class="form-control" id="idDocumentoIdentidadInput" [(ngModel)]="nuevoUsuario.idDocumentoIdentidad">
           @for (doc of documentos; track doc.idDocumentoIdentidad) { <option [ngValue]="doc.idDocumentoIdentidad">{{doc.descripcion}}</option> }
         </select>
       </div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>Email de contacto</label><input class="form-control" type="email" [(ngModel)]="nuevoUsuario.correoElectronico" placeholder="Ej: carlos160@ejemplo.com"></div>
-      <div class="form-group"><label>Teléfono</label><input class="form-control" [(ngModel)]="nuevoUsuario.nroTelefono" placeholder="Ej: 999888777"></div>
-    </div>
-    <div style="font-weight:600;font-size:13px;color:#64748B;margin:16px 0 12px;text-transform:uppercase;letter-spacing:0.4px;">Datos de acceso</div>
-    <div class="form-row">
-      <div class="form-group"><label>Correo (usuario) <span class="req">*</span></label><input class="form-control" type="email" [(ngModel)]="nuevoUsuario.correo" placeholder="Ej: pcarlos@vetclinic.com"></div>
       <div class="form-group">
-        <label>Rol <span class="req">*</span></label>
-        <select class="form-control" [(ngModel)]="nuevoUsuario.idRolesClinica">
+        <label for="correoElectronicoInput">Email de contacto</label>
+        <input class="form-control" id="correoElectronicoInput" type="email" [(ngModel)]="nuevoUsuario.correoElectronico" placeholder="Ej: carlos160@ejemplo.com">
+      </div>
+      <div class="form-group">
+        <label for="nroTelefonoInput">Teléfono</label>
+        <input class="form-control" id="nroTelefonoInput" [(ngModel)]="nuevoUsuario.nroTelefono" placeholder="Ej: 999888777">
+      </div>
+    </div>
+    <div class="section-label spaced">Datos de acceso</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="correoInput">Correo (usuario) <span class="req">*</span></label>
+        <input class="form-control" id="correoInput" type="email" [(ngModel)]="nuevoUsuario.correo" placeholder="Ej: pcarlos@vetclinic.com">
+      </div>
+      <div class="form-group">
+        <label for="idRolesClinicaInput">Rol <span class="req">*</span></label>
+        <select class="form-control" id="idRolesClinicaInput" [(ngModel)]="nuevoUsuario.idRolesClinica">
           <option [ngValue]="null">Seleccionar</option>
           @for (rol of roles; track rol.idRoles) { <option [ngValue]="rol.idRoles">{{rol.nombreRol}}</option> }
         </select>
       </div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>Contraseña <span class="req">*</span></label><input class="form-control" type="password" [(ngModel)]="nuevoUsuario.contrasena"></div>
-      <div class="form-group"><label>Confirmar Contraseña <span class="req">*</span></label><input class="form-control" type="password" [(ngModel)]="nuevoUsuario.confirmarContrasena"></div>
+      <div class="form-group">
+        <label for="contrasenaInput">Contraseña <span class="req">*</span></label>
+        <input class="form-control" id="contrasenaInput" type="password" [(ngModel)]="nuevoUsuario.contrasena">
+      </div>
+      <div class="form-group">
+        <label for="confirmarContrasenaInput">Confirmar Contraseña <span class="req">*</span></label>
+        <input class="form-control" id="confirmarContrasenaInput" type="password" [(ngModel)]="nuevoUsuario.confirmarContrasena">
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" (click)="modalNuevoUsuario=false">Cancelar</button>
@@ -259,41 +308,71 @@
 <!-- MODAL: EDITAR USUARIO -->
 @if (modalEditarUsuario && editandoUsuario) {
   <app-modal title="Editar Usuario" subtitle="Modificar los datos del usuario" size="lg" (close)="modalEditarUsuario=false">
-    <div style="font-weight:600;font-size:13px;color:#64748B;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.4px;">Datos Personales</div>
+    <div class="section-label">Datos Personales</div>
     <div class="form-row">
-      <div class="form-group"><label>Nombre <span class="req">*</span></label><input class="form-control" [(ngModel)]="editandoUsuario.nombreEmpleado"></div>
-      <div class="form-group"><label>Apellido Paterno <span class="req">*</span></label><input class="form-control" [(ngModel)]="editandoUsuario.apellidoPaterno"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>Apellido Materno <span class="req">*</span></label><input class="form-control" [(ngModel)]="editandoUsuario.apellidoMaterno"></div>
-      <div class="form-group"><label>DNI <span class="req">*</span></label><input class="form-control" [(ngModel)]="editandoUsuario.nroDocumento"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>Fecha de Nacimiento</label><input class="form-control" type="date" [(ngModel)]="editandoUsuario.fechaNacimiento"></div>
       <div class="form-group">
-        <label>Tipo de Documento</label>
-        <select class="form-control" [(ngModel)]="editandoUsuario.idDocumentoIdentidad">
+        <label for="nombreEditInput">Nombre <span class="req">*</span></label>
+        <input class="form-control" id="nombreEditInput" [(ngModel)]="editandoUsuario.nombreEmpleado">
+      </div>
+      <div class="form-group">
+        <label for="apellidoPaternoEditInput">Apellido Paterno <span class="req">*</span></label>
+        <input class="form-control" id="apellidoPaternoEditInput" [(ngModel)]="editandoUsuario.apellidoPaterno">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="apellidoMaternoEditInput">Apellido Materno <span class="req">*</span></label>
+        <input class="form-control" id="apellidoMaternoEditInput" [(ngModel)]="editandoUsuario.apellidoMaterno">
+      </div>
+      <div class="form-group">
+        <label for="DniEditInput">DNI <span class="req">*</span></label>
+        <input class="form-control" id="DniEditInput" [(ngModel)]="editandoUsuario.nroDocumento">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="fechaNacimientoEditInput">Fecha de Nacimiento</label>
+        <input class="form-control" id="fechaNacimientoEditInput" type="date" [(ngModel)]="editandoUsuario.fechaNacimiento">
+      </div>
+      <div class="form-group">
+        <label for="tipoDocumentoEditInput">Tipo de Documento</label>
+        <select class="form-control" id="tipoDocumentoEditInput" [(ngModel)]="editandoUsuario.idDocumentoIdentidad">
           @for (doc of documentos; track doc.idDocumentoIdentidad) { <option [ngValue]="doc.idDocumentoIdentidad">{{doc.descripcion}}</option> }
         </select>
       </div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>Email de contacto</label><input class="form-control" [(ngModel)]="editandoUsuario.correoElectronico"></div>
-      <div class="form-group"><label>Teléfono</label><input class="form-control" [(ngModel)]="editandoUsuario.nroTelefono"></div>
-    </div>
-    <div style="font-weight:600;font-size:13px;color:#64748B;margin:16px 0 12px;text-transform:uppercase;letter-spacing:0.4px;">Datos de acceso</div>
-    <div class="form-row">
-      <div class="form-group"><label>Correo (usuario) <span class="req">*</span></label><input class="form-control" type="email" [(ngModel)]="editandoUsuario.correo"></div>
       <div class="form-group">
-        <label>Rol <span class="req">*</span></label>
-        <select class="form-control" [(ngModel)]="editandoUsuario.idRolesClinica">
+        <label for="EmailEditInput">Email de contacto</label>
+        <input class="form-control" id="EmailEditInput" [(ngModel)]="editandoUsuario.correoElectronico">
+      </div>
+      <div class="form-group">
+        <label for="TelefonoEditInput">Teléfono</label>
+        <input class="form-control" id="TelefonoEditInput" [(ngModel)]="editandoUsuario.nroTelefono">
+      </div>
+    </div>
+    <div class="section-label spaced">Datos de acceso</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="correoEditInput">Correo (usuario) <span class="req">*</span></label>
+        <input class="form-control" id="correoEditInput" type="email" [(ngModel)]="editandoUsuario.correo">
+      </div>
+      <div class="form-group">
+        <label for="RolesClinicaEditInput">Rol <span class="req">*</span></label>
+        <select class="form-control" id="RolesClinicaEditInput" [(ngModel)]="editandoUsuario.idRolesClinica">
           @for (rol of roles; track rol.idRoles) { <option [ngValue]="rol.idRoles">{{rol.nombreRol}}</option> }
         </select>
       </div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>Nueva Contraseña</label><input class="form-control" type="password" [(ngModel)]="editandoUsuario.contrasena" placeholder="Dejar en blanco para no cambiar"></div>
-      <div class="form-group"><label>Confirmar Contraseña</label><input class="form-control" type="password" [(ngModel)]="editandoUsuario.confirmarContrasena"></div>
+      <div class="form-group">
+        <label for="NuevacontraEditInput">Nueva Contraseña</label>
+        <input class="form-control" id="NuevacontraEditInput" type="password" [(ngModel)]="editandoUsuario.contrasena" placeholder="Dejar en blanco para no cambiar">
+      </div>
+      <div class="form-group">
+        <label for="confirmarContrasenaEditInput">Confirmar Contraseña</label>
+        <input class="form-control" id="confirmarContrasenaEditInput" type="password" [(ngModel)]="editandoUsuario.confirmarContrasena">
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" (click)="modalEditarUsuario=false">Cancelar</button>
@@ -306,14 +385,25 @@
 @if (modalNuevoMed) {
   <app-modal title="Nuevo Medicamento" subtitle="Completa los datos del medicamento" (close)="modalNuevoMed=false">
     <div class="form-row">
-      <div class="form-group"><label>Código <span class="req">*</span></label><input class="form-control" [(ngModel)]="nuevoMed.codigoMedicamento" placeholder="Ej: MED-005"></div>
-      <div class="form-group"><label>Nombre <span class="req">*</span></label><input class="form-control" [(ngModel)]="nuevoMed.nombreMedicamento" placeholder="Ej: Amoxicilina 500mg"></div>
+      <div class="form-group">
+        <label for="codigoInput">Código <span class="req">*</span></label><input class="form-control" id="codigoInput" [(ngModel)]="nuevoMed.codigoMedicamento" placeholder="Ej: MED-005">
+      </div>
+      <div class="form-group">
+        <label for="nombreInput">Nombre <span class="req">*</span></label><input class="form-control" id="nombreInput" [(ngModel)]="nuevoMed.nombreMedicamento" placeholder="Ej: Amoxicilina 500mg">
+      </div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>Concentración <span class="req">*</span></label><input class="form-control" [(ngModel)]="nuevoMed.concentracion" placeholder="Ej: 500mg"></div>
-      <div class="form-group"><label>Presentación <span class="req">*</span></label><input class="form-control" [(ngModel)]="nuevoMed.presentacion" placeholder="Ej: Cápsulas"></div>
+      <div class="form-group">
+        <label for="concentracionInput">Concentración <span class="req">*</span></label><input class="form-control" id="concentracionInput" [(ngModel)]="nuevoMed.concentracion" placeholder="Ej: 500mg">
+      </div>
+      <div class="form-group">
+        <label for="presentacionInput">Presentación <span class="req">*</span></label><input class="form-control" id="presentacionInput" [(ngModel)]="nuevoMed.presentacion" placeholder="Ej: Cápsulas">
+      </div>
     </div>
-    <div class="form-group"><label>Descripción <span class="req">*</span></label><textarea class="form-control" [(ngModel)]="nuevoMed.descripcion" placeholder="Descripción del medicamento"></textarea></div>
+    <div class="form-group">
+      <label for="descripcionInput">Descripción <span class="req">*</span></label>
+      <textarea class="form-control" id="descripcionInput" [(ngModel)]="nuevoMed.descripcion" placeholder="Descripción del medicamento"></textarea>
+    </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" (click)="modalNuevoMed=false">Cancelar</button>
       <button class="btn btn-primary" (click)="guardarNuevoMed()">Registrar</button>
@@ -324,14 +414,29 @@
 @if (modalEditarMed && editandoMed) {
   <app-modal title="Editar Medicamento" subtitle="Modificar los datos del medicamento" (close)="modalEditarMed=false">
     <div class="form-row">
-      <div class="form-group"><label>Código <span class="req">*</span></label><input class="form-control" [(ngModel)]="editandoMed.codigoMedicamento"></div>
-      <div class="form-group"><label>Nombre <span class="req">*</span></label><input class="form-control" [(ngModel)]="editandoMed.nombreMedicamento"></div>
+      <div class="form-group">
+        <label for="codigoInput">Código <span class="req">*</span></label>
+        <input class="form-control" id="codigoInput" [(ngModel)]="editandoMed.codigoMedicamento">
+      </div>
+      <div class="form-group">
+        <label for="nombreInput">Nombre <span class="req">*</span></label>
+        <input class="form-control" id="nombreInput" [(ngModel)]="editandoMed.nombreMedicamento">
+      </div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>Concentración <span class="req">*</span></label><input class="form-control" [(ngModel)]="editandoMed.concentracion"></div>
-      <div class="form-group"><label>Presentación <span class="req">*</span></label><input class="form-control" [(ngModel)]="editandoMed.presentacion"></div>
+      <div class="form-group">
+        <label for="concentracionInput">Concentración <span class="req">*</span></label>
+        <input class="form-control" id="concentracionInput" [(ngModel)]="editandoMed.concentracion">
+      </div>
+      <div class="form-group">
+        <label for="presentacionInput">Presentación <span class="req">*</span></label>
+        <input class="form-control" id="presentacionInput" [(ngModel)]="editandoMed.presentacion">
+      </div>
     </div>
-    <div class="form-group"><label>Descripción <span class="req">*</span></label><textarea class="form-control" [(ngModel)]="editandoMed.descripcion"></textarea></div>
+    <div class="form-group">
+      <label for="descripcionInput">Descripción <span class="req">*</span></label>
+      <textarea class="form-control" id="descripcionInput" [(ngModel)]="editandoMed.descripcion"></textarea>
+    </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" (click)="modalEditarMed=false">Cancelar</button>
       <button class="btn btn-primary" (click)="guardarEdicionMed()">Guardar Cambios</button>
@@ -343,10 +448,19 @@
 @if (modalNuevoDiag) {
   <app-modal title="Nuevo Diagnóstico" subtitle="Completa los datos del diagnóstico" (close)="modalNuevoDiag=false">
     <div class="form-row">
-      <div class="form-group"><label>Código <span class="req">*</span></label><input class="form-control" [(ngModel)]="nuevoDiag.codigoDiagnostico" placeholder="Ej: CIE-V004"></div>
-      <div class="form-group"><label>Nombre <span class="req">*</span></label><input class="form-control" [(ngModel)]="nuevoDiag.nombreDiagnostico" placeholder="Ej: Otitis externa"></div>
+      <div class="form-group">
+        <label for="codigoInput">Código <span class="req">*</span></label>
+        <input class="form-control" id="codigoInput" [(ngModel)]="nuevoDiag.codigoDiagnostico" placeholder="Ej: CIE-V004">
+      </div>
+      <div class="form-group">
+        <label for="nombreInput">Nombre <span class="req">*</span></label>
+        <input class="form-control" id="nombreInput" [(ngModel)]="nuevoDiag.nombreDiagnostico" placeholder="Ej: Otitis externa">
+      </div>
     </div>
-    <div class="form-group"><label>Descripción <span class="req">*</span></label><textarea class="form-control" [(ngModel)]="nuevoDiag.descripcion" placeholder="Descripción del diagnóstico"></textarea></div>
+    <div class="form-group">
+      <label for="descripcionInput">Descripción <span class="req">*</span></label>
+      <textarea class="form-control" id="descripcionInput" [(ngModel)]="nuevoDiag.descripcion" placeholder="Descripción del diagnóstico"></textarea>
+    </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" (click)="modalNuevoDiag=false">Cancelar</button>
       <button class="btn btn-primary" (click)="guardarNuevoDiag()">Registrar</button>
@@ -357,10 +471,19 @@
 @if (modalEditarDiag && editandoDiag) {
   <app-modal title="Editar Diagnóstico" subtitle="Modificar los datos del diagnóstico" (close)="modalEditarDiag=false">
     <div class="form-row">
-      <div class="form-group"><label>Código <span class="req">*</span></label><input class="form-control" [(ngModel)]="editandoDiag.codigoDiagnostico"></div>
-      <div class="form-group"><label>Nombre <span class="req">*</span></label><input class="form-control" [(ngModel)]="editandoDiag.nombreDiagnostico"></div>
+      <div class="form-group">
+        <label for="codigoInput">Código <span class="req">*</span></label>
+        <input class="form-control" id="codigoInput" [(ngModel)]="editandoDiag.codigoDiagnostico">
+      </div>
+      <div class="form-group">
+        <label for="nombreInput">Nombre <span class="req">*</span></label>
+        <input class="form-control" id="nombreInput" [(ngModel)]="editandoDiag.nombreDiagnostico">
+      </div>
     </div>
-    <div class="form-group"><label>Descripción <span class="req">*</span></label><textarea class="form-control" [(ngModel)]="editandoDiag.descripcion"></textarea></div>
+    <div class="form-group">
+      <label for="descripcionInput">Descripción <span class="req">*</span></label>
+      <textarea class="form-control" id="descripcionInput" [(ngModel)]="editandoDiag.descripcion"></textarea>
+    </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" (click)="modalEditarDiag=false">Cancelar</button>
       <button class="btn btn-primary" (click)="guardarEdicionDiag()">Guardar Cambios</button>

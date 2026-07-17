@@ -2,7 +2,7 @@
   <div class="page-header">
     <div class="page-header-row">
       <div>
-        <h1 class="page-title">Bienvenido de vuelta, {{ nombreUsuario }} 👋</h1>
+        <h1 class="page-title">Bienvenido de vuelta, {{ nombreUsuario }}</h1>
         <p class="page-subtitle">
           {{ hoyTexto }} · Tienes <strong>{{ resumen.citasHoyPendientes }} citas pendientes</strong> hoy
         </p>
@@ -31,7 +31,7 @@
       <div class="stat-value stat-success">S/ {{ resumen.ingresosHoy | number:'1.2-2' }}</div>
       <div class="stat-sub">
         @if (variacionIngresos !== null) {
-          <span [style.color]="variacionIngresos >= 0 ? '#16A34A' : '#DC2626'">
+          <span [class.variacion-positiva]="variacionIngresos >= 0" [class.variacion-negativa]="variacionIngresos < 0">
             {{ variacionIngresos >= 0 ? '+' : '' }}{{ variacionIngresos }}% vs ayer
           </span>
         } @else { Sin datos de ayer }
@@ -45,35 +45,35 @@
   </div>
 
   <!-- BOTTOM GRID -->
-  <div class="grid-2" style="margin-bottom:20px;">
+  <div class="grid-2 bottom-grid">
     <!-- CITAS HOY -->
     <div class="card">
       <div class="card-header">
-        <span class="card-title">📅 Citas de Hoy</span>
-        <a style="font-size:13px;color:#0EA5E9;font-weight:500;cursor:pointer;" (click)="irCitas()">Ver todas →</a>
+        <span class="card-title"><span class="material-icons">event</span>Citas de Hoy</span>
+        <a class="card-link" (click)="irCitas()">Ver todas<span class="material-icons">arrow_forward</span></a>
       </div>
-      <div class="card-body" style="padding:0;">
-        <table style="width:100%;border-collapse:collapse;">
+      <div class="card-body card-body-flush">
+        <table class="citas-table">
           <tbody>
             @for (c of citasHoy; track c.idCitaProgramada) {
-              <tr style="border-bottom:1px solid #E2E8F0;">
-                <td style="padding:12px 20px;white-space:nowrap;">
+              <tr>
+                <td class="cell-time">
                   <span class="dot" [class.dot-done]="c.idEstadoCita === 2"></span>
                   <strong>{{ hora(c) }}</strong>
                 </td>
-                <td style="padding:12px 14px;">
-                  <div style="font-weight:600;">{{ c.nombreMascota }}</div>
-                  <div style="font-size:12px;color:#64748B;">{{ c.especie }} · {{ c.raza }} · {{ c.nombreDueno }}</div>
-                  <div style="font-size:12px;color:#64748B;">{{ c.nombreServicio || c.motivo }}</div>
+                <td class="cell-info">
+                  <div class="cita-name">{{ c.nombreMascota }}</div>
+                  <div class="cita-meta">{{ c.especie }} · {{ c.raza }} · {{ c.nombreDueno }}</div>
+                  <div class="cita-meta">{{ c.nombreServicio || c.motivo }}</div>
                 </td>
-                <td style="padding:12px 14px;text-align:right;">
-                  <div style="font-size:12px;color:#64748B;">{{ c.nombreVeterinario }}</div>
+                <td class="cell-info-right">
+                  <div class="cita-meta">{{ c.nombreVeterinario }}</div>
                   <app-badge [estado]="c.estadoCita"></app-badge>
                 </td>
               </tr>
             }
             @if (!citasHoy.length) {
-              <tr><td style="padding:28px;text-align:center;color:#94A3B8;">No hay citas programadas para hoy.</td></tr>
+              <tr><td class="empty-table-row">No hay citas programadas para hoy.</td></tr>
             }
           </tbody>
         </table>
@@ -81,25 +81,25 @@
     </div>
 
     <!-- RIGHT COLUMN -->
-    <div style="display:flex;flex-direction:column;gap:16px;">
+    <div class="right-col">
       <!-- ALERTAS STOCK -->
       <div class="card">
         <div class="card-header">
-          <span class="card-title">⚠️ Alertas de Stock</span>
+          <span class="card-title"><span class="material-icons alert-icon">warning</span>Alertas de Stock</span>
         </div>
         <div class="card-body">
           @for (a of alertasStock; track a.nombre) {
-            <div style="margin-bottom:14px;">
-              <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-                <span style="font-weight:600;font-size:13.5px;">{{ a.nombre }}</span>
-                <span style="font-size:12px;font-weight:600;" [style.color]="claseStock(a) === 'danger' ? '#DC2626' : '#D97706'">{{ a.stock }} unidades</span>
+            <div class="alert-item">
+              <div class="alert-item-header">
+                <span class="alert-name">{{ a.nombre }}</span>
+                <span class="alert-stock" [class.danger]="claseStock(a) === 'danger'" [class.warning]="claseStock(a) !== 'danger'">{{ a.stock }} unidades</span>
               </div>
-              <div style="font-size:12px;color:#64748B;margin-bottom:6px;">{{ a.categoria || 'Sin categoría' }} · Mín. requerido: {{ a.minimo }}</div>
+              <div class="alert-detail">{{ a.categoria || 'Sin categoría' }} · Mín. requerido: {{ a.minimo }}</div>
               <div class="progress-bar"><div class="progress-fill" [class.danger]="claseStock(a)==='danger'" [class.warning]="claseStock(a)==='warning'" [style.width.%]="porcentajeStock(a)"></div></div>
             </div>
           }
           @if (!alertasStock.length) {
-            <div style="text-align:center;color:#94A3B8;font-size:13px;padding:12px 0;">Sin alertas de stock 🎉</div>
+            <div class="empty-alert"><span class="material-icons">celebration</span>Sin alertas de stock</div>
           }
         </div>
       </div>
@@ -107,7 +107,7 @@
       <!-- CITAS SEMANA -->
       <div class="card">
         <div class="card-header">
-          <span class="card-title">📈 Citas esta semana</span>
+          <span class="card-title"><span class="material-icons">trending_up</span>Citas esta semana</span>
         </div>
         <div class="card-body">
           <div class="bar-chart">

@@ -1,5 +1,21 @@
 :host { display: contents; }
 
+.card-body-tight { padding-bottom: 0; }
+
+.empty-row {
+  text-align: center;
+  padding: 32px;
+  color: #64748B;
+}
+
+.table-name { font-weight: 600; }
+
+.btn-danger-soft { background: #FEE2E2; color: #DC2626; }
+
+.form-group-relative { position: relative; }
+
+.input-readonly { background: #F8FAFC; }
+
 .sugerencias {
   position: absolute;
   top: 100%;

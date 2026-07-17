@@ -68,6 +68,27 @@
 
 .form-control::placeholder { color: #94A3B8; }
 
+.password-field { position: relative; }
+
+.password-input { padding-right: 42px; }
+
+.password-toggle {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: inline-flex;
+}
+
+.password-toggle .material-icons {
+  font-size: 18px;
+  color: #666;
+}
+
 .form-row-check {
   display: flex;
   align-items: center;

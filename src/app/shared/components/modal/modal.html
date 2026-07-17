@@ -5,7 +5,7 @@
         <div class="modal-title">{{ title }}</div>
         @if (subtitle) { <div class="modal-subtitle">{{ subtitle }}</div> }
       </div>
-      <button class="modal-close" (click)="close.emit()">✕</button>
+      <button class="modal-close" (click)="close.emit()"><span class="material-icons">close</span></button>
     </div>
     <div class="modal-body">
       <ng-content></ng-content>

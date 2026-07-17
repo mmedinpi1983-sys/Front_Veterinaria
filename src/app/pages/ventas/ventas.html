@@ -1,27 +1,29 @@
-<main class="content" style="padding:16px 24px;">
+<main class="content ventas-content">
 
   <!-- POS / Registro -->
   @if (vista === 'pos') {
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+    <div class="pos-header">
       <div>
         <h1 class="page-title">Registro de Venta</h1>
         <p class="page-subtitle">Selecciona los productos o servicios</p>
       </div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-secondary" (click)="abrirModalCliente()">👤 Registrar Cliente</button>
-        <button class="btn btn-secondary" (click)="irHistorial()">📋 Historial</button>
+      <div class="pos-header-actions">
+        <button class="btn btn-secondary" (click)="abrirModalCliente()"><span class="material-icons">person</span>Registrar Cliente</button>
+        <button class="btn btn-secondary" (click)="irHistorial()"><span class="material-icons">receipt_long</span>Historial</button>
       </div>
     </div>
 
     <div class="pos-layout">
       <!-- PRODUCTOS -->
       <div class="pos-products">
-        <div class="search-bar" style="margin-bottom:12px;">
-          <div class="search-input-wrap" style="flex:1;">
-            <span class="search-icon">🔍</span>
-            <input type="text" placeholder="Buscar producto..." [(ngModel)]="busquedaProducto">
+        <div class="search-bar search-bar-tight">
+          <div class="search-input-wrap">
+            <span class="material-icons search-icon">search</span>
+            <label for="pos-busqueda-producto" class="visually-hidden">Buscar producto</label>
+            <input id="pos-busqueda-producto" type="text" placeholder="Buscar producto..." [(ngModel)]="busquedaProducto">
           </div>
-          <select class="filter-select" [(ngModel)]="filtroCategoria">
+          <label for="pos-filtro-categoria" class="visually-hidden">Filtrar por categoría</label>
+          <select id="pos-filtro-categoria" class="filter-select" [(ngModel)]="filtroCategoria">
             <option value="">Todas las categorías</option>
             @for (c of categorias; track c) { <option [value]="c">{{ c }}</option> }
           </select>
@@ -30,18 +32,18 @@
         <div class="product-grid">
           @for (p of productosFiltrados; track p.idProducto) {
             <div class="product-card" [class.selected]="cantidadEnCarrito(p.idProducto) > 0">
-              <div class="product-icon">{{ icono(p) }}</div>
+              <div class="product-icon"><span class="material-icons">{{ icono(p) }}</span></div>
               <div class="product-name">{{ p.nombre }}</div>
               <div class="product-price">S/ {{ (p.precioVenta || 0) | number:'1.2-2' }}</div>
               <div class="product-qty-control">
                 <div class="qty-btn" (click)="cambiarCantidad(p, -1)">−</div>
-                <span style="font-size:14px;font-weight:600;">{{ cantidadEnCarrito(p.idProducto) }}</span>
+                <span class="qty-value">{{ cantidadEnCarrito(p.idProducto) }}</span>
                 <div class="qty-btn" (click)="cambiarCantidad(p, 1)">+</div>
               </div>
             </div>
           }
           @if (!productosFiltrados.length) {
-            <div style="grid-column:1/-1;text-align:center;color:#94A3B8;padding:40px;">No hay productos disponibles.</div>
+            <div class="empty-products">No hay productos disponibles.</div>
           }
         </div>
       </div>
@@ -49,12 +51,12 @@
       <!-- CHECKOUT -->
       <div class="pos-checkout">
         <div class="checkout-header">
-          <div style="font-weight:700;font-size:15px;margin-bottom:6px;">Resumen de Venta</div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <div class="cli-avatar">👤</div>
+          <div class="checkout-title">Resumen de Venta</div>
+          <div class="checkout-client">
+            <div class="cli-avatar"><span class="material-icons">person</span></div>
             <div>
-              <div style="font-size:13px;font-weight:600;">{{ cliente.nombre || 'Cliente general' }}</div>
-              <div style="font-size:11px;color:#64748B;">{{ cliente.dni ? 'DNI: ' + cliente.dni : 'Sin identificar' }}</div>
+              <div class="client-name">{{ cliente.nombre || 'Cliente general' }}</div>
+              <div class="client-meta">{{ cliente.dni ? 'DNI: ' + cliente.dni : 'Sin identificar' }}</div>
             </div>
           </div>
         </div>
@@ -62,49 +64,49 @@
         <div class="checkout-items">
           @for (i of carrito; track i.idProducto) {
             <div class="checkout-item">
-              <div class="ci-icon">{{ i.icon }}</div>
-              <div style="flex:1;">
-                <div style="font-weight:600;font-size:13.5px;">{{ i.nombre }}</div>
-                <div style="font-size:12px;color:#64748B;">{{ i.cantidad }} × S/{{ i.precioUnitario | number:'1.2-2' }}</div>
+              <div class="ci-icon"><span class="material-icons">{{ i.icon }}</span></div>
+              <div class="ci-info">
+                <div class="ci-strong">{{ i.nombre }}</div>
+                <div class="ci-meta">{{ i.cantidad }} × S/{{ i.precioUnitario | number:'1.2-2' }}</div>
               </div>
-              <div style="font-weight:600;font-size:13.5px;">S/{{ i.precioUnitario * i.cantidad | number:'1.2-2' }}</div>
-              <button class="ci-remove" (click)="quitar(i)">×</button>
+              <div class="ci-strong">S/{{ i.precioUnitario * i.cantidad | number:'1.2-2' }}</div>
+              <button class="ci-remove" (click)="quitar(i)" aria-label="Quitar producto">×</button>
             </div>
           }
           @if (!carrito.length) {
-            <div style="text-align:center;color:#94A3B8;padding:24px 0;font-size:13px;">Aún no agregas productos.</div>
+            <div class="empty-cart">Aún no agregas productos.</div>
           }
         </div>
 
         <div class="checkout-footer">
-          <div style="margin-bottom:12px;">
-            <div style="font-weight:600;font-size:13px;margin-bottom:8px;">Método de Pago</div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <div class="payment-method">
+            <div class="payment-title">Método de Pago</div>
+            <div class="payment-options">
               @for (m of metodosPago; track m.idMetodoPago) {
-                <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;">
+                <label class="payment-option">
                   <input type="radio" name="pago" [value]="m.idMetodoPago" [(ngModel)]="idMetodoPago"> {{ m.nombre }}
                 </label>
               }
             </div>
           </div>
 
-          <div class="form-row" style="gap:10px;margin-bottom:10px;">
-            <div class="form-group" style="margin-bottom:0;">
-              <label style="font-size:12px;">Comprobante</label>
-              <select class="form-control" [(ngModel)]="tipoComprobante">
+          <div class="form-row form-row-tight">
+            <div class="form-group form-group-flush">
+              <label for="pos-comprobante" class="form-label-sm">Comprobante</label>
+              <select id="pos-comprobante" class="form-control" [(ngModel)]="tipoComprobante">
                 <option value="Boleta">Boleta</option>
                 <option value="Factura">Factura</option>
               </select>
             </div>
-            <div class="form-group" style="margin-bottom:0;">
-              <label style="font-size:12px;">Recibe (efectivo)</label>
-              <input class="form-control" type="number" min="0" placeholder="S/ 0.00" [(ngModel)]="montoRecibido">
+            <div class="form-group form-group-flush">
+              <label for="pos-monto-recibido" class="form-label-sm">Recibe (efectivo)</label>
+              <input id="pos-monto-recibido" class="form-control" type="number" min="0" placeholder="S/ 0.00" [(ngModel)]="montoRecibido">
             </div>
           </div>
 
-          <div class="form-group" style="margin-bottom:10px;">
-            <label style="font-size:12px;">Descuento (S/)</label>
-            <input class="form-control" type="number" min="0" placeholder="0.00" [(ngModel)]="descuento">
+          <div class="form-group form-group-sm-mb">
+            <label for="pos-descuento" class="form-label-sm">Descuento (S/)</label>
+            <input id="pos-descuento" class="form-control" type="number" min="0" placeholder="0.00" [(ngModel)]="descuento">
           </div>
 
           <div class="total-row"><span>Subtotal:</span><span>S/{{ base | number:'1.2-2' }}</span></div>
@@ -113,7 +115,7 @@
           <div class="total-row"><span>Vuelto:</span><span>S/{{ vuelto | number:'1.2-2' }}</span></div>
           <div class="total-row grand"><span>Total:</span><span>S/{{ total | number:'1.2-2' }}</span></div>
 
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">
+          <div class="checkout-actions">
             <button class="btn btn-secondary" (click)="cancelarVenta()">Cancelar</button>
             <button class="btn btn-primary" (click)="confirmarVenta()">Confirmar</button>
           </div>
@@ -137,13 +139,15 @@
     </div>
 
     <div class="card">
-      <div class="card-body" style="padding-bottom:0;">
-        <div class="search-bar" style="margin-bottom:0;">
-          <div class="search-input-wrap" style="flex:2;">
-            <span class="search-icon">🔍</span>
-            <input type="text" placeholder="Buscar por cliente o comprobante..." [(ngModel)]="filtro.q" (ngModelChange)="onFiltroChange()">
+      <div class="card-body card-body-tight">
+        <div class="search-bar search-bar-flush">
+          <div class="search-input-wrap search-input-wrap-wide">
+            <span class="material-icons search-icon">search</span>
+            <label for="historial-busqueda" class="visually-hidden">Buscar por cliente o comprobante</label>
+            <input id="historial-busqueda" type="text" placeholder="Buscar por cliente o comprobante..." [(ngModel)]="filtro.q" (ngModelChange)="onFiltroChange()">
           </div>
-          <select class="filter-select" [(ngModel)]="filtro.tipoComprobante" (ngModelChange)="onFiltroChange()">
+          <label for="historial-filtro-comprobante" class="visually-hidden">Filtrar por comprobante</label>
+          <select id="historial-filtro-comprobante" class="filter-select" [(ngModel)]="filtro.tipoComprobante" (ngModelChange)="onFiltroChange()">
             <option value="">Todos los comprobantes</option>
             <option value="Boleta">Boleta</option>
             <option value="Factura">Factura</option>
@@ -163,24 +167,24 @@
               <tr>
                 <td class="text-muted text-sm">{{ v.codigoVenta }}</td>
                 <td class="text-muted text-sm">{{ v.fechaVenta | date:'dd/MM/yyyy' }}</td>
-                <td><span style="font-weight:600;">{{ v.cliente || 'Cliente general' }}</span></td>
+                <td><span class="table-name">{{ v.cliente || 'Cliente general' }}</span></td>
                 <td class="text-muted text-sm">{{ v.tipoComprobante }}</td>
                 <td class="text-muted text-sm">{{ v.metodoPago }}</td>
-                <td style="font-weight:600;">S/ {{ v.total | number:'1.2-2' }}</td>
+                <td class="cell-strong">S/ {{ v.total | number:'1.2-2' }}</td>
                 <td><app-badge [estado]="estadoTexto(v.estadoVenta)"></app-badge></td>
                 <td>
                   <div class="table-actions">
-                    <button class="btn btn-sm btn-secondary" title="Ver" (click)="verDetalle(v)">👁</button>
-                    <button class="btn btn-sm btn-secondary" title="Imprimir" (click)="imprimir(v)">🖨</button>
+                    <button class="btn btn-sm btn-secondary" title="Ver" (click)="verDetalle(v)"><span class="material-icons">visibility</span></button>
+                    <button class="btn btn-sm btn-secondary" title="Imprimir" (click)="imprimir(v)"><span class="material-icons">print</span></button>
                     @if (v.estadoVenta === 1) {
-                      <button class="btn btn-sm" style="background:#FEE2E2;color:#DC2626;" title="Anular" (click)="anular(v)">🗑</button>
+                      <button class="btn btn-sm btn-danger-soft" title="Anular" (click)="anular(v)"><span class="material-icons">delete</span></button>
                     }
                   </div>
                 </td>
               </tr>
             }
             @if (!ventasPaginadas.length) {
-              <tr><td colspan="8" style="text-align:center;color:#94A3B8;padding:32px;">No hay ventas registradas.</td></tr>
+              <tr><td colspan="8" class="empty-row">No hay ventas registradas.</td></tr>
             }
           </tbody>
         </table>
@@ -197,16 +201,16 @@
 @if (modalClienteVisible) {
   <app-modal title="Registrar Cliente" size="sm" (close)="modalClienteVisible=false">
     <div class="form-group">
-      <label>Nombre completo <span class="req">*</span></label>
-      <input class="form-control" placeholder="Nombre del cliente" [(ngModel)]="nuevoCliente.nombre">
+      <label for="cliente-nombre">Nombre completo <span class="req">*</span></label>
+      <input id="cliente-nombre" class="form-control" placeholder="Nombre del cliente" [(ngModel)]="nuevoCliente.nombre">
     </div>
     <div class="form-group">
-      <label>DNI <span class="req">*</span></label>
-      <input class="form-control" placeholder="Ej: 75897634" [(ngModel)]="nuevoCliente.dni">
+      <label for="cliente-dni">DNI <span class="req">*</span></label>
+      <input id="cliente-dni" class="form-control" placeholder="Ej: 75897634" [(ngModel)]="nuevoCliente.dni">
     </div>
     <div class="form-group">
-      <label>Teléfono</label>
-      <input class="form-control" placeholder="Ej: 999888777" [(ngModel)]="nuevoCliente.telefono">
+      <label for="cliente-telefono">Teléfono</label>
+      <input id="cliente-telefono" class="form-control" placeholder="Ej: 999888777" [(ngModel)]="nuevoCliente.telefono">
     </div>
     <div modal-footer>
       <button class="btn btn-secondary" (click)="modalClienteVisible=false">Cancelar</button>
@@ -224,7 +228,7 @@
       <div class="dv-row"><span>Fecha</span><b>{{ ventaDetalle.fechaVenta | date:'dd/MM/yyyy HH:mm' }}</b></div>
       <div class="dv-row"><span>Método de pago</span><b>{{ ventaDetalle.metodoPago }}</b></div>
     </div>
-    <div class="table-wrap" style="margin-top:10px;">
+    <div class="table-wrap mt-10">
       <table>
         <thead><tr><th>Ítem</th><th>Tipo</th><th>Cant.</th><th>P. Unit.</th><th>Subtotal</th></tr></thead>
         <tbody>
@@ -240,7 +244,7 @@
         </tbody>
       </table>
     </div>
-    <div class="detalle-venta" style="margin-top:10px;">
+    <div class="detalle-venta mt-10">
       <div class="dv-row"><span>Subtotal</span><b>S/ {{ ventaDetalle.subTotal | number:'1.2-2' }}</b></div>
       <div class="dv-row"><span>IGV</span><b>S/ {{ ventaDetalle.igv | number:'1.2-2' }}</b></div>
       <div class="dv-row"><span>Descuento</span><b>S/ {{ ventaDetalle.descuento | number:'1.2-2' }}</b></div>

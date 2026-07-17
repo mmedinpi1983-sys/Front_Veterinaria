@@ -19,24 +19,26 @@
 
   <!-- Productos -->
   @if (tab === 'productos') {
-    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;">
+    <div class="stats-grid stats-grid-3">
       <div class="stat-card"><div class="stat-label">Items en Inventario</div><div class="stat-value">{{ stats.items }}</div><div class="stat-sub">{{ stats.categorias }} categorías</div></div>
       <div class="stat-card"><div class="stat-label">Bajo Stock</div><div class="stat-value stat-danger">{{ stats.bajoStock }}</div><div class="stat-sub">Requieren reposición</div></div>
       <div class="stat-card"><div class="stat-label">Valor Total</div><div class="stat-value stat-success">S/ {{ stats.valorTotal | number:'1.2-2' }}</div><div class="stat-sub">Valor total inventario</div></div>
     </div>
 
     @if (stats.bajoStock > 0) {
-      <div class="inv-alert">⚠️ <span><strong>Alerta de Stock Bajo:</strong> {{ stats.bajoStock }} producto(s) por debajo del stock mínimo requerido.</span></div>
+      <div class="inv-alert"><span class="material-icons">warning</span> <span><strong>Alerta de Stock Bajo:</strong> {{ stats.bajoStock }} producto(s) por debajo del stock mínimo requerido.</span></div>
     }
 
     <div class="card">
-      <div class="card-body" style="padding-bottom:0;">
-        <div class="search-bar" style="margin-bottom:0;">
-          <div class="search-input-wrap" style="flex:2;">
-            <span class="search-icon">🔍</span>
-            <input type="text" placeholder="Buscar producto..." [(ngModel)]="filtroProd.q" (ngModelChange)="onFiltroProd()">
+      <div class="card-body card-body-tight">
+        <div class="search-bar search-bar-flush">
+          <div class="search-input-wrap search-input-wrap-wide">
+            <label for="buscar-prod" class="visually-hidden">Buscar producto</label>
+            <span class="material-icons search-icon">search</span>
+            <input id="buscar-prod" type="text" placeholder="Buscar producto..." [(ngModel)]="filtroProd.q" (ngModelChange)="onFiltroProd()">
           </div>
-          <select class="filter-select" [(ngModel)]="filtroProd.idCategoria" (ngModelChange)="cargarProductos()">
+          <label for="filtro-prod-categoria" class="visually-hidden">Filtrar por categoría</label>
+          <select id="filtro-prod-categoria" class="filter-select" [(ngModel)]="filtroProd.idCategoria" (ngModelChange)="cargarProductos()">
             <option value="">Todas las categorías</option>
             @for (c of categorias; track c.idCategoria) { <option [value]="c.idCategoria">{{ c.nombreCategoria }}</option> }
           </select>
@@ -48,23 +50,23 @@
           <tbody>
             @for (p of productosPag; track p.idProducto) {
               <tr>
-                <td><div style="font-weight:600;">{{ p.nombre }}</div></td>
+                <td><div class="cell-name">{{ p.nombre }}</div></td>
                 <td class="text-muted text-sm">{{ p.categoria || '—' }}</td>
                 <td>
-                  <div style="font-size:13px;"><span [style.color]="claseStock(p)==='danger' ? '#DC2626' : (claseStock(p)==='warning' ? '#D97706' : '#16A34A')" style="font-weight:600;">{{ p.stock }}</span> / Min: {{ p.cantidadMinima }}</div>
-                  <div class="progress-bar" style="margin-top:4px;"><div class="progress-fill" [class.danger]="claseStock(p)==='danger'" [class.warning]="claseStock(p)==='warning'" [class.success]="claseStock(p)==='success'" [style.width.%]="porcentajeStock(p)"></div></div>
+                  <div class="stock-cell"><span class="stock-value" [class.danger]="claseStock(p)==='danger'" [class.warning]="claseStock(p)==='warning'" [class.success]="claseStock(p)==='success'">{{ p.stock }}</span> / Min: {{ p.cantidadMinima }}</div>
+                  <div class="progress-bar mt-4"><div class="progress-fill" [class.danger]="claseStock(p)==='danger'" [class.warning]="claseStock(p)==='warning'" [class.success]="claseStock(p)==='success'" [style.width.%]="porcentajeStock(p)"></div></div>
                 </td>
-                <td style="font-weight:600;">S/ {{ p.precioVenta | number:'1.2-2' }}</td>
+                <td class="cell-name">S/ {{ p.precioVenta | number:'1.2-2' }}</td>
                 <td class="text-muted text-sm">{{ p.proveedor || '—' }}</td>
                 <td class="text-muted text-sm">{{ p.fechaVencimiento ? (p.fechaVencimiento | date:'dd/MM/yyyy') : 'Sin venc.' }}</td>
                 <td><app-badge [estado]="badgeStock(p)"></app-badge></td>
                 <td><div class="table-actions">
-                  <button class="btn btn-sm btn-secondary" (click)="abrirEditarProd(p)">✏️</button>
-                  <button class="btn btn-sm" style="background:#FEE2E2;color:#DC2626;" (click)="eliminarProd(p)">🗑</button>
+                  <button class="btn btn-sm btn-secondary" (click)="abrirEditarProd(p)"><span class="material-icons">edit_note</span></button>
+                  <button class="btn btn-sm btn-danger-soft" (click)="eliminarProd(p)"><span class="material-icons">delete</span></button>
                 </div></td>
               </tr>
             }
-            @if (!productos.length) { <tr><td colspan="8" style="text-align:center;color:#94A3B8;padding:28px;">No hay productos registrados.</td></tr> }
+            @if (!productos.length) { <tr><td colspan="8" class="empty-row">No hay productos registrados.</td></tr> }
           </tbody>
         </table>
       </div>
@@ -76,20 +78,22 @@
 
   <!-- Movimientos -->
   @if (tab === 'movimientos') {
-    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;">
+    <div class="stats-grid stats-grid-3">
       <div class="stat-card"><div class="stat-label">Entradas (mes)</div><div class="stat-value stat-success">{{ movStats.entradas }}</div><div class="stat-sub">Ingreso stock</div></div>
       <div class="stat-card"><div class="stat-label">Salidas (mes)</div><div class="stat-value stat-danger">{{ movStats.salidas }}</div><div class="stat-sub">Uso y despacho</div></div>
       <div class="stat-card"><div class="stat-label">Ajustes (mes)</div><div class="stat-value stat-warning">{{ movStats.ajustes }}</div><div class="stat-sub">Correcciones</div></div>
     </div>
 
     <div class="card">
-      <div class="card-body" style="padding-bottom:0;">
-        <div class="search-bar" style="margin-bottom:0;">
-          <div class="search-input-wrap" style="flex:2;">
-            <span class="search-icon">🔍</span>
-            <input type="text" placeholder="Buscar producto..." [(ngModel)]="filtroMov.q" (ngModelChange)="onFiltroMov()">
+      <div class="card-body card-body-tight">
+        <div class="search-bar search-bar-flush">
+          <div class="search-input-wrap search-input-wrap-wide">
+            <label for="buscar-mov" class="visually-hidden">Buscar producto</label>
+            <span class="material-icons search-icon">search</span>
+            <input id="buscar-mov" type="text" placeholder="Buscar producto..." [(ngModel)]="filtroMov.q" (ngModelChange)="onFiltroMov()">
           </div>
-          <select class="filter-select" [(ngModel)]="filtroMov.idClaseMovimiento" (ngModelChange)="cargarMovimientos()">
+          <label for="filtro-mov-tipo" class="visually-hidden">Filtrar por tipo de movimiento</label>
+          <select id="filtro-mov-tipo" class="filter-select" [(ngModel)]="filtroMov.idClaseMovimiento" (ngModelChange)="cargarMovimientos()">
             <option value="">Todos los tipos</option>
             @for (c of clases; track c.idClaseMovimiento) { <option [value]="c.idClaseMovimiento">{{ c.descripcion }}</option> }
           </select>
@@ -102,16 +106,16 @@
             @for (m of movimientosPag; track m.idMovimiento) {
               <tr>
                 <td class="text-muted text-sm">{{ m.fecha | date:'dd/MM/yyyy' }}</td>
-                <td style="font-weight:600;">{{ m.producto }}</td>
+                <td class="cell-name">{{ m.producto }}</td>
                 <td><app-badge [estado]="badgeTipo(m.tipo)"></app-badge></td>
-                <td [style.color]="signo(m.tipo)==='-' ? '#DC2626' : '#16A34A'" style="font-weight:600;">{{ signo(m.tipo) }}{{ m.cantidad }}</td>
+                <td class="qty-signed" [class.out]="signo(m.tipo)==='-'" [class.in]="signo(m.tipo)!=='-'">{{ signo(m.tipo) }}{{ m.cantidad }}</td>
                 <td class="text-muted">{{ m.stockAnterior }}</td>
-                <td style="font-weight:600;">{{ m.stockNuevo }}</td>
+                <td class="cell-name">{{ m.stockNuevo }}</td>
                 <td class="text-muted text-sm">{{ m.motivo }}</td>
                 <td class="text-muted text-sm">{{ m.empleado }}</td>
               </tr>
             }
-            @if (!movimientos.length) { <tr><td colspan="8" style="text-align:center;color:#94A3B8;padding:28px;">No hay movimientos registrados.</td></tr> }
+            @if (!movimientos.length) { <tr><td colspan="8" class="empty-row">No hay movimientos registrados.</td></tr> }
           </tbody>
         </table>
       </div>
@@ -125,29 +129,29 @@
 <!-- MODAL: PRODUCTO -->
 @if (modalProdVisible) {
   <app-modal [title]="editandoProd ? 'Editar Producto' : 'Nuevo Producto'" subtitle="Datos del producto" (close)="modalProdVisible=false">
-    <div class="form-group"><label>Nombre del Producto <span class="req">*</span></label><input class="form-control" [(ngModel)]="formProd.nombre"></div>
+    <div class="form-group"><label for="prod-nombre">Nombre del Producto <span class="req">*</span></label><input id="prod-nombre" class="form-control" [(ngModel)]="formProd.nombre"></div>
     <div class="form-row">
-      <div class="form-group"><label>Categoría <span class="req">*</span></label>
-        <select class="form-control" [(ngModel)]="formProd.idCategoria">
+      <div class="form-group"><label for="prod-categoria">Categoría <span class="req">*</span></label>
+        <select id="prod-categoria" class="form-control" [(ngModel)]="formProd.idCategoria">
           <option value="">Seleccionar</option>
           @for (c of categorias; track c.idCategoria) { <option [value]="c.idCategoria">{{ c.nombreCategoria }}</option> }
         </select>
       </div>
-      <div class="form-group"><label>Concentración / Unidad</label><input class="form-control" [(ngModel)]="formProd.concentracion" placeholder="Ej: Cápsulas"></div>
+      <div class="form-group"><label for="prod-concentracion">Concentración / Unidad</label><input id="prod-concentracion" class="form-control" [(ngModel)]="formProd.concentracion" placeholder="Ej: Cápsulas"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>Stock Actual <span class="req">*</span></label><input class="form-control" type="number" [(ngModel)]="formProd.cantidadIngreso"></div>
-      <div class="form-group"><label>Stock Mínimo <span class="req">*</span></label><input class="form-control" type="number" [(ngModel)]="formProd.cantidadMinima"></div>
+      <div class="form-group"><label for="prod-stock-actual">Stock Actual <span class="req">*</span></label><input id="prod-stock-actual" class="form-control" type="number" [(ngModel)]="formProd.cantidadIngreso"></div>
+      <div class="form-group"><label for="prod-stock-minimo">Stock Mínimo <span class="req">*</span></label><input id="prod-stock-minimo" class="form-control" type="number" [(ngModel)]="formProd.cantidadMinima"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>Precio Venta <span class="req">*</span></label><input class="form-control" type="number" [(ngModel)]="formProd.precioVenta"></div>
-      <div class="form-group"><label>Precio Compra</label><input class="form-control" type="number" [(ngModel)]="formProd.precioCompra"></div>
+      <div class="form-group"><label for="prod-precio-venta">Precio Venta <span class="req">*</span></label><input id="prod-precio-venta" class="form-control" type="number" [(ngModel)]="formProd.precioVenta"></div>
+      <div class="form-group"><label for="prod-precio-compra">Precio Compra</label><input id="prod-precio-compra" class="form-control" type="number" [(ngModel)]="formProd.precioCompra"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>Proveedor</label><input class="form-control" [(ngModel)]="formProd.proveedor"></div>
-      <div class="form-group"><label>Fecha de Vencimiento</label><input class="form-control" type="date" [(ngModel)]="formProd.fechaVencimiento"></div>
+      <div class="form-group"><label for="prod-proveedor">Proveedor</label><input id="prod-proveedor" class="form-control" [(ngModel)]="formProd.proveedor"></div>
+      <div class="form-group"><label for="prod-fecha-vencimiento">Fecha de Vencimiento</label><input id="prod-fecha-vencimiento" class="form-control" type="date" [(ngModel)]="formProd.fechaVencimiento"></div>
     </div>
-    <div class="form-group"><label>Notas</label><textarea class="form-control" [(ngModel)]="formProd.notas"></textarea></div>
+    <div class="form-group"><label for="prod-notas">Notas</label><textarea id="prod-notas" class="form-control" [(ngModel)]="formProd.notas"></textarea></div>
     <div modal-footer>
       <button class="btn btn-secondary" (click)="modalProdVisible=false">Cancelar</button>
       <button class="btn btn-primary" (click)="guardarProd()">{{ editandoProd ? 'Guardar Cambios' : 'Crear Producto' }}</button>
@@ -158,28 +162,28 @@
 <!-- MODAL: MOVIMIENTO -->
 @if (modalMovVisible) {
   <app-modal title="Registrar Movimiento" subtitle="Entrada, salida o ajuste de stock" (close)="modalMovVisible=false">
-    <div class="form-group"><label>Producto <span class="req">*</span></label>
-      <select class="form-control" [(ngModel)]="formMov.idProducto">
+    <div class="form-group"><label for="mov-producto">Producto <span class="req">*</span></label>
+      <select id="mov-producto" class="form-control" [(ngModel)]="formMov.idProducto">
         <option value="">Seleccionar producto</option>
         @for (p of catalogoProd; track p.idProducto) { <option [value]="p.idProducto">{{ p.nombre }} (stock: {{ p.stock }})</option> }
       </select>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>Tipo de Movimiento <span class="req">*</span></label>
-        <select class="form-control" [(ngModel)]="formMov.idClaseMovimiento">
+      <div class="form-group"><label for="mov-tipo">Tipo de Movimiento <span class="req">*</span></label>
+        <select id="mov-tipo" class="form-control" [(ngModel)]="formMov.idClaseMovimiento">
           <option value="">Seleccionar</option>
           @for (c of clases; track c.idClaseMovimiento) { <option [value]="c.idClaseMovimiento">{{ c.descripcion }}</option> }
         </select>
       </div>
-      <div class="form-group"><label>Cantidad <span class="req">*</span></label><input class="form-control" type="number" min="1" [(ngModel)]="formMov.cantidad"></div>
+      <div class="form-group"><label for="mov-cantidad">Cantidad <span class="req">*</span></label><input id="mov-cantidad" class="form-control" type="number" min="1" [(ngModel)]="formMov.cantidad"></div>
     </div>
-    <div class="form-group"><label>Motivo <span class="req">*</span></label>
-      <select class="form-control" [(ngModel)]="formMov.idMotivoMovimiento">
+    <div class="form-group"><label for="mov-motivo">Motivo <span class="req">*</span></label>
+      <select id="mov-motivo" class="form-control" [(ngModel)]="formMov.idMotivoMovimiento">
         <option value="">Seleccionar motivo</option>
         @for (mo of motivos; track mo.idMotivoMovimiento) { <option [value]="mo.idMotivoMovimiento">{{ mo.descripcion }}</option> }
       </select>
     </div>
-    <div class="form-group"><label>Observaciones</label><textarea class="form-control" [(ngModel)]="formMov.observaciones"></textarea></div>
+    <div class="form-group"><label for="mov-observaciones">Observaciones</label><textarea id="mov-observaciones" class="form-control" [(ngModel)]="formMov.observaciones"></textarea></div>
     <div modal-footer>
       <button class="btn btn-secondary" (click)="modalMovVisible=false">Cancelar</button>
       <button class="btn btn-primary" (click)="guardarMov()">Guardar Movimiento</button>

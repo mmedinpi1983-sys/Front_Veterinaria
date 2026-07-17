@@ -1,0 +1,60 @@
+:host { display: contents;}
+
+.tabs-wrap { margin-bottom: 20px;}
+
+.tabs-wrap-sm { margin-bottom: 16px; }
+
+.card-veterinaria { max-width: 680px;}
+
+.card-sistema { max-width: 540px;}
+
+.card-mb { margin-bottom: 20px; }
+
+.card-body-flush {padding: 0; }
+
+.actions-end { 
+  display: flex; 
+  justify-content: flex-end; 
+}
+
+.role-actions { 
+  display: flex;
+  gap: 8px; 
+}
+
+.empty-row { 
+  text-align: center; 
+  padding: 32px; 
+  color: #64748B;
+}
+
+.empty-row-sm { 
+  text-align: center;
+  padding: 24px;
+  color: #64748B;
+}
+
+.estado-label {
+  font-size: 12px; 
+  margin-left: 6px; 
+}
+.estado-label.activo { color: #16A34A; }
+.estado-label.inactivo { color: #DC2626; }
+
+.permiso-name { padding: 10px 14px;
+  font-size: 13.5px; 
+}
+.permiso-cell { padding: 10px 14px; }
+
+.btn-danger-soft { background: #FEE2E2;
+  color: #DC2626; }
+
+.section-label {
+  font-weight: 600;
+  font-size: 13px;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 12px;
+}
+.section-label.spaced { margin: 16px 0 12px; }

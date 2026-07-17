@@ -62,11 +62,11 @@ export class Pacientes implements OnInit {
   editando: any = null;
 
   constructor(
-    private mascotaService: MascotaService,
-    private pacienteService: PacienteService,
-    private http: HttpClient,
-    private router: Router,
-    private cdr: ChangeDetectorRef
+    private readonly mascotaService: MascotaService,
+    private readonly pacienteService: PacienteService,
+    private readonly http: HttpClient,
+    private readonly router: Router,
+    private readonly cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {

@@ -18,20 +18,23 @@
       </div>
 
       <!-- FILTROS -->
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-body" style="padding:14px 20px;">
+      <div class="card card-mb">
+        <div class="card-body card-body-compact">
           <div class="search-bar">
             <app-search-bar placeholder="Buscar mascota o propietario..." [(texto)]="filtros.busqueda" (buscar)="onFiltroChange()"></app-search-bar>
-            <select class="filter-select" [(ngModel)]="filtros.idEstado" (change)="cargarCitas()">
+            <label for="filtro-estado-cita" class="visually-hidden">Filtrar por estado</label>
+            <select id="filtro-estado-cita" class="filter-select" [(ngModel)]="filtros.idEstado" (change)="cargarCitas()">
               <option value="">Todos los estados</option>
               <option value="1">Pendiente</option>
               <option value="2">Completado</option>
               <option value="3">Cancelado</option>
             </select>
-            <div style="display:flex;gap:6px;align-items:center;">
-              <input type="date" class="filter-select" [(ngModel)]="filtros.fechaInicio" (change)="cargarCitas()">
-              <span style="color:#64748B;font-size:13px;">al</span>
-              <input type="date" class="filter-select" [(ngModel)]="filtros.fechaFin" (change)="cargarCitas()">
+            <div class="date-range">
+              <label for="filtro-fecha-inicio" class="visually-hidden">Fecha inicio</label>
+              <input id="filtro-fecha-inicio" type="date" class="filter-select" [(ngModel)]="filtros.fechaInicio" (change)="cargarCitas()">
+              <span class="date-range-sep">al</span>
+              <label for="filtro-fecha-fin" class="visually-hidden">Fecha fin</label>
+              <input id="filtro-fecha-fin" type="date" class="filter-select" [(ngModel)]="filtros.fechaFin" (change)="cargarCitas()">
             </div>
           </div>
         </div>
@@ -49,7 +52,7 @@
             </thead>
             <tbody>
               @if (citasPaginadas.length === 0) {
-                <tr><td colspan="9" style="text-align:center;padding:32px;color:#64748B;">No hay citas registradas</td></tr>
+                <tr><td colspan="9" class="empty-row">No hay citas registradas</td></tr>
               }
               @for (c of citasPaginadas; track c.idCitaProgramada; let i = $index) {
                 <tr>
@@ -57,7 +60,7 @@
                   <td><strong>{{c.horaInicio?.substring(0,5)}}</strong></td>
                   <td class="text-muted">{{c.fecha}}</td>
                   <td>
-                    <span style="font-weight:600;">{{c.nombreMascota}}</span><br>
+                    <span class="fw-600">{{c.nombreMascota}}</span><br>
                     @if (c.especie || c.raza) {
                       <span class="text-muted text-sm">{{c.especie}}{{c.especie && c.raza ? ' · ' : ''}}{{c.raza}}</span>
                     }
@@ -71,11 +74,12 @@
                       <button class="btn btn-sm btn-secondary" (click)="verDetalle(c)" title="Ver detalle"><span class="material-icons">visibility</span></button>
                       <button class="btn btn-sm btn-secondary"
                         [disabled]="c.estadoCita !== 'Pendiente'"
-                        [style.opacity]="c.estadoCita !== 'Pendiente' ? '0.35' : '1'"
+                        [class.btn-faded]="c.estadoCita !== 'Pendiente'"
                         (click)="c.estadoCita === 'Pendiente' && abrirReprogramar(c)" title="Reprogramar"><span class="material-icons">edit_calendar</span></button>
                       <button class="btn btn-sm"
                         [disabled]="c.estadoCita !== 'Pendiente'"
-                        [style]="c.estadoCita !== 'Pendiente' ? 'background:#F1F5F9;color:#CBD5E1;' : 'background:#FEE2E2;color:#DC2626;'"
+                        [class.btn-danger-soft]="c.estadoCita === 'Pendiente'"
+                        [class.btn-cancel-disabled]="c.estadoCita !== 'Pendiente'"
                         (click)="c.estadoCita === 'Pendiente' && cancelarCita(c.idCitaProgramada)" title="Cancelar"><span class="material-icons">cancel</span></button>
                     </div>
                   </td>
@@ -93,11 +97,11 @@
 @if (modalNuevaVisible) {
   <app-modal title="Nueva Cita" subtitle="Completa los datos de la consulta" (close)="modalNuevaVisible=false">
         <!-- Búsqueda mascota en tiempo real -->
-        <div class="form-group" style="position:relative;">
-          <label>Mascota / Propietario <span class="req">*</span></label>
+        <div class="form-group form-group-relative">
+          <label for="nueva-cita-busqueda-mascota">Mascota / Propietario <span class="req">*</span></label>
           <div class="search-input-wrap">
             <span class="material-icons search-icon">search</span>
-            <input class="form-control" type="text"
+            <input id="nueva-cita-busqueda-mascota" class="form-control" type="text"
               placeholder="Buscar por nombre de mascota o propietario..."
               [(ngModel)]="busquedaMascota"
               (input)="onBusquedaMascota()"
@@ -108,7 +112,7 @@
             <div class="sugerencias">
               @for (m of mascotasBusqueda; track m.idMascota) {
                 <div class="sugerencia-item" (mousedown)="seleccionarMascota(m)">
-                  <span style="font-weight:600;">{{m.nombre}}</span>
+                  <span class="fw-600">{{m.nombre}}</span>
                   <span class="text-muted text-sm"> — {{m.especie}} · {{m.raza}}</span><br>
                   <span class="text-muted text-sm">Propietario: {{m.nombreDueno || 'Sin asignar'}}</span>
                 </div>
@@ -117,15 +121,15 @@
           }
           @if (mascotaSeleccionada) {
             <div class="mascota-seleccionada">
-              <span>✅ {{mascotaSeleccionada.nombre}}</span>
+              <span><span class="material-icons">check_circle</span>{{mascotaSeleccionada.nombre}}</span>
               <span class="text-muted text-sm"> — {{mascotaSeleccionada.nombreDueno}}</span>
             </div>
           }
         </div>
 
         <div class="form-group">
-          <label>Tipo de Servicio <span class="req">*</span></label>
-          <select class="form-control" [(ngModel)]="nuevaCita.idServicio">
+          <label for="nueva-cita-servicio">Tipo de Servicio <span class="req">*</span></label>
+          <select id="nueva-cita-servicio" class="form-control" [(ngModel)]="nuevaCita.idServicio">
             <option value="">Seleccionar servicio...</option>
             @for (s of servicios; track s.idServicio) {
               <option [value]="s.idServicio">{{s.nombre}}</option>
@@ -133,8 +137,8 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Veterinario <span class="req">*</span></label>
-          <select class="form-control" [(ngModel)]="nuevaCita.idProgramacion" (change)="onVetOrFechaChange()">
+          <label for="nueva-cita-veterinario">Veterinario <span class="req">*</span></label>
+          <select id="nueva-cita-veterinario" class="form-control" [(ngModel)]="nuevaCita.idProgramacion" (change)="onVetOrFechaChange()">
             <option value="">Seleccionar veterinario...</option>
             @for (v of veterinarios; track v.idProgramacion) {
               <option [value]="v.idProgramacion">{{v.nombreVeterinario}} — {{v.nombreTurno}} ({{v.horaInicio}}–{{v.horaFin}})</option>
@@ -143,12 +147,12 @@
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Fecha <span class="req">*</span></label>
-            <input class="form-control" type="date" [(ngModel)]="nuevaCita.fecha" (change)="onVetOrFechaChange()">
+            <label for="nueva-cita-fecha">Fecha <span class="req">*</span></label>
+            <input id="nueva-cita-fecha" class="form-control" type="date" [(ngModel)]="nuevaCita.fecha" (change)="onVetOrFechaChange()">
           </div>
           <div class="form-group">
-            <label>Hora <span class="req">*</span></label>
-            <select class="form-control" [(ngModel)]="nuevaCita.hora" [disabled]="!nuevaCita.idProgramacion || !nuevaCita.fecha">
+            <label for="nueva-cita-hora">Hora <span class="req">*</span></label>
+            <select id="nueva-cita-hora" class="form-control" [(ngModel)]="nuevaCita.hora" [disabled]="!nuevaCita.idProgramacion || !nuevaCita.fecha">
               <option value="">{{ !nuevaCita.idProgramacion ? 'Elige un veterinario' : (!nuevaCita.fecha ? 'Elige una fecha' : (horasDisponibles.length ? 'Seleccionar hora...' : 'Sin horas disponibles')) }}</option>
               @for (h of horasDisponibles; track h) {
                 <option [value]="h">{{h}}</option>
@@ -157,8 +161,8 @@
           </div>
         </div>
         <div class="form-group">
-          <label>Motivo de Consulta <span class="req">*</span></label>
-          <textarea class="form-control" [(ngModel)]="nuevaCita.motivo" placeholder="Describe el motivo de la consulta..."></textarea>
+          <label for="nueva-cita-motivo">Motivo de Consulta <span class="req">*</span></label>
+          <textarea id="nueva-cita-motivo" class="form-control" [(ngModel)]="nuevaCita.motivo" placeholder="Describe el motivo de la consulta..."></textarea>
         </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" (click)="modalNuevaVisible=false">Cancelar</button>
@@ -170,42 +174,42 @@
 <!-- MODAL DETALLE -->
 @if (modalDetalleVisible && citaSeleccionada) {
   <app-modal title="Detalle de Cita" size="sm" [footer]="false" (close)="modalDetalleVisible=false">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-          <div style="display:flex;align-items:center;gap:10px;">
-            <div style="width:40px;height:40px;background:#1E3A5F;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;">🐾</div>
+        <div class="detail-header">
+          <div class="detail-header-left">
+            <div class="avatar-circle"><span class="material-icons">pets</span></div>
             <div>
-              <div style="font-weight:700;font-size:15px;">{{citaSeleccionada.nombreMascota}}</div>
-              <div style="font-size:12px;color:#64748B;">Propietario: {{citaSeleccionada.nombreDueno}}</div>
+              <div class="detail-name">{{citaSeleccionada.nombreMascota}}</div>
+              <div class="detail-sub">Propietario: {{citaSeleccionada.nombreDueno}}</div>
             </div>
           </div>
           <app-badge [estado]="citaSeleccionada.estadoCita"></app-badge>
         </div>
-        <div class="grid-2" style="gap:12px;margin-bottom:16px;">
-          <div style="background:#F8FAFC;border-radius:8px;padding:12px;">
-            <div style="font-size:11px;color:#64748B;font-weight:600;text-transform:uppercase;">Servicio</div>
-            <div style="font-weight:500;margin-top:4px;">{{citaSeleccionada.nombreServicio}}</div>
+        <div class="grid-2 detail-grid">
+          <div class="detail-box">
+            <div class="detail-box-label">Servicio</div>
+            <div class="detail-box-value">{{citaSeleccionada.nombreServicio}}</div>
           </div>
-          <div style="background:#F8FAFC;border-radius:8px;padding:12px;">
-            <div style="font-size:11px;color:#64748B;font-weight:600;text-transform:uppercase;">Veterinario</div>
-            <div style="font-weight:500;margin-top:4px;">{{citaSeleccionada.nombreVeterinario}}</div>
+          <div class="detail-box">
+            <div class="detail-box-label">Veterinario</div>
+            <div class="detail-box-value">{{citaSeleccionada.nombreVeterinario}}</div>
           </div>
-          <div style="background:#F8FAFC;border-radius:8px;padding:12px;">
-            <div style="font-size:11px;color:#64748B;font-weight:600;text-transform:uppercase;">Fecha</div>
-            <div style="font-weight:500;margin-top:4px;">{{citaSeleccionada.fecha}}</div>
+          <div class="detail-box">
+            <div class="detail-box-label">Fecha</div>
+            <div class="detail-box-value">{{citaSeleccionada.fecha}}</div>
           </div>
-          <div style="background:#F8FAFC;border-radius:8px;padding:12px;">
-            <div style="font-size:11px;color:#64748B;font-weight:600;text-transform:uppercase;">Hora</div>
-            <div style="font-weight:500;margin-top:4px;">{{citaSeleccionada.horaInicio?.substring(0,5)}}@if (citaSeleccionada.horaFin) { – {{citaSeleccionada.horaFin?.substring(0,5)}}}</div>
+          <div class="detail-box">
+            <div class="detail-box-label">Hora</div>
+            <div class="detail-box-value">{{citaSeleccionada.horaInicio?.substring(0,5)}}@if (citaSeleccionada.horaFin) { – {{citaSeleccionada.horaFin?.substring(0,5)}}}</div>
           </div>
         </div>
         @if (citaSeleccionada.estadoCita === 'Pendiente') {
-          <button class="btn btn-primary w-full" style="margin-bottom:8px;" (click)="iniciarAtencion()">Iniciar Atención</button>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <button class="btn btn-primary w-full mb-8" (click)="iniciarAtencion()">Iniciar Atención</button>
+          <div class="detail-actions-grid">
             <button class="btn btn-secondary w-full" (click)="cancelarDesdeModal()">Cancelar cita</button>
             <button class="btn btn-secondary w-full" (click)="abrirReprogramar(citaSeleccionada)">Reprogramar</button>
           </div>
         } @else {
-          <div style="text-align:center;padding:12px;background:#F8FAFC;border-radius:8px;color:#64748B;font-size:13px;">
+          <div class="detail-notice">
             Esta cita está <strong>{{citaSeleccionada.estadoCita}}</strong> y no puede modificarse.
           </div>
         }
@@ -216,8 +220,8 @@
 @if (modalReprogVisible) {
   <app-modal title="Reprogramar Cita" subtitle="Actualice los datos de la cita" size="sm" (close)="modalReprogVisible=false">
         <div class="form-group">
-          <label>Veterinario <span class="req">*</span></label>
-          <select class="form-control" [(ngModel)]="reprog.idProgramacion" (change)="onVetOrFechaChangeReprog()">
+          <label for="reprog-veterinario">Veterinario <span class="req">*</span></label>
+          <select id="reprog-veterinario" class="form-control" [(ngModel)]="reprog.idProgramacion" (change)="onVetOrFechaChangeReprog()">
             <option value="">Seleccionar veterinario...</option>
             @for (v of veterinarios; track v.idProgramacion) {
               <option [value]="v.idProgramacion">{{v.nombreVeterinario}} — {{v.nombreTurno}} ({{v.horaInicio}}–{{v.horaFin}})</option>
@@ -225,15 +229,15 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Nueva fecha <span class="req">*</span></label>
-          <input type="date" class="form-control" [(ngModel)]="reprog.fecha" (change)="onVetOrFechaChangeReprog()">
+          <label for="reprog-fecha">Nueva fecha <span class="req">*</span></label>
+          <input id="reprog-fecha" type="date" class="form-control" [(ngModel)]="reprog.fecha" (change)="onVetOrFechaChangeReprog()">
           @if (reprog.fecha) {
-            <div class="fecha-formateada">📅 {{formatFechaReprog(reprog.fecha)}}</div>
+            <div class="fecha-formateada"><span class="material-icons">event</span>{{formatFechaReprog(reprog.fecha)}}</div>
           }
         </div>
         <div class="form-group">
-          <label>Nueva hora <span class="req">*</span></label>
-          <select class="form-control" [(ngModel)]="reprog.hora" [disabled]="!reprog.idProgramacion || !reprog.fecha">
+          <label for="reprog-hora">Nueva hora <span class="req">*</span></label>
+          <select id="reprog-hora" class="form-control" [(ngModel)]="reprog.hora" [disabled]="!reprog.idProgramacion || !reprog.fecha">
             <option value="">{{ !reprog.idProgramacion ? 'Elige un veterinario' : (!reprog.fecha ? 'Elige una fecha' : (horasDisponiblesReprog.length ? 'Seleccionar hora...' : 'Sin horas disponibles')) }}</option>
             @for (h of horasDisponiblesReprog; track h) {
               <option [value]="h">{{h}}</option>
@@ -241,8 +245,8 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Motivo de reprogramación <span class="req">*</span></label>
-          <textarea class="form-control" [(ngModel)]="reprog.motivo" placeholder="Explica el motivo del cambio..."></textarea>
+          <label for="reprog-motivo">Motivo de reprogramación <span class="req">*</span></label>
+          <textarea id="reprog-motivo" class="form-control" [(ngModel)]="reprog.motivo" placeholder="Explica el motivo del cambio..."></textarea>
         </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" (click)="modalReprogVisible=false">Volver</button>

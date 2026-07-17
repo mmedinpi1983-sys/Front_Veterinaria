@@ -1,6 +1,6 @@
 <aside class="sidebar">
   <div class="sidebar-logo">
-    <img src="IMG.png" alt="VetClinic" style="width:130px;display:block;margin:0 auto;filter:invert(1) contrast(4);mix-blend-mode:screen;">
+    <img src="IMG.png" alt="VetClinic" class="sidebar-logo-img">
   </div>
   <nav class="sidebar-nav">
     @if (acceso?.superAdmin || acceso?.modulos?.includes('dashboard')) {
@@ -13,7 +13,7 @@
       <div class="nav-item" routerLink="/citas" routerLinkActive="active"><span class="material-icons">calendar_month</span> Citas</div>
     }
     @if (acceso?.superAdmin || acceso?.modulos?.includes('atencion clinica')) {
-      <div class="nav-item" style="opacity:0.5;cursor:default;"><span class="material-icons">local_hospital</span> Atención Clínica</div>
+      <div class="nav-item nav-item-disabled"><span class="material-icons">local_hospital</span> Atención Clínica</div>
     }
     @if (acceso?.superAdmin || acceso?.modulos?.includes('ventas')) {
       <div class="nav-item" routerLink="/ventas" routerLinkActive="active"><span class="material-icons">shopping_cart</span> Ventas</div>
@@ -23,6 +23,6 @@
     }
   </nav>
   <div class="sidebar-footer">
-    <div class="nav-item" (click)="cerrarSesion()" style="cursor:pointer;"><span class="material-icons">logout</span> Cerrar Sesión</div>
+    <div class="nav-item" (click)="cerrarSesion()"><span class="material-icons">logout</span> Cerrar Sesión</div>
   </div>
 </aside>

@@ -6,18 +6,18 @@
     </div>
     <div class="login-body">
       <div class="form-group">
-        <label>Correo Electrónico</label>
-        <input class="form-control" type="email" [(ngModel)]="correo" placeholder="Ingresa tu correo electrónico" (keyup.enter)="ingresar()">
+        <label for="login-correo">Correo Electrónico</label>
+        <input id="login-correo" class="form-control" type="email" [(ngModel)]="correo" placeholder="Ingresa tu correo electrónico" (keyup.enter)="ingresar()">
       </div>
       <div class="form-group">
-        <label>Contraseña</label>
-        <div style="position:relative;">
-          <input class="form-control" [type]="mostrarClave ? 'text' : 'password'" [(ngModel)]="contrasena" placeholder="••••••••" (keyup.enter)="ingresar()" style="padding-right:42px;">
+        <label for="login-contrasena">Contraseña</label>
+        <div class="password-field">
+          <input id="login-contrasena" class="form-control password-input" [type]="mostrarClave ? 'text' : 'password'" [(ngModel)]="contrasena" placeholder="••••••••" (keyup.enter)="ingresar()">
           <button type="button" (click)="mostrarClave = !mostrarClave"
             [attr.aria-label]="mostrarClave ? 'Ocultar contraseña' : 'Mostrar contraseña'"
             [title]="mostrarClave ? 'Ocultar contraseña' : 'Mostrar contraseña'"
-            style="position:absolute; right:6px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; padding:4px;">
-            <span class="material-icons" style="font-size:18px; color:#666;">
+            class="password-toggle">
+            <span class="material-icons">
               {{ mostrarClave ? 'visibility' : 'visibility_off' }}
             </span>
           </button>

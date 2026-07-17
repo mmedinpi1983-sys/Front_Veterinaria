@@ -6,13 +6,13 @@
         <p class="page-subtitle">Análisis y métricas de la clínica</p>
       </div>
       <div class="page-header-actions">
-        <button class="btn btn-secondary" (click)="abrirFiltros()">🔧 Filtros / Generar Reporte</button>
+        <button class="btn btn-secondary" (click)="abrirFiltros()"><span class="material-icons">tune</span>Filtros / Generar Reporte</button>
       </div>
     </div>
   </div>
 
   <!-- STATS -->
-  <div class="stats-grid" style="margin-bottom:20px;">
+  <div class="stats-grid">
     <div class="stat-card">
       <div class="stat-label">Ingresos del Mes</div>
       <div class="stat-value stat-success">S/ {{ resumen.ingresosMes | number:'1.2-2' }}</div>
@@ -35,10 +35,10 @@
     </div>
   </div>
 
-  <div class="grid-2" style="margin-bottom:20px;">
+  <div class="grid-2 mb-20">
     <!-- CITAS POR DIA -->
     <div class="card">
-      <div class="card-header"><span class="card-title">📅 Citas por día (semana actual)</span></div>
+      <div class="card-header"><span class="card-title"><span class="material-icons">event</span>Citas por día (semana actual)</span></div>
       <div class="card-body">
         <div class="bar-chart">
           @for (d of citasSemana; track d.etiqueta) {
@@ -57,19 +57,19 @@
 
     <!-- INGRESOS POR CATEGORIA -->
     <div class="card">
-      <div class="card-header"><span class="card-title">💰 Ingresos por categoría</span></div>
-      <div class="card-body" style="display:flex;align-items:center;gap:20px;">
+      <div class="card-header"><span class="card-title"><span class="material-icons">paid</span>Ingresos por categoría</span></div>
+      <div class="card-body card-body-dona">
         <div class="dona" [style.background]="gradiente"><div class="dona-hole"></div></div>
-        <div style="flex:1;">
+        <div class="cat-list">
           @for (c of ingresosCategoria; track c.categoria; let i = $index) {
             <div class="cat-row">
               <span class="dot" [style.background]="colores[i % colores.length]"></span>
-              <span style="flex:1;">{{ c.categoria }}</span>
-              <span style="font-weight:600;">S/ {{ c.total | number:'1.2-2' }}</span>
-              <span style="color:#64748B;font-size:12px;">{{ pct(c.total) }}%</span>
+              <span class="cat-nombre">{{ c.categoria }}</span>
+              <span class="cat-total">S/ {{ c.total | number:'1.2-2' }}</span>
+              <span class="cat-pct">{{ pct(c.total) }}%</span>
             </div>
           }
-          @if (!ingresosCategoria.length) { <div style="color:#94A3B8;font-size:13px;">Sin ventas registradas.</div> }
+          @if (!ingresosCategoria.length) { <div class="empty-text">Sin ventas registradas.</div> }
         </div>
       </div>
     </div>
@@ -78,7 +78,7 @@
   <div class="grid-2">
     <!-- PRODUCTOS MAS VENDIDOS -->
     <div class="card">
-      <div class="card-header"><span class="card-title">🏆 Productos más vendidos</span></div>
+      <div class="card-header"><span class="card-title"><span class="material-icons">emoji_events</span>Productos más vendidos</span></div>
       <div class="card-body">
         @for (p of productosTop; track p.nombre) {
           <div class="hbar-row">
@@ -87,13 +87,13 @@
             <div class="hbar-val">{{ p.cantidad }}</div>
           </div>
         }
-        @if (!productosTop.length) { <div style="color:#94A3B8;font-size:13px;text-align:center;padding:16px;">Sin productos vendidos aún.</div> }
+        @if (!productosTop.length) { <div class="empty-text-center">Sin productos vendidos aún.</div> }
       </div>
     </div>
 
     <!-- PACIENTES NUEVOS -->
     <div class="card">
-      <div class="card-header"><span class="card-title">🐾 Pacientes nuevos por mes</span></div>
+      <div class="card-header"><span class="card-title"><span class="material-icons">pets</span>Pacientes nuevos por mes</span></div>
       <div class="card-body">
         <div class="bar-chart">
           @for (m of pacientesMes; track m.etiqueta) {
@@ -103,7 +103,7 @@
               <div class="bar-label">{{ m.etiqueta }}</div>
             </div>
           }
-          @if (!pacientesMes.length) { <div style="color:#94A3B8;font-size:13px;">Sin datos.</div> }
+          @if (!pacientesMes.length) { <div class="empty-text">Sin datos.</div> }
         </div>
       </div>
     </div>
@@ -113,18 +113,18 @@
 <!-- MODAL: FILTROS / DETALLE -->
 @if (modalFiltrosVisible) {
   <app-modal title="Filtros y Generación de Reporte" subtitle="Aplica filtros para ver el detalle de ventas" size="lg" (close)="modalFiltrosVisible=false">
-    <div class="form-row" style="grid-template-columns:1fr 1fr 1fr;">
-      <div class="form-group"><label>Fecha Inicio</label><input class="form-control" type="date" [(ngModel)]="filtro.fechaInicio"></div>
-      <div class="form-group"><label>Fecha Fin</label><input class="form-control" type="date" [(ngModel)]="filtro.fechaFin"></div>
-      <div class="form-group"><label>Tipo de reporte</label>
-        <select class="form-control" [(ngModel)]="filtro.tipo"><option>Todo</option><option>Ventas</option></select>
+    <div class="form-row form-row-3">
+      <div class="form-group"><label for="filtro-fecha-inicio">Fecha Inicio</label><input id="filtro-fecha-inicio" class="form-control" type="date" [(ngModel)]="filtro.fechaInicio"></div>
+      <div class="form-group"><label for="filtro-fecha-fin">Fecha Fin</label><input id="filtro-fecha-fin" class="form-control" type="date" [(ngModel)]="filtro.fechaFin"></div>
+      <div class="form-group"><label for="filtro-tipo-reporte">Tipo de reporte</label>
+        <select id="filtro-tipo-reporte" class="form-control" [(ngModel)]="filtro.tipo"><option>Todo</option><option>Ventas</option></select>
       </div>
     </div>
-    <div style="background:#F8FAFC;border-radius:8px;padding:14px;">
-      <div style="font-weight:600;color:#1E293B;margin-bottom:8px;font-size:13px;">Resultados · {{ detalle.length }} registro(s)</div>
+    <div class="resultados-box">
+      <div class="resultados-title">Resultados · {{ detalle.length }} registro(s)</div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Fecha</th><th>Cliente</th><th>Ítem</th><th>Vendedor</th><th style="text-align:right;">Total</th></tr></thead>
+          <thead><tr><th>Fecha</th><th>Cliente</th><th>Ítem</th><th>Vendedor</th><th class="col-right">Total</th></tr></thead>
           <tbody>
             @for (r of detallePag; track $index) {
               <tr>
@@ -132,10 +132,10 @@
                 <td class="text-sm">{{ r.cliente || 'Cliente general' }}</td>
                 <td class="text-sm">{{ r.item }}</td>
                 <td class="text-sm">{{ r.vendedor }}</td>
-                <td class="text-sm" style="text-align:right;">S/ {{ r.total | number:'1.2-2' }}</td>
+                <td class="text-sm col-right">S/ {{ r.total | number:'1.2-2' }}</td>
               </tr>
             }
-            @if (!detalle.length) { <tr><td colspan="5" style="text-align:center;color:#94A3B8;padding:20px;">Sin registros en el rango.</td></tr> }
+            @if (!detalle.length) { <tr><td colspan="5" class="empty-row">Sin registros en el rango.</td></tr> }
           </tbody>
         </table>
       </div>

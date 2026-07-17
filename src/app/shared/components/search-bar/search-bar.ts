@@ -5,7 +5,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
   selector: 'app-search-bar',
   imports: [],
   templateUrl: './search-bar.html',
-  styles: [':host { display: contents; }']
+  styleUrl: './search-bar.css'
 })
 export class SearchBar {
   @Input() placeholder = 'Buscar...';
