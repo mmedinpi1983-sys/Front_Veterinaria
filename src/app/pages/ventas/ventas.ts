@@ -78,11 +78,11 @@ export class Ventas implements OnInit {
 
   icono(p: any): string {
     const c = (p.categoria || '').toLowerCase();
-    if (c.includes('medic')) return '💊';
-    if (c.includes('vacun')) return '💉';
-    if (c.includes('alim')) return '🥫';
-    if (c.includes('acces')) return '🦴';
-    return '📦';
+    if (c.includes('medic')) return 'medication';
+    if (c.includes('vacun')) return 'vaccines';
+    if (c.includes('alim')) return 'restaurant';
+    if (c.includes('acces')) return 'pets';
+    return 'inventory_2';
   }
 
   cantidadEnCarrito(idProducto: number): number {

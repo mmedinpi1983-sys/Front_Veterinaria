@@ -1,6 +1,6 @@
     <main class="content">
-      <div style="margin-bottom:14px;">
-        <button class="btn btn-secondary btn-sm" routerLink="/pacientes">← Volver</button>
+      <div class="back-row">
+        <button class="btn btn-secondary btn-sm" routerLink="/pacientes"><span class="material-icons">arrow_back</span>Volver</button>
       </div>
       <div class="page-header">
         <h1 class="page-title">Historia Clínica</h1>
@@ -11,8 +11,8 @@
         <!-- LEFT: INFO -->
         <div class="hc-left">
           <!-- Mascota -->
-          <div class="card" style="margin-bottom:16px;">
-            <div class="card-header"><span class="card-title" style="display:inline-flex;align-items:center;gap:6px;"><span class="material-icons" style="font-size:18px;">pets</span>Información del Paciente</span></div>
+          <div class="card card-mb">
+            <div class="card-header"><span class="card-title"><span class="material-icons">pets</span>Información del Paciente</span></div>
             <div class="card-body">
               @if (mascota) {
                 <div class="info-grid">
@@ -23,24 +23,24 @@
                   <div class="info-block"><div class="info-label">Tamaño</div><div class="info-value">{{mascota.tamanio || '—'}}</div></div>
                 </div>
               } @else {
-                <p style="color:#64748B;font-size:13px;">Cargando...</p>
+                <p class="loading-text">Cargando...</p>
               }
             </div>
           </div>
 
           <!-- Dueño -->
           <div class="card">
-            <div class="card-header"><span class="card-title" style="display:inline-flex;align-items:center;gap:6px;"><span class="material-icons" style="font-size:18px;">person</span>Información del Propietario</span></div>
+            <div class="card-header"><span class="card-title"><span class="material-icons">person</span>Información del Propietario</span></div>
             <div class="card-body">
               @if (dueno) {
                 <div class="info-grid">
                   <div class="info-block"><div class="info-label">Nombre</div><div class="info-value">{{dueno.nombre}} {{dueno.apellidoPaterno}} {{dueno.apellidoMaterno}}</div></div>
                   <div class="info-block"><div class="info-label">DNI</div><div class="info-value">{{dueno.nroDocumento}}</div></div>
-                  <div class="info-block"><div class="info-label">Email</div><div class="info-value" style="font-size:12px;">{{dueno.correoElectronico || '—'}}</div></div>
+                  <div class="info-block"><div class="info-label">Email</div><div class="info-value info-value-sm">{{dueno.correoElectronico || '—'}}</div></div>
                   <div class="info-block"><div class="info-label">Teléfono</div><div class="info-value">{{dueno.nroTelefono || '—'}}</div></div>
                 </div>
               } @else {
-                <p style="color:#64748B;font-size:13px;">Sin propietario asignado</p>
+                <p class="loading-text">Sin propietario asignado</p>
               }
             </div>
           </div>
@@ -48,16 +48,16 @@
 
         <!-- RIGHT: TABS -->
         <div class="card">
-          <div class="card-body" style="padding-bottom:0;">
+          <div class="card-body card-body-tight">
             <div class="tabs">
-              <div class="tab-item" [class.active]="tabActivo==='historial'" (click)="tabActivo='historial'" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;"><span class="material-icons" style="font-size:16px;">history</span>Historial</div>
-              <div class="tab-item" [class.active]="tabActivo==='citas'" (click)="tabActivo='citas'" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;"><span class="material-icons" style="font-size:16px;">calendar_month</span>Citas</div>
+              <div class="tab-item" [class.active]="tabActivo==='historial'" (click)="tabActivo='historial'"><span class="material-icons">history</span>Historial</div>
+              <div class="tab-item" [class.active]="tabActivo==='citas'" (click)="tabActivo='citas'"><span class="material-icons">calendar_month</span>Citas</div>
             </div>
           </div>
 
           <!-- TAB HISTORIAL -->
           @if (tabActivo === 'historial') {
-            <div class="card-body" style="padding-top:12px;">
+            <div class="card-body card-body-top">
               @if (historial.length === 0) {
                 <div class="empty-state">Sin registros de atención clínica</div>
               }
@@ -80,7 +80,7 @@
                     </div>
                   }
                   @if (h.fechaProximoControl) {
-                    <div style="font-size:12px;color:#64748B;margin-top:6px;display:flex;align-items:center;gap:4px;"><span class="material-icons" style="font-size:14px;">event</span>Próximo control: {{h.fechaProximoControl}}</div>
+                    <div class="next-control"><span class="material-icons">event</span>Próximo control: {{h.fechaProximoControl}}</div>
                   }
                 </div>
               }
@@ -89,7 +89,7 @@
 
           <!-- TAB CITAS -->
           @if (tabActivo === 'citas') {
-            <div class="card-body" style="padding-top:12px;">
+            <div class="card-body card-body-top">
               @if (citas.length === 0) {
                 <div class="empty-state">Sin citas registradas</div>
               }

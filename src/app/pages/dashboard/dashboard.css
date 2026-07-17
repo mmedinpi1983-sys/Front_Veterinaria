@@ -2,6 +2,68 @@
 
 .stat-accent { color: #0EA5E9; }
 
+.variacion-positiva { color: #16A34A; }
+.variacion-negativa { color: #DC2626; }
+
+.bottom-grid { margin-bottom: 20px; }
+
+.right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card-body-flush { padding: 0; }
+
+.citas-table { width: 100%; border-collapse: collapse; }
+.citas-table tr { border-bottom: 1px solid #E2E8F0; }
+
+.cell-time { padding: 12px 20px; white-space: nowrap; }
+.cell-info { padding: 12px 14px; }
+.cell-info-right { padding: 12px 14px; text-align: right; }
+
+.cita-name { font-weight: 600; }
+.cita-meta { font-size: 12px; color: #64748B; }
+
+.empty-table-row { padding: 28px; text-align: center; color: #94A3B8; }
+
+.alert-item { margin-bottom: 14px; }
+.alert-item-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.alert-name { font-weight: 600; font-size: 13.5px; }
+.alert-stock { font-size: 12px; font-weight: 600; }
+.alert-stock.danger { color: #DC2626; }
+.alert-stock.warning { color: #D97706; }
+.alert-detail { font-size: 12px; color: #64748B; margin-bottom: 6px; }
+
+.card-link {
+  font-size: 13px;
+  color: #0EA5E9;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.card-link .material-icons { font-size: 16px; }
+
+.alert-icon { color: #D97706; }
+
+.empty-alert {
+  text-align: center;
+  color: #94A3B8;
+  font-size: 13px;
+  padding: 12px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.empty-alert .material-icons { font-size: 16px; }
+
 /* Punto de estado de la cita */
 .dot {
   display: inline-block; width: 6px; height: 6px; border-radius: 50%;

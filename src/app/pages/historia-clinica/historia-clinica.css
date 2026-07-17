@@ -1,5 +1,20 @@
 :host { display: contents; }
 
+.back-row { margin-bottom: 14px; }
+
+.card-mb { margin-bottom: 16px; }
+
+.card-body-tight { padding-bottom: 0; }
+
+.card-body-top { padding-top: 12px; }
+
+.loading-text {
+  color: #64748B;
+  font-size: 13px;
+}
+
+.info-value-sm { font-size: 12px; }
+
 .hc-grid {
   display: grid;
   grid-template-columns: 1fr 1.4fr;
@@ -20,9 +35,24 @@
 .info-value { font-size: 14px; color: #1E293B; font-weight: 500; }
 
 .tabs { display: flex; gap: 4px; border-bottom: 1px solid #F1F5F9; padding-bottom: 0; }
-.tab-item { padding: 10px 16px; font-size: 13px; font-weight: 500; color: #64748B; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tab-item {
+  padding: 10px 16px; font-size: 13px; font-weight: 500; color: #64748B; cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+}
+.tab-item .material-icons { font-size: 16px; }
 .tab-item.active { color: #1E3A5F; border-bottom-color: #1E3A5F; font-weight: 600; }
 .tab-item:hover:not(.active) { color: #1E293B; }
+
+.next-control {
+  font-size: 12px;
+  color: #64748B;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.next-control .material-icons { font-size: 14px; }
 
 .historial-item {
   border: 1px solid #E2E8F0;

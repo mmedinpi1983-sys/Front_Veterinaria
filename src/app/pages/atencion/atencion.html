@@ -1,6 +1,6 @@
     <main class="content">
-      <div style="margin-bottom:14px;">
-        <button class="btn btn-secondary btn-sm" (click)="router.navigate(['/citas'])">← Volver a Citas</button>
+      <div class="back-row">
+        <button class="btn btn-secondary btn-sm" (click)="router.navigate(['/citas'])"><span class="material-icons">arrow_back</span>Volver a Citas</button>
       </div>
       <div class="page-header">
         <h1 class="page-title">Atención Clínica</h1>
@@ -9,9 +9,9 @@
 
       <!-- PATIENT CARD -->
       <div class="status-card" *ngIf="cita">
-        <div style="width:40px;height:40px;background:#1E3A5F;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;flex-shrink:0;">🐾</div>
-        <div style="flex:1;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <div class="avatar-circle"><span class="material-icons">pets</span></div>
+        <div class="status-info">
+          <div class="status-name-row">
             <span class="patient-name">{{cita.nombreMascota}}</span>
             <span class="badge badge-accent">En proceso</span>
           </div>
@@ -27,7 +27,7 @@
 
       <!-- TABS -->
       <div class="card">
-        <div class="card-body" style="padding-bottom:0;">
+        <div class="card-body card-body-tight">
           <app-tabs [tabs]="tabs" [activo]="tabActivo" (activoChange)="showTab($event)"></app-tabs>
         </div>
 
@@ -35,138 +35,138 @@
         <div class="card-body" *ngIf="tabActivo==='triaje'">
           <div class="form-row">
             <div class="form-group">
-              <label>Método de Ingreso <span class="req">*</span></label>
-              <select class="form-control" [(ngModel)]="triaje.metodo">
+              <label for="triaje-metodo">Método de Ingreso <span class="req">*</span></label>
+              <select id="triaje-metodo" class="form-control" [(ngModel)]="triaje.metodo">
                 <option value="1">Con cita programada</option>
                 <option value="2">Urgencia</option>
                 <option value="3">Sin cita</option>
               </select>
             </div>
             <div class="form-group">
-              <label>Prioridad <span class="req">*</span></label>
-              <select class="form-control" [(ngModel)]="triaje.prioridad">
+              <label for="triaje-prioridad">Prioridad <span class="req">*</span></label>
+              <select id="triaje-prioridad" class="form-control" [(ngModel)]="triaje.prioridad">
                 <option value="1">Normal</option>
                 <option value="2">Urgente</option>
                 <option value="3">Crítico</option>
               </select>
             </div>
           </div>
-          <div style="font-weight:600;font-size:14px;margin-bottom:12px;color:#1E3A5F;">Signos Vitales</div>
+          <div class="section-label">Signos Vitales</div>
           <div class="form-row">
-            <div class="form-group"><label>Temperatura (°C)</label><input class="form-control" [(ngModel)]="triaje.temperatura" placeholder="Ej: 38.5" type="number" step="0.1"></div>
-            <div class="form-group"><label>Peso (Kg)</label><input class="form-control" [(ngModel)]="triaje.peso" placeholder="Ej: 12.0" type="number" step="0.1"></div>
+            <div class="form-group"><label for="triaje-temperatura">Temperatura (°C)</label><input id="triaje-temperatura" class="form-control" [(ngModel)]="triaje.temperatura" placeholder="Ej: 38.5" type="number" step="0.1"></div>
+            <div class="form-group"><label for="triaje-peso">Peso (Kg)</label><input id="triaje-peso" class="form-control" [(ngModel)]="triaje.peso" placeholder="Ej: 12.0" type="number" step="0.1"></div>
           </div>
-          <div class="form-group"><label>Alergias conocidas</label><input class="form-control" [(ngModel)]="triaje.alergias" placeholder="Ej: Penicilina, ninguna"></div>
-          <div class="form-group"><label>Observaciones</label><textarea class="form-control" [(ngModel)]="triaje.observaciones" placeholder="Observaciones al ingreso..."></textarea></div>
-          <div style="display:flex;justify-content:flex-end;gap:10px;">
-            <button class="btn btn-primary" (click)="submitTriaje()" [disabled]="loading">{{loading ? 'Guardando...' : 'Registrar Triaje →'}}</button>
+          <div class="form-group"><label for="triaje-alergias">Alergias conocidas</label><input id="triaje-alergias" class="form-control" [(ngModel)]="triaje.alergias" placeholder="Ej: Penicilina, ninguna"></div>
+          <div class="form-group"><label for="triaje-observaciones">Observaciones</label><textarea id="triaje-observaciones" class="form-control" [(ngModel)]="triaje.observaciones" placeholder="Observaciones al ingreso..."></textarea></div>
+          <div class="actions-end">
+            <button class="btn btn-primary" (click)="submitTriaje()" [disabled]="loading">{{loading ? 'Guardando...' : 'Registrar Triaje'}}<span class="material-icons" *ngIf="!loading">arrow_forward</span></button>
           </div>
         </div>
 
         <!-- ANAMNESIS -->
         <div class="card-body" *ngIf="tabActivo==='anamnesis'">
-          <div style="font-weight:600;font-size:14px;margin-bottom:12px;color:#1E3A5F;">Historial Médico</div>
-          <div class="form-group"><label>Antecedentes</label><textarea class="form-control" [(ngModel)]="anamnesis.antecedentes" placeholder="Enfermedades previas..."></textarea></div>
+          <div class="section-label">Historial Médico</div>
+          <div class="form-group"><label for="anamnesis-antecedentes">Antecedentes</label><textarea id="anamnesis-antecedentes" class="form-control" [(ngModel)]="anamnesis.antecedentes" placeholder="Enfermedades previas..."></textarea></div>
           <div class="form-row">
             <div class="form-group">
-              <label>¿Presenta alergias?</label>
+              <div class="form-label">¿Presenta alergias?</div>
               <div class="radio-group">
                 <label><input type="radio" name="alergias" [(ngModel)]="anamnesis.alergias" value="1"> Sí</label>
                 <label><input type="radio" name="alergias" [(ngModel)]="anamnesis.alergias" value="0"> No</label>
               </div>
             </div>
             <div class="form-group">
-              <label>¿Cirugías anteriores?</label>
+              <div class="form-label">¿Cirugías anteriores?</div>
               <div class="radio-group">
                 <label><input type="radio" name="cirugias" [(ngModel)]="anamnesis.cirugias" value="1"> Sí</label>
                 <label><input type="radio" name="cirugias" [(ngModel)]="anamnesis.cirugias" value="0"> No</label>
               </div>
             </div>
           </div>
-          <div class="form-group"><label>Medicamentos actuales</label><input class="form-control" [(ngModel)]="anamnesis.medicamentos" placeholder="Medicamentos actuales"></div>
-          <div class="form-group"><label>Historial de vacunación</label><textarea class="form-control" [(ngModel)]="anamnesis.vacunas" placeholder="Vacunas recibidas y fechas"></textarea></div>
-          <div style="font-weight:600;font-size:14px;margin:16px 0 12px;color:#1E3A5F;">Hábitos</div>
+          <div class="form-group"><label for="anamnesis-medicamentos">Medicamentos actuales</label><input id="anamnesis-medicamentos" class="form-control" [(ngModel)]="anamnesis.medicamentos" placeholder="Medicamentos actuales"></div>
+          <div class="form-group"><label for="anamnesis-vacunas">Historial de vacunación</label><textarea id="anamnesis-vacunas" class="form-control" [(ngModel)]="anamnesis.vacunas" placeholder="Vacunas recibidas y fechas"></textarea></div>
+          <div class="section-label spaced">Hábitos</div>
           <div class="form-row">
-            <div class="form-group"><label>Alimentación</label><input class="form-control" [(ngModel)]="anamnesis.alimentacion" placeholder="Tipo de dieta"></div>
-            <div class="form-group"><label>Comportamiento</label><input class="form-control" [(ngModel)]="anamnesis.comportamiento" placeholder="Tranquilo, agresivo..."></div>
+            <div class="form-group"><label for="anamnesis-alimentacion">Alimentación</label><input id="anamnesis-alimentacion" class="form-control" [(ngModel)]="anamnesis.alimentacion" placeholder="Tipo de dieta"></div>
+            <div class="form-group"><label for="anamnesis-comportamiento">Comportamiento</label><input id="anamnesis-comportamiento" class="form-control" [(ngModel)]="anamnesis.comportamiento" placeholder="Tranquilo, agresivo..."></div>
           </div>
-          <div style="font-weight:600;font-size:14px;margin:16px 0 12px;color:#1E3A5F;">Motivo consulta actual</div>
+          <div class="section-label spaced">Motivo consulta actual</div>
           <div class="form-row">
-            <div class="form-group"><label>Inicio de síntomas</label><input class="form-control" [(ngModel)]="anamnesis.inicioSintomas" placeholder="¿Cuándo comenzaron?"></div>
-            <div class="form-group"><label>Evolución</label><input class="form-control" [(ngModel)]="anamnesis.evolucionSintomas" placeholder="¿Cómo han evolucionado?"></div>
+            <div class="form-group"><label for="anamnesis-inicio-sintomas">Inicio de síntomas</label><input id="anamnesis-inicio-sintomas" class="form-control" [(ngModel)]="anamnesis.inicioSintomas" placeholder="¿Cuándo comenzaron?"></div>
+            <div class="form-group"><label for="anamnesis-evolucion">Evolución</label><input id="anamnesis-evolucion" class="form-control" [(ngModel)]="anamnesis.evolucionSintomas" placeholder="¿Cómo han evolucionado?"></div>
           </div>
-          <div class="form-group"><label>Observaciones</label><textarea class="form-control" [(ngModel)]="anamnesis.observaciones" placeholder="Información adicional..."></textarea></div>
-          <div style="display:flex;justify-content:flex-end;gap:10px;">
-            <button class="btn btn-secondary" (click)="showTab('triaje')">← Anterior</button>
-            <button class="btn btn-primary" (click)="guardarAnamnesis()">Guardar Anamnesis →</button>
+          <div class="form-group"><label for="anamnesis-obs-adicionales">Observaciones</label><textarea id="anamnesis-obs-adicionales" class="form-control" [(ngModel)]="anamnesis.observaciones" placeholder="Información adicional..."></textarea></div>
+          <div class="actions-end">
+            <button class="btn btn-secondary" (click)="showTab('triaje')"><span class="material-icons">arrow_back</span>Anterior</button>
+            <button class="btn btn-primary" (click)="guardarAnamnesis()">Guardar Anamnesis<span class="material-icons">arrow_forward</span></button>
           </div>
         </div>
 
         <!-- CONSULTA -->
         <div class="card-body" *ngIf="tabActivo==='consulta'">
-          <div class="form-group"><label>Diagnóstico <span class="req">*</span></label><textarea class="form-control" [(ngModel)]="consulta.diagnostico" placeholder="Describe el diagnóstico..." style="min-height:100px;"></textarea></div>
-          <div class="form-group"><label>Tratamiento</label><textarea class="form-control" [(ngModel)]="consulta.tratamiento" placeholder="Tratamiento recomendado..."></textarea></div>
-          <div class="form-group"><label>Observaciones</label><textarea class="form-control" [(ngModel)]="consulta.observaciones" placeholder="Observaciones adicionales..."></textarea></div>
+          <div class="form-group"><label for="consulta-diagnostico">Diagnóstico <span class="req">*</span></label><textarea id="consulta-diagnostico" class="form-control textarea-tall" [(ngModel)]="consulta.diagnostico" placeholder="Describe el diagnóstico..."></textarea></div>
+          <div class="form-group"><label for="consulta-tratamiento">Tratamiento</label><textarea id="consulta-tratamiento" class="form-control" [(ngModel)]="consulta.tratamiento" placeholder="Tratamiento recomendado..."></textarea></div>
+          <div class="form-group"><label for="consulta-observaciones">Observaciones</label><textarea id="consulta-observaciones" class="form-control" [(ngModel)]="consulta.observaciones" placeholder="Observaciones adicionales..."></textarea></div>
           <div class="form-group">
-            <label>¿Requiere control posterior?</label>
+            <div class="form-label">¿Requiere control posterior?</div>
             <div class="radio-group">
               <label><input type="radio" name="requiereControl" [(ngModel)]="consulta.requiereControl" [value]="true"> Sí</label>
               <label><input type="radio" name="requiereControl" [(ngModel)]="consulta.requiereControl" [value]="false"> No</label>
             </div>
           </div>
-          <div class="form-group" *ngIf="consulta.requiereControl"><label>Fecha de Próximo Control</label><input class="form-control" [(ngModel)]="consulta.fechaControl" type="date"></div>
-          <div style="display:flex;justify-content:flex-end;gap:10px;">
-            <button class="btn btn-secondary" (click)="showTab('anamnesis')">← Anterior</button>
-            <button class="btn btn-primary" (click)="submitConsulta()" [disabled]="loading">{{loading ? 'Guardando...' : 'Guardar Atención →'}}</button>
+          <div class="form-group" *ngIf="consulta.requiereControl"><label for="consulta-fecha-control">Fecha de Próximo Control</label><input id="consulta-fecha-control" class="form-control" [(ngModel)]="consulta.fechaControl" type="date"></div>
+          <div class="actions-end">
+            <button class="btn btn-secondary" (click)="showTab('anamnesis')"><span class="material-icons">arrow_back</span>Anterior</button>
+            <button class="btn btn-primary" (click)="submitConsulta()" [disabled]="loading">{{loading ? 'Guardando...' : 'Guardar Atención'}}<span class="material-icons" *ngIf="!loading">arrow_forward</span></button>
           </div>
         </div>
 
         <!-- RECETA -->
         <div class="card-body" *ngIf="tabActivo==='receta'">
-          <div style="font-weight:600;font-size:14px;margin-bottom:12px;color:#1E3A5F;">Prescripción de Medicamentos</div>
-          <div style="border:1px solid #E2E8F0;border-radius:8px;padding:16px;margin-bottom:16px;">
+          <div class="section-label">Prescripción de Medicamentos</div>
+          <div class="med-form-box">
             <div class="form-row">
               <div class="form-group">
-                <label>Medicamento <span class="req">*</span></label>
-                <select class="form-control" [(ngModel)]="recetaForm.idMedicamento">
+                <label for="receta-medicamento">Medicamento <span class="req">*</span></label>
+                <select id="receta-medicamento" class="form-control" [(ngModel)]="recetaForm.idMedicamento">
                   <option value="">Seleccionar medicamento</option>
                   <option *ngFor="let m of medicamentos" [value]="m.idMedicamento">{{m.nombreMedicamento}}</option>
                 </select>
               </div>
-              <div class="form-group"><label>Dosis</label><input class="form-control" [(ngModel)]="recetaForm.dosis" placeholder="Ej: 1 cápsula"></div>
+              <div class="form-group"><label for="receta-dosis">Dosis</label><input id="receta-dosis" class="form-control" [(ngModel)]="recetaForm.dosis" placeholder="Ej: 1 cápsula"></div>
             </div>
             <div class="form-row">
-              <div class="form-group"><label>Frecuencia</label><input class="form-control" [(ngModel)]="recetaForm.frecuencia" placeholder="Ej: Cada 8 horas"></div>
-              <div class="form-group"><label>Duración</label><input class="form-control" [(ngModel)]="recetaForm.duracion" placeholder="Ej: 7 días"></div>
+              <div class="form-group"><label for="receta-frecuencia">Frecuencia</label><input id="receta-frecuencia" class="form-control" [(ngModel)]="recetaForm.frecuencia" placeholder="Ej: Cada 8 horas"></div>
+              <div class="form-group"><label for="receta-duracion">Duración</label><input id="receta-duracion" class="form-control" [(ngModel)]="recetaForm.duracion" placeholder="Ej: 7 días"></div>
             </div>
             <div class="form-row">
               <div class="form-group">
-                <label>Vía de Administración <span class="req">*</span></label>
-                <select class="form-control" [(ngModel)]="recetaForm.via">
+                <label for="receta-via">Vía de Administración <span class="req">*</span></label>
+                <select id="receta-via" class="form-control" [(ngModel)]="recetaForm.via">
                   <option *ngFor="let v of viasAdmin" [value]="v.id">{{v.nombre}}</option>
                 </select>
               </div>
-              <div class="form-group"><label>Indicaciones Específicas</label><input class="form-control" [(ngModel)]="recetaForm.instrucciones" placeholder="Ej: Administrar con comida"></div>
+              <div class="form-group"><label for="receta-instrucciones">Indicaciones Específicas</label><input id="receta-instrucciones" class="form-control" [(ngModel)]="recetaForm.instrucciones" placeholder="Ej: Administrar con comida"></div>
             </div>
             <button class="btn btn-secondary btn-sm" (click)="agregarMedicamento()">+ Agregar Medicamento</button>
           </div>
 
           <!-- Lista medicamentos -->
-          <div *ngIf="medicamentosReceta.length > 0" style="margin-bottom:16px;">
-            <div style="font-weight:600;font-size:13px;color:#1E3A5F;margin-bottom:8px;">Medicamentos ({{medicamentosReceta.length}})</div>
-            <div *ngFor="let m of medicamentosReceta; let i=index" style="background:#F1F5F9;border-radius:8px;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+          <div *ngIf="medicamentosReceta.length > 0" class="med-list">
+            <div class="med-list-title">Medicamentos ({{medicamentosReceta.length}})</div>
+            <div *ngFor="let m of medicamentosReceta; let i=index" class="med-item">
               <div>
-                <span style="font-weight:600;">{{m.nombre}}</span>
-                <span style="color:#64748B;font-size:12px;margin-left:8px;">{{m.dosis}} · {{m.frecuencia}} · {{m.duracion}} · {{m.via}}</span>
+                <span class="med-item-name">{{m.nombre}}</span>
+                <span class="med-item-detail">{{m.dosis}} · {{m.frecuencia}} · {{m.duracion}} · {{m.via}}</span>
               </div>
-              <button (click)="quitarMedicamento(i)" style="background:none;border:none;color:#DC2626;cursor:pointer;font-size:16px;">✕</button>
+              <button class="btn-icon-remove" (click)="quitarMedicamento(i)"><span class="material-icons">close</span></button>
             </div>
           </div>
 
-          <div style="display:flex;justify-content:flex-end;gap:10px;">
-            <button class="btn btn-secondary" (click)="showTab('consulta')">← Anterior</button>
-            <button class="btn btn-secondary" (click)="vistaPreviaReceta()">👁 Vista previa</button>
-            <button class="btn btn-primary" (click)="guardarReceta()" [disabled]="loading">{{loading ? 'Guardando...' : 'Guardar Receta ✓'}}</button>
+          <div class="actions-end">
+            <button class="btn btn-secondary" (click)="showTab('consulta')"><span class="material-icons">arrow_back</span>Anterior</button>
+            <button class="btn btn-secondary" (click)="vistaPreviaReceta()"><span class="material-icons">visibility</span>Vista previa</button>
+            <button class="btn btn-primary" (click)="guardarReceta()" [disabled]="loading">{{loading ? 'Guardando...' : 'Guardar Receta'}}<span class="material-icons" *ngIf="!loading">check</span></button>
           </div>
         </div>
       </div>
@@ -180,64 +180,63 @@
 
 <!-- MODAL VISTA PREVIA DE RECETA -->
 <div class="modal-overlay" *ngIf="modalPreviaReceta" (click)="cerrarPreviaReceta()">
-  <div class="modal" style="max-width:640px;" (click)="$event.stopPropagation()">
+  <div class="modal modal-receta" (click)="$event.stopPropagation()">
     <div class="modal-header no-print">
-      <div class="modal-title" style="flex:1;text-align:center;">Vista previa de Receta</div>
-      <button class="modal-close" (click)="cerrarPreviaReceta()">✕</button>
+      <div class="modal-title modal-title-center">Vista previa de Receta</div>
+      <button class="modal-close" (click)="cerrarPreviaReceta()"><span class="material-icons">close</span></button>
     </div>
 
     <div class="modal-body" id="recetaPrintable">
       <!-- Encabezado de la clínica -->
-      <div style="display:flex;align-items:center;gap:14px;border-bottom:2px solid #1E3A5F;padding-bottom:14px;margin-bottom:14px;">
-        <div style="width:54px;height:54px;background:#1E3A5F;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:24px;flex-shrink:0;">🐾</div>
+      <div class="receta-header">
+        <div class="avatar-circle avatar-circle-lg"><span class="material-icons">pets</span></div>
         <div>
-          <div style="font-weight:700;font-size:16px;color:#1E3A5F;">{{clinica.nombre}}</div>
-          <div style="font-size:12px;color:#64748B;">Dirección: {{clinica.direccion}}</div>
-          <div style="font-size:12px;color:#64748B;">Teléfono: {{clinica.telefono}}</div>
+          <div class="receta-clinic-name">{{clinica.nombre}}</div>
+          <div class="receta-clinic-detail">Dirección: {{clinica.direccion}}</div>
+          <div class="receta-clinic-detail">Teléfono: {{clinica.telefono}}</div>
         </div>
       </div>
 
       <!-- Datos de la receta -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;margin-bottom:16px;font-size:13px;">
-        <div><span style="color:#64748B;">Mascota:</span> <strong>{{cita?.nombreMascota || '—'}}</strong></div>
-        <div><span style="color:#64748B;">Fecha de Receta:</span> <strong>{{fechaReceta}}</strong></div>
-        <div><span style="color:#64748B;">Propietario:</span> <strong>{{cita?.nombreDueno || '—'}}</strong></div>
-        <div><span style="color:#64748B;">Veterinario:</span> <strong>{{cita?.nombreVeterinario || '—'}}</strong></div>
-        <div><span style="color:#64748B;">Código de Atención:</span> <strong>{{getCodigo()}}</strong></div>
-        <div><span style="color:#64748B;">Rol:</span> <strong>Veterinario</strong></div>
+      <div class="receta-info-grid">
+        <div><span class="receta-info-label">Mascota:</span> <strong>{{cita?.nombreMascota || '—'}}</strong></div>
+        <div><span class="receta-info-label">Fecha de Receta:</span> <strong>{{fechaReceta}}</strong></div>
+        <div><span class="receta-info-label">Propietario:</span> <strong>{{cita?.nombreDueno || '—'}}</strong></div>
+        <div><span class="receta-info-label">Veterinario:</span> <strong>{{cita?.nombreVeterinario || '—'}}</strong></div>
+        <div><span class="receta-info-label">Código de Atención:</span> <strong>{{getCodigo()}}</strong></div>
+        <div><span class="receta-info-label">Rol:</span> <strong>Veterinario</strong></div>
       </div>
 
       <!-- Medicamentos prescritos -->
-      <div style="font-weight:700;font-size:12.5px;color:#1E3A5F;letter-spacing:0.5px;border-bottom:1px solid #E2E8F0;padding-bottom:6px;margin-bottom:12px;">MEDICAMENTOS PRESCRITOS</div>
-      <div style="border:1px solid #E2E8F0;border-radius:8px;padding:14px;margin-bottom:14px;">
+      <div class="receta-section-title">MEDICAMENTOS PRESCRITOS</div>
+      <div class="receta-med-box">
         <div *ngFor="let m of medicamentosReceta; let i=index"
-             [style.margin-bottom]="i < medicamentosReceta.length-1 ? '14px' : '0'"
-             [style.padding-bottom]="i < medicamentosReceta.length-1 ? '14px' : '0'"
-             [style.border-bottom]="i < medicamentosReceta.length-1 ? '1px dashed #CBD5E1' : 'none'">
-          <div style="font-weight:600;font-size:14px;margin-bottom:6px;">{{i+1}}. {{m.nombre}}</div>
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;font-size:12.5px;margin-bottom:4px;">
-            <div><span style="color:#64748B;">Dosis:</span> {{m.dosis || '—'}}</div>
-            <div><span style="color:#64748B;">Frecuencia:</span> {{m.frecuencia || '—'}}</div>
-            <div><span style="color:#64748B;">Duración:</span> {{m.duracion || '—'}}</div>
-            <div><span style="color:#64748B;">Vía:</span> {{m.via || 'Oral'}}</div>
+             class="receta-med-row"
+             [class.with-divider]="i < medicamentosReceta.length-1">
+          <div class="receta-med-name">{{i+1}}. {{m.nombre}}</div>
+          <div class="receta-med-grid">
+            <div><span class="receta-info-label">Dosis:</span> {{m.dosis || '—'}}</div>
+            <div><span class="receta-info-label">Frecuencia:</span> {{m.frecuencia || '—'}}</div>
+            <div><span class="receta-info-label">Duración:</span> {{m.duracion || '—'}}</div>
+            <div><span class="receta-info-label">Vía:</span> {{m.via || 'Oral'}}</div>
           </div>
-          <div *ngIf="m.indicacionesEspecificas" style="font-size:12.5px;"><span style="color:#64748B;">Indicaciones:</span> {{m.indicacionesEspecificas}}</div>
+          <div *ngIf="m.indicacionesEspecificas" class="receta-med-note"><span class="receta-info-label">Indicaciones:</span> {{m.indicacionesEspecificas}}</div>
         </div>
       </div>
 
       <!-- Observaciones generales + firma -->
-      <div style="border:1px solid #E2E8F0;border-radius:8px;padding:14px;">
-        <div style="font-weight:600;font-size:13px;margin-bottom:6px;">Observaciones Generales:</div>
-        <div style="font-size:13px;color:#334155;">{{consulta.observaciones || 'Sin observaciones adicionales.'}}</div>
-        <div style="display:flex;justify-content:flex-end;margin-top:28px;">
-          <div style="text-align:center;border-top:1px solid #94A3B8;padding-top:4px;width:200px;font-size:12px;color:#64748B;">Firma del Veterinario</div>
+      <div class="receta-obs-box">
+        <div class="receta-obs-title">Observaciones Generales:</div>
+        <div class="receta-obs-text">{{consulta.observaciones || 'Sin observaciones adicionales.'}}</div>
+        <div class="receta-signature-row">
+          <div class="receta-signature">Firma del Veterinario</div>
         </div>
       </div>
     </div>
 
     <div class="modal-footer no-print">
-      <button class="btn btn-secondary" (click)="imprimirReceta()">🖨 Imprimir</button>
-      <button class="btn btn-primary" (click)="imprimirReceta()">📄 Descargar PDF</button>
+      <button class="btn btn-secondary" (click)="imprimirReceta()"><span class="material-icons">print</span>Imprimir</button>
+      <button class="btn btn-primary" (click)="imprimirReceta()"><span class="material-icons">picture_as_pdf</span>Descargar PDF</button>
       <button class="btn btn-secondary" (click)="cerrarPreviaReceta()">Cerrar</button>
     </div>
   </div>

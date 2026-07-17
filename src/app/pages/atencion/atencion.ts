@@ -190,7 +190,7 @@ export class Atencion implements OnInit {
       const citaRaw: any = await lastValueFrom(this.api.getCita(this.idCita));
       await lastValueFrom(this.api.actualizarCita(this.idCita, { ...citaRaw.data, idEstadoCita: 2 }));
 
-      this.showToast('¡Atención clínica completada! ✓');
+      this.showToast('¡Atención clínica completada!');
       setTimeout(() => this.router.navigate(['/citas']), 2500);
     } catch(e) { this.showToast('Error al guardar receta', 'error'); console.error(e); }
     finally { this.loading = false; this.cdr.detectChanges(); }
