@@ -8,6 +8,8 @@ import { Atencion } from './pages/atencion/atencion';
 import { HistoriaClinica } from './pages/historia-clinica/historia-clinica';
 import { Ventas } from './pages/ventas/ventas';
 import { Configuracion } from './pages/configuracion/configuracion';
+import { Inventario } from './pages/inventario/inventario';
+import { Reportes } from './pages/reportes/reportes';
 import { authGuard } from './guards/auth.guard';
 import { moduloGuard } from './guards/modulo.guard';
 
@@ -28,6 +30,8 @@ export const routes: Routes = [
       { path: 'historia-clinica/:idMascota', component: HistoriaClinica, canActivate: [moduloGuard('pacientes')] },  // Expediente clínico
       { path: 'atencion/:idCita', component: Atencion, canActivate: [moduloGuard('atencion clinica')] },             // Atención clínica
       { path: 'ventas', component: Ventas, canActivate: [moduloGuard('ventas')] },                                   // Ventas (POS + historial)
+      { path: 'inventario', component: Inventario, canActivate: [moduloGuard('inventario')] },                       // Inventario (productos + movimientos)
+      { path: 'reportes', component: Reportes, canActivate: [moduloGuard('reportes')] },                           // Reportes y estadísticas
       { path: 'configuracion', component: Configuracion, canActivate: [moduloGuard('configuracion')] },              // Configuración del sistema
     ]
   },

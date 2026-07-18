@@ -18,6 +18,12 @@
     @if (acceso?.superAdmin || acceso?.modulos?.includes('ventas')) {
       <div class="nav-item" routerLink="/ventas" routerLinkActive="active"><span class="material-icons">shopping_cart</span> Ventas</div>
     }
+    @if (acceso?.superAdmin || acceso?.modulos?.includes('inventario')) {
+      <div class="nav-item" routerLink="/inventario" routerLinkActive="active"><span class="material-icons">inventory_2</span> Inventario</div>
+    }
+    @if (acceso?.superAdmin || acceso?.modulos?.includes('reportes')) {
+      <div class="nav-item" routerLink="/reportes" routerLinkActive="active"><span class="material-icons">bar_chart</span> Reportes</div>
+    }
     @if (acceso?.superAdmin || acceso?.modulos?.includes('configuracion')) {
       <div class="nav-item" routerLink="/configuracion" routerLinkActive="active"><span class="material-icons">settings</span> Configuración</div>
     }
