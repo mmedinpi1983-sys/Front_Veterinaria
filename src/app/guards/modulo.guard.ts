@@ -1,6 +1,6 @@
 import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
-import { PermisosService } from '../services/permisos.service';
+import { PermisosService } from '../services/permisos/permisos.service';
 import { map, catchError, of } from 'rxjs';
 
 // Rutas candidatas para redirigir cuando al usuario le falta el módulo pedido,

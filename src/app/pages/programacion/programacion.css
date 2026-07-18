@@ -1,0 +1,20 @@
+:host { display: contents; }
+.prog-tabs { display: flex; gap: 4px; margin-bottom: 16px; }
+.btn-navy { background: #1E3A5F; color: #fff; border: 1px solid #1E3A5F; }
+.btn-navy:hover { background: #172F4C; }
+
+.card-body-tight { padding-bottom: 0; }
+.search-bar-flush { margin-bottom: 0; }
+.filter-date { max-width: 180px; }
+
+.cell-name { font-weight: 600; }
+.btn-danger-soft { background: #FEE2E2; color: #DC2626; }
+.empty-row { text-align: center; color: #94A3B8; padding: 28px; }
+
+.estado-pill {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748B;
+  margin-left: 6px;
+}
+.estado-pill.activo { color: #16A34A; }

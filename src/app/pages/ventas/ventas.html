@@ -35,6 +35,9 @@
               <div class="product-icon"><span class="material-icons">{{ icono(p) }}</span></div>
               <div class="product-name">{{ p.nombre }}</div>
               <div class="product-price">S/ {{ (p.precioVenta || 0) | number:'1.2-2' }}</div>
+              <div class="product-stock" [class.low]="p.stock > 0 && p.stock <= 5" [class.out]="p.stock <= 0">
+                {{ p.stock > 0 ? 'Stock: ' + p.stock : 'Sin stock' }}
+              </div>
               <div class="product-qty-control">
                 <div class="qty-btn" (click)="cambiarCantidad(p, -1)">−</div>
                 <span class="qty-value">{{ cantidadEnCarrito(p.idProducto) }}</span>

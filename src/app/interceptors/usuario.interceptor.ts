@@ -1,6 +1,6 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from '../services/auth/auth.service';
 
 // Interceptor de auditoría/autenticación: agrega el header "X-Usuario-Id" con el id del
 // empleado logueado y el header "Authorization" con el token JWT (tomados del localStorage

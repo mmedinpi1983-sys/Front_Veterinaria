@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Modal } from '../../shared/components/modal/modal';
 import { Pagination } from '../../shared/components/pagination/pagination';
-import { ReporteService } from '../../services/reporte.service';
+import { ReporteService } from '../../services/reportes/reporte.service';
 
 // Reportes de la clinica: resumen, graficos y un detalle que se filtra por fechas.
 @Component({

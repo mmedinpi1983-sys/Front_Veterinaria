@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Tabs } from '../../shared/components/tabs/tabs';
 import { lastValueFrom } from 'rxjs';
-import { ApiService } from '../../services/api';
+import { AtencionService } from '../../services/atencion/atencion.service';
 
 @Component({
   selector: 'app-atencion',
@@ -39,7 +39,7 @@ export class Atencion implements OnInit {
     { id: 7, nombre: 'Ótica' }
   ];
 
-  constructor(private route: ActivatedRoute, public router: Router, private api: ApiService, private cdr: ChangeDetectorRef) {}
+  constructor(private route: ActivatedRoute, public router: Router, private api: AtencionService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.idCita = +this.route.snapshot.paramMap.get('idCita')!;

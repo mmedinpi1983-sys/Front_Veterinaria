@@ -3,6 +3,7 @@ import { Login } from './pages/login/login';
 import { Layout } from './shared/components/layout/layout';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { Citas } from './pages/citas/citas';
+import { Programacion } from './pages/programacion/programacion';
 import { Pacientes } from './pages/pacientes/pacientes';
 import { Atencion } from './pages/atencion/atencion';
 import { HistoriaClinica } from './pages/historia-clinica/historia-clinica';
@@ -27,6 +28,7 @@ export const routes: Routes = [
       { path: 'dashboard', component: Dashboard, canActivate: [moduloGuard('dashboard')] },                           // Panel de indicadores
       { path: 'pacientes', component: Pacientes, canActivate: [moduloGuard('pacientes')] },                          // Gestión de pacientes
       { path: 'citas', component: Citas, canActivate: [moduloGuard('citas')] },                                      // Gestión de citas
+      { path: 'programacion', component: Programacion, canActivate: [moduloGuard('programacion')] },                  // Programación de veterinarios (turnos)
       { path: 'historia-clinica/:idMascota', component: HistoriaClinica, canActivate: [moduloGuard('pacientes')] },  // Expediente clínico
       { path: 'atencion/:idCita', component: Atencion, canActivate: [moduloGuard('atencion clinica')] },             // Atención clínica
       { path: 'ventas', component: Ventas, canActivate: [moduloGuard('ventas')] },                                   // Ventas (POS + historial)

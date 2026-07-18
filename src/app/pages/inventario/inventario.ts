@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Modal } from '../../shared/components/modal/modal';
 import { Badge } from '../../shared/components/badge/badge';
 import { Pagination } from '../../shared/components/pagination/pagination';
-import { InventarioService } from '../../services/inventario.service';
+import { InventarioService } from '../../services/inventario/inventario.service';
 import Swal from 'sweetalert2';
 
 // Inventario: manejo de productos y los movimientos de stock (entradas, salidas, ajustes).

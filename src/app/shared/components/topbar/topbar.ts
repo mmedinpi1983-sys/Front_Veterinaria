@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { AuthService } from '../../../services/auth.service';
-import { ConfiguracionService } from '../../../services/configuracion.service';
-import { RolClinica } from '../../../pages/configuracion/configuracion.model';
+import { AuthService } from '../../../services/auth/auth.service';
+import { ConfiguracionService } from '../../../services/configuracion/configuracion.service';
+import { RolClinica } from '../../../services/configuracion/configuracion.model';
 
 // Barra superior reutilizable: muestra al usuario logueado (tomado del localStorage)
 // y su rol real, consultado contra el catálogo de roles (RolesClinica) en vez de asumirlo.

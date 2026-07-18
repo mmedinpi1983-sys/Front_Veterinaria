@@ -2,9 +2,10 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { PacienteService } from '../../services/paciente.service';
+import { PacienteService } from '../../services/pacientes/paciente.service';
+import { environment } from '../../../environments/environment';
 
-const API = 'http://localhost:8080';
+const API = environment.apiUrl;
 
 // Página de Historia Clínica
 // Muestra el expediente completo de una mascota: información del paciente, propietario,

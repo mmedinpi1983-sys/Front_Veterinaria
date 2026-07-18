@@ -1,6 +1,6 @@
 import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from '../services/auth/auth.service';
 
 // Guard de autenticación: protege las rutas internas del sistema.
 // Si hay una sesión activa (usuario en localStorage) deja pasar; si no,

@@ -2,16 +2,8 @@
 // Reflejan los DTO del backend (ver los paquetes Asociado, EmpleadoAsociado, RolesClinica,
 // Permiso, RolPermiso, MedicamentoCatalogo, DiagnosticoCatalogo, DocumentoIdentidad y
 // ConfiguracionSistema en Backend_Veterinaria).
-
-// Envoltorio genérico de respuesta de la API (ver ApiResponse.java)
-export interface ApiResponse<T> {
-  success: boolean;
-  message?: string;
-  data?: T;
-  count?: number;
-  error?: string;
-  errorCode?: string;
-}
+import { ApiResponse } from '../shared/api-response.model';
+export type { ApiResponse };
 
 // ---- Veterinaria (Asociado) ----
 export interface Asociado {

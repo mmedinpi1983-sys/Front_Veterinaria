@@ -2,8 +2,8 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Badge } from '../../shared/components/badge/badge';
-import { DashboardService } from '../../services/dashboard.service';
-import { AuthService } from '../../services/auth.service';
+import { DashboardService } from '../../services/dashboard/dashboard.service';
+import { AuthService } from '../../services/auth/auth.service';
 
 // Pantalla de inicio con los numeros del dia: citas, pacientes, ingresos y stock.
 @Component({

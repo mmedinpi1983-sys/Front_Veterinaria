@@ -3,14 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import Swal from 'sweetalert2';
-import { ConfiguracionService } from '../../services/configuracion.service';
-import { AuthService } from '../../services/auth.service';
+import { ConfiguracionService } from '../../services/configuracion/configuracion.service';
+import { AuthService } from '../../services/auth/auth.service';
 import { Modal } from '../../shared/components/modal/modal';
 import { Tabs } from '../../shared/components/tabs/tabs';
 import {
   Asociado, Empleado, RolClinica, Permiso, RolPermiso, DocumentoIdentidad,
   Medicamento, MedicamentoForm, Diagnostico, DiagnosticoForm, UsuarioForm, ConfiguracionSistemaForm
-} from './configuracion.model';
+} from '../../services/configuracion/configuracion.model';
 
 
 function usuarioFormVacio(): UsuarioForm {

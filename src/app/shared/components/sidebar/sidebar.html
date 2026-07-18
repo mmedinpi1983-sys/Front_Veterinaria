@@ -12,6 +12,9 @@
     @if (acceso?.superAdmin || acceso?.modulos?.includes('citas')) {
       <div class="nav-item" routerLink="/citas" routerLinkActive="active"><span class="material-icons">calendar_month</span> Citas</div>
     }
+    @if (acceso?.superAdmin || acceso?.modulos?.includes('programacion')) {
+      <div class="nav-item" routerLink="/programacion" routerLinkActive="active"><span class="material-icons">schedule</span> Programación</div>
+    }
     @if (acceso?.superAdmin || acceso?.modulos?.includes('atencion clinica')) {
       <div class="nav-item nav-item-disabled"><span class="material-icons">local_hospital</span> Atención Clínica</div>
     }

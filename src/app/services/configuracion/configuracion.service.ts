@@ -5,9 +5,10 @@ import {
   ApiResponse, Asociado, Empleado, EmpleadoDetalle, EmpleadoCreateRequest, EmpleadoUpdateRequest,
   RolClinica, Permiso, RolPermiso, DocumentoIdentidad, Medicamento, MedicamentoForm,
   Diagnostico, DiagnosticoForm, ConfiguracionSistema, ConfiguracionSistemaForm
-} from '../pages/configuracion/configuracion.model';
+} from './configuracion.model';
+import { environment } from '../../../environments/environment';
 
-const API = 'http://localhost:8080';
+const API = environment.apiUrl;
 
 // Servicio del módulo de Configuración - agrupa Veterinaria (Asociado), Usuarios (EmpleadoAsociado),
 // Roles y Permisos (matriz Rol_Permiso), Catálogos (Medicamentos/Diagnósticos) y Configuración de Sistema.

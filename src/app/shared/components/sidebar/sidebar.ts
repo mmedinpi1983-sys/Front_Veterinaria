@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { AuthService } from '../../../services/auth.service';
-import { PermisosService, AccesoRol } from '../../../services/permisos.service';
+import { AuthService } from '../../../services/auth/auth.service';
+import { PermisosService, AccesoRol } from '../../../services/permisos/permisos.service';
 
 // Barra lateral de navegación reutilizable (resalta la opción activa según la ruta,
 // y solo muestra los módulos que el rol del usuario logueado tiene permitidos)

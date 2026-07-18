@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Modal } from '../../shared/components/modal/modal';
 import { Pagination } from '../../shared/components/pagination/pagination';
 import { Badge } from '../../shared/components/badge/badge';
-import { VentaService } from '../../services/venta.service';
+import { VentaService } from '../../services/ventas/venta.service';
 import Swal from 'sweetalert2';
 
 // El modulo de ventas: el POS para cobrar y el historial de lo vendido.
@@ -91,10 +91,19 @@ export class Ventas implements OnInit {
   }
 
   agregar(p: any) {
+    const disponible = Number(p.stock) || 0;
     const item = this.carrito.find(i => i.idProducto === p.idProducto);
     if (item) {
+      if (item.cantidad >= disponible) {
+        Swal.fire({ icon: 'warning', title: 'No hay más stock disponible', timer: 1400, showConfirmButton: false });
+        return;
+      }
       item.cantidad++;
     } else {
+      if (disponible <= 0) {
+        Swal.fire({ icon: 'warning', title: 'Producto sin stock', timer: 1400, showConfirmButton: false });
+        return;
+      }
       this.carrito.push({
         idProducto: p.idProducto,
         nombre: p.nombre,
@@ -109,6 +118,10 @@ export class Ventas implements OnInit {
     const item = this.carrito.find(i => i.idProducto === p.idProducto);
     if (!item) {
       if (delta > 0) this.agregar(p);
+      return;
+    }
+    if (delta > 0 && item.cantidad >= (Number(p.stock) || 0)) {
+      Swal.fire({ icon: 'warning', title: 'No hay más stock disponible', timer: 1400, showConfirmButton: false });
       return;
     }
     item.cantidad += delta;
@@ -184,6 +197,7 @@ export class Ventas implements OnInit {
       next: () => {
         Swal.fire({ icon: 'success', title: 'Venta registrada', timer: 1500, showConfirmButton: false });
         this.cancelarVenta();
+        this.cargarProductos(); // refresca el stock mostrado (se descontó en el backend)
       },
       error: (err: any) => {
         const msg = err?.error?.error || err?.error?.message;
@@ -261,6 +275,7 @@ export class Ventas implements OnInit {
         next: () => {
           Swal.fire({ icon: 'success', title: 'Venta anulada', timer: 1400, showConfirmButton: false });
           this.cargarHistorial();
+          this.cargarProductos(); // el backend restauró el stock; refresca lo que se ve en el POS
         },
         error: () => Swal.fire({ icon: 'error', title: 'Error al anular' })
       });

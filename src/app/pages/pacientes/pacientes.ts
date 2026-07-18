@@ -2,8 +2,8 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { MascotaService } from '../../services/mascota.service';
-import { PacienteService } from '../../services/paciente.service';
+import { MascotaService } from '../../services/pacientes/mascota.service';
+import { PacienteService } from '../../services/pacientes/paciente.service';
 import { HttpClient } from '@angular/common/http';
 import { forkJoin, lastValueFrom } from 'rxjs';
 import Swal from 'sweetalert2';
@@ -11,8 +11,9 @@ import { Modal } from '../../shared/components/modal/modal';
 import { Pagination } from '../../shared/components/pagination/pagination';
 import { SearchBar } from '../../shared/components/search-bar/search-bar';
 import { Tabs } from '../../shared/components/tabs/tabs';
+import { environment } from '../../../environments/environment';
 
-const API = 'http://localhost:8080';
+const API = environment.apiUrl;
 
 // Página de Gestión de Pacientes
 // Lista mascotas con sus propietarios. Permite registrar (crea Dueño + Mascota + vínculo),

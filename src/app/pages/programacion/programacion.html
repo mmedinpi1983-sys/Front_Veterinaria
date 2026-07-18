@@ -1,0 +1,157 @@
+<main class="content">
+  <div class="page-header">
+    <div class="page-header-row">
+      <div>
+        <h1 class="page-title">Programación de Veterinarios</h1>
+        <p class="page-subtitle">Administra los turnos de trabajo y los horarios del equipo</p>
+      </div>
+      <div class="page-header-actions">
+        @if (tab === 'programaciones') { <button class="btn btn-primary" (click)="abrirNuevoProg()">+ Nueva Programación</button> }
+        @if (tab === 'turnos') { <button class="btn btn-primary" (click)="abrirNuevoTurno()">+ Nuevo Turno</button> }
+      </div>
+    </div>
+  </div>
+
+  <div class="prog-tabs">
+    <button class="btn btn-sm" [class.btn-navy]="tab==='programaciones'" [class.btn-secondary]="tab!=='programaciones'" (click)="cambiarTab('programaciones')">Programaciones</button>
+    <button class="btn btn-sm" [class.btn-navy]="tab==='turnos'" [class.btn-secondary]="tab!=='turnos'" (click)="cambiarTab('turnos')">Turnos</button>
+  </div>
+
+  <!-- Programaciones -->
+  @if (tab === 'programaciones') {
+    <div class="card">
+      <div class="card-body card-body-tight">
+        <div class="search-bar search-bar-flush">
+          <label for="filtro-prog-fecha" class="visually-hidden">Filtrar por fecha</label>
+          <input id="filtro-prog-fecha" class="form-control filter-date" type="date" [(ngModel)]="filtroProg.fecha" (ngModelChange)="onFiltroProg()">
+          <label for="filtro-prog-vet" class="visually-hidden">Filtrar por veterinario</label>
+          <select id="filtro-prog-vet" class="filter-select" [(ngModel)]="filtroProg.idEmpleadoRegistrador" (ngModelChange)="onFiltroProg()">
+            <option value="">Todos los veterinarios</option>
+            @for (e of empleados; track e.idEmpleadoAsociado) { <option [value]="e.idEmpleadoAsociado">{{ e.nombreEmpleado }} {{ e.apellidoPaterno }}</option> }
+          </select>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Fecha</th><th>Veterinario</th><th>Turno</th><th>Horario</th><th>Estado</th><th>Ambiente</th><th>Acciones</th></tr></thead>
+          <tbody>
+            @for (p of programacionesPag; track p.idProgramacion) {
+              <tr>
+                <td class="cell-name">{{ p.fecha | date:'dd/MM/yyyy' }}</td>
+                <td>{{ p.nombreVeterinario }}</td>
+                <td class="text-muted text-sm">{{ p.nombreTurno }}</td>
+                <td class="text-muted text-sm">{{ p.horaInicio }} - {{ p.horaFin }}</td>
+                <td><span class="estado-pill" [class.activo]="p.nombreEstadoProgramacion === 'Activo'">{{ p.nombreEstadoProgramacion }}</span></td>
+                <td class="text-muted text-sm">{{ p.ambiente || '—' }}</td>
+                <td><div class="table-actions">
+                  <button class="btn btn-sm btn-secondary" (click)="abrirEditarProg(p)"><span class="material-icons">edit_note</span></button>
+                  <button class="btn btn-sm btn-danger-soft" (click)="eliminarProg(p)"><span class="material-icons">delete</span></button>
+                </div></td>
+              </tr>
+            }
+            @if (!programaciones.length) { <tr><td colspan="7" class="empty-row">No hay programaciones registradas.</td></tr> }
+          </tbody>
+        </table>
+      </div>
+    </div>
+    @if (totalPagProg > 1) {
+      <app-pagination [paginaActual]="pagProg" [totalPaginas]="totalPagProg" (cambiar)="cambiarPagProg($event)"></app-pagination>
+    }
+  }
+
+  <!-- Turnos -->
+  @if (tab === 'turnos') {
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Nombre</th><th>Hora Inicio</th><th>Hora Fin</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody>
+            @for (t of turnosPag; track t.idTurno) {
+              <tr>
+                <td class="cell-name">{{ t.nombre }}</td>
+                <td class="text-muted text-sm">{{ t.horaInicio }}</td>
+                <td class="text-muted text-sm">{{ t.horaFin }}</td>
+                <td>
+                  <label class="toggle"><input type="checkbox" [checked]="t.estado" (change)="toggleEstadoTurno(t)"><span class="toggle-slider"></span></label>
+                  <span class="estado-pill" [class.activo]="t.estado">{{ t.estado ? 'Activo' : 'Inactivo' }}</span>
+                </td>
+                <td><div class="table-actions">
+                  <button class="btn btn-sm btn-secondary" (click)="abrirEditarTurno(t)"><span class="material-icons">edit_note</span></button>
+                  <button class="btn btn-sm btn-danger-soft" (click)="eliminarTurno(t)"><span class="material-icons">delete</span></button>
+                </div></td>
+              </tr>
+            }
+            @if (!turnos.length) { <tr><td colspan="5" class="empty-row">No hay turnos registrados.</td></tr> }
+          </tbody>
+        </table>
+      </div>
+    </div>
+    @if (totalPagTurno > 1) {
+      <app-pagination [paginaActual]="pagTurno" [totalPaginas]="totalPagTurno" (cambiar)="cambiarPagTurno($event)"></app-pagination>
+    }
+  }
+</main>
+
+<!-- MODAL: PROGRAMACIÓN -->
+@if (modalProgVisible) {
+  <app-modal [title]="editandoProg ? 'Editar Programación' : 'Nueva Programación'" subtitle="Asigna un veterinario a un turno de trabajo" (close)="modalProgVisible=false">
+    <div class="form-row">
+      <div class="form-group"><label for="prog-fecha">Fecha <span class="req">*</span></label><input id="prog-fecha" class="form-control" type="date" [(ngModel)]="formProg.fecha"></div>
+      <div class="form-group"><label for="prog-turno">Turno <span class="req">*</span></label>
+        <select id="prog-turno" class="form-control" [(ngModel)]="formProg.idTurno">
+          <option value="">Seleccionar</option>
+          @for (t of turnosParaSelect; track t.idTurno) { <option [value]="t.idTurno">{{ t.nombre }} ({{ t.horaInicio }} - {{ t.horaFin }})</option> }
+        </select>
+      </div>
+    </div>
+    <div class="form-group"><label for="prog-veterinario">Veterinario <span class="req">*</span></label>
+      <select id="prog-veterinario" class="form-control" [(ngModel)]="formProg.idEmpleadoRegistrador">
+        <option value="">Seleccionar</option>
+        @for (e of empleados; track e.idEmpleadoAsociado) { <option [value]="e.idEmpleadoAsociado">{{ e.nombreEmpleado }} {{ e.apellidoPaterno }}</option> }
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label for="prog-categoria">Categoría <span class="req">*</span></label>
+        <select id="prog-categoria" class="form-control" [(ngModel)]="formProg.idCategoria">
+          <option value="">Seleccionar</option>
+          @for (c of categorias; track c.idCategoria) { <option [value]="c.idCategoria">{{ c.nombreCategoria }}</option> }
+        </select>
+      </div>
+      <div class="form-group"><label for="prog-servicio">Servicio <span class="req">*</span></label>
+        <select id="prog-servicio" class="form-control" [(ngModel)]="formProg.idServicio">
+          <option value="">Seleccionar</option>
+          @for (s of servicios; track s.idServicio) { <option [value]="s.idServicio">{{ s.nombre }}</option> }
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label for="prog-estado">Estado <span class="req">*</span></label>
+        <select id="prog-estado" class="form-control" [(ngModel)]="formProg.idEstadoProgramacion">
+          <option value="">Seleccionar</option>
+          @for (es of estados; track es.idEstadoProgramacion) { <option [value]="es.idEstadoProgramacion">{{ es.nombre }}</option> }
+        </select>
+      </div>
+      <div class="form-group"><label for="prog-ambiente">Ambiente</label><input id="prog-ambiente" class="form-control" [(ngModel)]="formProg.ambiente" placeholder="Ej: Consultorio 1"></div>
+    </div>
+    <div class="form-group"><label for="prog-descripcion">Descripción</label><textarea id="prog-descripcion" class="form-control" [(ngModel)]="formProg.descripcion"></textarea></div>
+    <div modal-footer>
+      <button class="btn btn-secondary" (click)="modalProgVisible=false">Cancelar</button>
+      <button class="btn btn-primary" (click)="guardarProg()">{{ editandoProg ? 'Guardar Cambios' : 'Crear Programación' }}</button>
+    </div>
+  </app-modal>
+}
+
+<!-- MODAL: TURNO -->
+@if (modalTurnoVisible) {
+  <app-modal [title]="editandoTurno ? 'Editar Turno' : 'Nuevo Turno'" subtitle="Franja horaria de trabajo" (close)="modalTurnoVisible=false">
+    <div class="form-group"><label for="turno-nombre">Nombre <span class="req">*</span></label><input id="turno-nombre" class="form-control" [(ngModel)]="formTurno.nombre" placeholder="Ej: Mañana"></div>
+    <div class="form-row">
+      <div class="form-group"><label for="turno-hora-inicio">Hora Inicio <span class="req">*</span></label><input id="turno-hora-inicio" class="form-control" type="time" [(ngModel)]="formTurno.horaInicio"></div>
+      <div class="form-group"><label for="turno-hora-fin">Hora Fin <span class="req">*</span></label><input id="turno-hora-fin" class="form-control" type="time" [(ngModel)]="formTurno.horaFin"></div>
+    </div>
+    <div modal-footer>
+      <button class="btn btn-secondary" (click)="modalTurnoVisible=false">Cancelar</button>
+      <button class="btn btn-primary" (click)="guardarTurno()">{{ editandoTurno ? 'Guardar Cambios' : 'Crear Turno' }}</button>
+    </div>
+  </app-modal>
+}

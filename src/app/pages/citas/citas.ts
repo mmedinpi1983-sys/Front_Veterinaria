@@ -6,8 +6,8 @@ import { Pagination } from '../../shared/components/pagination/pagination';
 import { Badge } from '../../shared/components/badge/badge';
 import { SearchBar } from '../../shared/components/search-bar/search-bar';
 import { Router } from '@angular/router';
-import { CitaService } from '../../services/cita.service';
-import { MascotaService } from '../../services/mascota.service';
+import { CitaService } from '../../services/citas/cita.service';
+import { MascotaService } from '../../services/pacientes/mascota.service';
 import Swal from 'sweetalert2';
 
 // Página de Gestión de Citas
