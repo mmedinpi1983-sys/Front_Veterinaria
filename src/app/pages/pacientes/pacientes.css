@@ -14,6 +14,32 @@
 
 .form-group-relative { position: relative; }
 
+.section-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 12px;
+}
+
+.section-title-spaced { margin-top: 20px; }
+
+.cliente-seleccionado {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  margin: -8px 0 16px;
+  background: var(--success-light);
+  color: var(--success);
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+.cliente-seleccionado .material-icons { font-size: 18px; }
+
 .input-readonly { background: #F8FAFC; }
 
 .sugerencias {

@@ -68,75 +68,44 @@
 <!-- MODAL REGISTRAR PACIENTE -->
 
 @if (modalNuevoVisible) {
-  <app-modal title="Registrar Nuevo Paciente" subtitle="Completa la información del paciente" size="lg" (close)="modalNuevoVisible=false">
-    <app-tabs [tabs]="tabsFormulario" [activo]="tabNuevo" (activoChange)="tabNuevo=$event"></app-tabs>
+  <app-modal title="Nuevo Paciente" subtitle="Registra la mascota y su propietario" size="lg" (close)="modalNuevoVisible=false">
 
-    @if (tabNuevo === 'paciente') {
-        <div class="form-row">
-          <div class="form-group">
-            <label for="paciente-nombre">Nombre del Paciente <span class="req">*</span></label>
-            <input id="paciente-nombre" class="form-control" [(ngModel)]="nuevo.nombre" placeholder="Ej: Rocky">
-          </div>
-          <div class="form-group">
-            <label for="paciente-especie">Especie <span class="req">*</span></label>
-            <select id="paciente-especie" class="form-control" [(ngModel)]="nuevo.idEspecie" (change)="onEspecieChange()">
-              <option [ngValue]="null">Seleccionar</option>
-              @for (e of especies; track e.idEspecieRaza) {
-                <option [ngValue]="e.idEspecieRaza">{{e.nombre}}</option>
+    <div class="section-title">Propietario responsable</div>
+    <app-tabs [tabs]="tabsCliente" [activo]="origenCliente" (activoChange)="setOrigenCliente($event)"></app-tabs>
+
+    @if (origenCliente === 'existente') {
+        <div class="form-group form-group-relative">
+          <label for="buscar-dueno">Buscar propietario</label>
+          <input id="buscar-dueno" class="form-control"
+            type="text"
+            [(ngModel)]="buscarClienteInput"
+            (input)="onBuscarClienteInput()"
+            (focus)="onBuscarClienteInput()"
+            (blur)="cerrarDuenos()"
+            placeholder="Buscar por nombre o DNI..."
+            autocomplete="off">
+          @if (mostrarDuenos && duenosFiltrados.length > 0) {
+            <div class="sugerencias">
+              @for (d of duenosFiltrados; track d.idDueno) {
+                <div class="sugerencia-item" (mousedown)="seleccionarDueno(d)">
+                  {{d.nombre}} {{d.apellidoPaterno}} {{d.apellidoMaterno}} <span class="text-muted text-sm">— DNI {{d.nroDocumento}}</span>
+                </div>
               }
-            </select>
-          </div>
+            </div>
+          }
+          @if (mostrarDuenos && duenosFiltrados.length === 0) {
+            <div class="sugerencias"><div class="sugerencia-item text-muted">Sin resultados</div></div>
+          }
         </div>
-        <div class="form-row">
-          <div class="form-group form-group-relative">
-            <label for="paciente-raza">Raza <span class="req">*</span></label>
-            <input id="paciente-raza" class="form-control"
-              type="text"
-              [(ngModel)]="razaInput"
-              (input)="onRazaInput()"
-              (blur)="cerrarRazas()"
-              [disabled]="!nuevo.idEspecie"
-              placeholder="{{nuevo.idEspecie ? 'Escribe para buscar...' : 'Selecciona una especie primero'}}"
-              autocomplete="off">
-            @if (mostrarRazas && razasFiltradas.length > 0) {
-              <div class="sugerencias">
-                @for (r of razasFiltradas; track r.idEspecieRaza) {
-                  <div class="sugerencia-item" (mousedown)="seleccionarRaza(r)">{{r.nombre}}</div>
-                }
-              </div>
-            }
+        @if (duenoSeleccionado) {
+          <div class="cliente-seleccionado">
+            <span class="material-icons">check_circle</span>
+            {{duenoSeleccionado.nombre}} {{duenoSeleccionado.apellidoPaterno}} {{duenoSeleccionado.apellidoMaterno}} — DNI {{duenoSeleccionado.nroDocumento}}
           </div>
-          <div class="form-group">
-            <label for="paciente-sexo">Sexo</label>
-            <select id="paciente-sexo" class="form-control" [(ngModel)]="nuevo.sexo">
-              <option value="">Seleccionar</option>
-              <option value="Macho">Macho</option>
-              <option value="Hembra">Hembra</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="paciente-edad">Edad (años)</label>
-            <input id="paciente-edad" class="form-control" [(ngModel)]="nuevo.edad" placeholder="Ej: 1">
-          </div>
-          <div class="form-group">
-            <label for="paciente-tamanio">Tamaño</label>
-            <select id="paciente-tamanio" class="form-control" [(ngModel)]="nuevo.tamanio">
-              <option value="">Seleccionar</option>
-              <option value="Pequeño">Pequeño</option>
-              <option value="Mediano">Mediano</option>
-              <option value="Grande">Grande</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="paciente-notas">Notas Adicionales</label>
-          <textarea id="paciente-notas" class="form-control" [(ngModel)]="nuevo.notas" placeholder="Ej: Alergias, condiciones especiales, etc."></textarea>
-        </div>
+        }
     }
 
-    @if (tabNuevo === 'propietario') {
+    @if (origenCliente === 'nuevo') {
         <div class="form-row">
           <div class="form-group">
             <label for="dueno-nombre">Nombre del Propietario <span class="req">*</span></label>
@@ -168,6 +137,71 @@
           </div>
         </div>
     }
+
+    <div class="section-title section-title-spaced">Datos de la mascota</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="paciente-nombre">Nombre de la Mascota <span class="req">*</span></label>
+        <input id="paciente-nombre" class="form-control" [(ngModel)]="nuevo.nombre" placeholder="Ej: Rocky">
+      </div>
+      <div class="form-group">
+        <label for="paciente-especie">Especie <span class="req">*</span></label>
+        <select id="paciente-especie" class="form-control" [(ngModel)]="nuevo.idEspecie" (change)="onEspecieChange()">
+          <option [ngValue]="null">Seleccionar</option>
+          @for (e of especies; track e.idEspecieRaza) {
+            <option [ngValue]="e.idEspecieRaza">{{e.nombre}}</option>
+          }
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group form-group-relative">
+        <label for="paciente-raza">Raza <span class="req">*</span></label>
+        <input id="paciente-raza" class="form-control"
+          type="text"
+          [(ngModel)]="razaInput"
+          (input)="onRazaInput()"
+          (blur)="cerrarRazas()"
+          [disabled]="!nuevo.idEspecie"
+          placeholder="{{nuevo.idEspecie ? 'Escribe para buscar...' : 'Selecciona una especie primero'}}"
+          autocomplete="off">
+        @if (mostrarRazas && razasFiltradas.length > 0) {
+          <div class="sugerencias">
+            @for (r of razasFiltradas; track r.idEspecieRaza) {
+              <div class="sugerencia-item" (mousedown)="seleccionarRaza(r)">{{r.nombre}}</div>
+            }
+          </div>
+        }
+      </div>
+      <div class="form-group">
+        <label for="paciente-sexo">Sexo</label>
+        <select id="paciente-sexo" class="form-control" [(ngModel)]="nuevo.sexo">
+          <option value="">Seleccionar</option>
+          <option value="Macho">Macho</option>
+          <option value="Hembra">Hembra</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="paciente-edad">Edad (años)</label>
+        <input id="paciente-edad" class="form-control" [(ngModel)]="nuevo.edad" placeholder="Ej: 1">
+      </div>
+      <div class="form-group">
+        <label for="paciente-tamanio">Tamaño</label>
+        <select id="paciente-tamanio" class="form-control" [(ngModel)]="nuevo.tamanio">
+          <option value="">Seleccionar</option>
+          <option value="Pequeño">Pequeño</option>
+          <option value="Mediano">Mediano</option>
+          <option value="Grande">Grande</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="paciente-notas">Notas Adicionales</label>
+      <textarea id="paciente-notas" class="form-control" [(ngModel)]="nuevo.notas" placeholder="Ej: Alergias, condiciones especiales, etc."></textarea>
+    </div>
+
     <div class="modal-footer">
       <button class="btn btn-secondary" (click)="modalNuevoVisible=false">Cancelar</button>
       <button class="btn btn-primary" (click)="guardarNuevo()">Registrar Paciente</button>

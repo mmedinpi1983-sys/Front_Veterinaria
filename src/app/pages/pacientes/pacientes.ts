@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MascotaService } from '../../services/pacientes/mascota.service';
 import { PacienteService } from '../../services/pacientes/paciente.service';
+import { DuenoListItem } from '../../services/pacientes/pacientes.model';
 import { HttpClient } from '@angular/common/http';
 import { forkJoin, lastValueFrom } from 'rxjs';
 import Swal from 'sweetalert2';
@@ -28,10 +29,20 @@ export class Pacientes implements OnInit {
   pacientes: any[] = [];
   pacientesPaginados: any[] = [];
 
-  // Pestañas de los formularios de registro/edición: separan datos del paciente y del propietario
+  // Pestañas del modal de edición: separan datos del paciente y del propietario
   tabsFormulario = [{ id: 'paciente', label: 'Datos del Paciente' }, { id: 'propietario', label: 'Datos del Propietario' }];
-  tabNuevo = 'paciente';
   tabEditar = 'paciente';
+
+  // Toggle del modal de registro: elegir un propietario ya registrado o crear uno nuevo
+  tabsCliente = [{ id: 'existente', label: 'Propietario existente' }, { id: 'nuevo', label: 'Registrar nuevo propietario' }];
+  origenCliente: 'existente' | 'nuevo' = 'existente';
+
+  // Búsqueda de propietario existente (filtro en memoria sobre getDuenos())
+  duenos: DuenoListItem[] = [];
+  buscarClienteInput = '';
+  duenosFiltrados: DuenoListItem[] = [];
+  mostrarDuenos = false;
+  duenoSeleccionado: DuenoListItem | null = null;
 
   busqueda = '';
   filtroEspecie = '';
@@ -81,6 +92,40 @@ export class Pacientes implements OnInit {
       this.especiesRazas = razas.data || [];
       this.cdr.detectChanges();
     }});
+    // Carga los dueños existentes para el buscador de "Propietario existente"
+    this.pacienteService.getDuenos().subscribe({ next: (r: any) => {
+      this.duenos = r.data || [];
+      this.cdr.detectChanges();
+    }});
+  }
+
+  // Filtra dueños ya cargados por nombre completo o DNI mientras el usuario escribe
+  onBuscarClienteInput() {
+    this.duenoSeleccionado = null;
+    this.mostrarDuenos = true;
+    const q = this.buscarClienteInput.trim().toLowerCase();
+    if (!q) {
+      this.duenosFiltrados = this.duenos;
+      return;
+    }
+    this.duenosFiltrados = this.duenos.filter(d =>
+      `${d.nombre} ${d.apellidoPaterno} ${d.apellidoMaterno}`.toLowerCase().includes(q) ||
+      d.nroDocumento.toLowerCase().includes(q)
+    );
+  }
+
+  setOrigenCliente(id: string) {
+    this.origenCliente = id === 'nuevo' ? 'nuevo' : 'existente';
+  }
+
+  seleccionarDueno(d: DuenoListItem) {
+    this.duenoSeleccionado = d;
+    this.buscarClienteInput = `${d.nombre} ${d.apellidoPaterno} ${d.apellidoMaterno}`;
+    this.mostrarDuenos = false;
+  }
+
+  cerrarDuenos() {
+    setTimeout(() => { this.mostrarDuenos = false; }, 200);
   }
 
   // Al cambiar especie: filtra las razas que pertenecen a esa especie
@@ -164,7 +209,11 @@ export class Pacientes implements OnInit {
     this.razaInput = '';
     this.razasFiltradas = [];
     this.mostrarRazas = false;
-    this.tabNuevo = 'paciente';
+    this.origenCliente = this.duenos.length > 0 ? 'existente' : 'nuevo';
+    this.buscarClienteInput = '';
+    this.duenosFiltrados = this.duenos;
+    this.mostrarDuenos = false;
+    this.duenoSeleccionado = null;
     this.modalNuevoVisible = true;
   }
 
@@ -195,21 +244,35 @@ export class Pacientes implements OnInit {
   }
 
   async guardarNuevo() {
-    if (!this.nuevo.nombre || !this.nuevo.idEspecie || !this.nuevo.idRaza || !this.nuevo.nombreDueno || !this.nuevo.apellidoPaternoDueno || !this.nuevo.apellidoMaternoDueno || !this.nuevo.dni || !this.nuevo.telefono) {
+    if (!this.nuevo.nombre || !this.nuevo.idEspecie || !this.nuevo.idRaza) {
+      Swal.fire({ icon: 'warning', title: 'Completa todos los campos obligatorios (*)', timer: 2000, showConfirmButton: false });
+      return;
+    }
+    if (this.origenCliente === 'existente' && !this.duenoSeleccionado) {
+      Swal.fire({ icon: 'warning', title: 'Selecciona un propietario existente', text: 'O cambia a "Registrar nuevo propietario" si es la primera vez que viene.', timer: 2500, showConfirmButton: false });
+      return;
+    }
+    if (this.origenCliente === 'nuevo' && (!this.nuevo.nombreDueno || !this.nuevo.apellidoPaternoDueno || !this.nuevo.apellidoMaternoDueno || !this.nuevo.dni || !this.nuevo.telefono)) {
       Swal.fire({ icon: 'warning', title: 'Completa todos los campos obligatorios (*)', timer: 2000, showConfirmButton: false });
       return;
     }
     try {
-      const duenoRes: any = await lastValueFrom(this.pacienteService.crearDueno({
-        idDocumentoIdentidad: 1, idAsociado: 1,
-        nombre: this.nuevo.nombreDueno,
-        apellidoPaterno: this.nuevo.apellidoPaternoDueno,
-        apellidoMaterno: this.nuevo.apellidoMaternoDueno,
-        nroDocumento: this.nuevo.dni,
-        nroTelefono: this.nuevo.telefono || null,
-        correoElectronico: this.nuevo.email || null,
-        estado: true
-      }));
+      let idDueno: number;
+      if (this.origenCliente === 'existente') {
+        idDueno = this.duenoSeleccionado!.idDueno;
+      } else {
+        const duenoRes: any = await lastValueFrom(this.pacienteService.crearDueno({
+          idDocumentoIdentidad: 1, idAsociado: 1,
+          nombre: this.nuevo.nombreDueno,
+          apellidoPaterno: this.nuevo.apellidoPaternoDueno,
+          apellidoMaterno: this.nuevo.apellidoMaternoDueno,
+          nroDocumento: this.nuevo.dni,
+          nroTelefono: this.nuevo.telefono || null,
+          correoElectronico: this.nuevo.email || null,
+          estado: true
+        }));
+        idDueno = duenoRes.data.idDueno;
+      }
 
       const mascotaRes: any = await lastValueFrom(this.mascotaService.crearMascota({
         nombre: this.nuevo.nombre,
@@ -222,13 +285,14 @@ export class Pacientes implements OnInit {
         fechaNacimiento: null
       }));
 
-      await lastValueFrom(this.pacienteService.vincularDuenoMascota(
-        duenoRes.data.idDueno, mascotaRes.data.idMascota
-      ));
+      await lastValueFrom(this.pacienteService.vincularDuenoMascota(idDueno, mascotaRes.data.idMascota));
 
       this.modalNuevoVisible = false;
       Swal.fire({ icon: 'success', title: 'Paciente registrado', timer: 1500, showConfirmButton: false });
       this.cargarPacientes();
+      if (this.origenCliente === 'nuevo') {
+        this.pacienteService.getDuenos().subscribe({ next: (r: any) => { this.duenos = r.data || []; this.cdr.detectChanges(); } });
+      }
     } catch(e) {
       Swal.fire({ icon: 'error', title: 'No se pudo registrar', html: this.extraerMensajeError(e, 'Error al registrar paciente') });
     }
