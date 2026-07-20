@@ -1,5 +1,19 @@
 :host { display: contents; }
 
+.fieldset-plain {
+  border: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.fieldset-plain:disabled .form-control,
+.fieldset-plain:disabled select,
+.fieldset-plain:disabled textarea {
+  background: #F8FAFC;
+  cursor: not-allowed;
+}
+
 .avatar-circle-lg {
   width: 54px;
   height: 54px;

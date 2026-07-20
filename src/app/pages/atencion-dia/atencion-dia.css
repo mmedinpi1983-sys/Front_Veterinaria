@@ -1,0 +1,58 @@
+:host { display: contents; }
+
+.card-mb { margin-bottom: 16px; }
+
+.empty-row {
+  text-align: center;
+  padding: 32px;
+  color: #64748B;
+}
+
+.filtros-fecha {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.filtros-fecha .form-group {
+  margin-bottom: 0;
+}
+
+.btn-hoy {
+  margin-bottom: 1px;
+}
+
+.total-citas {
+  margin-left: auto;
+  margin-bottom: 9px;
+}
+
+.vet-group-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.vet-group-header .material-icons {
+  color: var(--accent);
+  font-size: 20px;
+}
+
+.vet-group-name {
+  flex: 1;
+}
+
+.table-actions .btn-sm {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.table-actions .btn-sm .material-icons {
+  font-size: 15px;
+}

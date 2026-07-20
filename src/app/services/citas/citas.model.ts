@@ -17,6 +17,7 @@ export interface CitaEnriquecida {
   estadoCita: string;
   idEstadoCita: number;
   motivo: string;
+  idAtencion: number | null;
 }
 
 // Detalle "en crudo" de una cita (GET /:id) - se usa como base para cancelar/reprogramar.

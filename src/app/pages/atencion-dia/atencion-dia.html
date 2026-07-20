@@ -1,0 +1,91 @@
+<main class="content">
+  <div class="page-header">
+    <div class="page-header-row">
+      <div>
+        <h1 class="page-title">Atención Clínica</h1>
+        <p class="page-subtitle">Citas programadas por veterinario — elige una acción para continuar</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-mb">
+    <div class="card-body card-body-tight">
+      <div class="filtros-fecha">
+        <div class="form-group">
+          <label for="fecha-inicio">Desde</label>
+          <input id="fecha-inicio" class="form-control" type="date" [(ngModel)]="fechaInicio" (change)="cargar()">
+        </div>
+        <div class="form-group">
+          <label for="fecha-fin">Hasta</label>
+          <input id="fecha-fin" class="form-control" type="date" [(ngModel)]="fechaFin" (change)="cargar()">
+        </div>
+        <button class="btn btn-secondary btn-sm btn-hoy" (click)="irAHoy()">Hoy</button>
+        <div class="form-group">
+          <label for="filtro-veterinario">Veterinario</label>
+          <select id="filtro-veterinario" class="form-control" [(ngModel)]="filtroVeterinario">
+            <option value="">Todos los veterinarios</option>
+            @for (v of veterinariosDisponibles; track v) {
+              <option [value]="v">{{v}}</option>
+            }
+          </select>
+        </div>
+        <span class="text-muted text-sm total-citas">{{totalCitas}} cita(s) en el rango seleccionado</span>
+      </div>
+    </div>
+  </div>
+
+  @if (!cargando && grupos.length === 0) {
+    <div class="card card-mb">
+      <div class="empty-row">No hay citas programadas en este rango de fechas.</div>
+    </div>
+  }
+
+  @if (!cargando && grupos.length > 0 && gruposMostrados.length === 0) {
+    <div class="card card-mb">
+      <div class="empty-row">El veterinario seleccionado no tiene citas en este rango de fechas.</div>
+    </div>
+  }
+
+  @for (grupo of gruposMostrados; track grupo.nombreVeterinario) {
+    <div class="card card-mb">
+      <div class="vet-group-header">
+        <span class="material-icons">medical_services</span>
+        <span class="vet-group-name">{{grupo.nombreVeterinario}}</span>
+        <span class="badge badge-gray">{{grupo.citas.length}} cita(s)</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Hora</th><th>Paciente</th><th>Propietario</th><th>Servicio</th><th>Estado</th><th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of grupo.citas; track c.idCitaProgramada) {
+              <tr>
+                <td class="text-muted">{{c.horaInicio.substring(0,5)}}</td>
+                <td><span class="table-name">{{c.nombreMascota}}</span></td>
+                <td class="text-muted">{{c.nombreDueno}}</td>
+                <td class="text-muted">{{c.nombreServicio}}</td>
+                <td><app-badge [estado]="c.estadoCita"></app-badge></td>
+                <td>
+                  <div class="table-actions">
+                    <button class="btn btn-sm btn-primary" [disabled]="c.estadoCita === 'Cancelado'" (click)="iniciar(c)" title="Iniciar Atención">
+                      <span class="material-icons">play_arrow</span>Iniciar
+                    </button>
+                    <button class="btn btn-sm btn-secondary" [disabled]="!c.idAtencion" (click)="ver(c)" title="Ver Atención">
+                      <span class="material-icons">visibility</span>Ver
+                    </button>
+                    <button class="btn btn-sm btn-secondary" [disabled]="!c.idAtencion" (click)="editar(c)" title="Editar Atención">
+                      <span class="material-icons">edit_note</span>Editar
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</main>

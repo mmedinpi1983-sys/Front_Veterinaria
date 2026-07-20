@@ -16,7 +16,7 @@
       <div class="nav-item" routerLink="/programacion" routerLinkActive="active"><span class="material-icons">schedule</span> Programación</div>
     }
     @if (acceso?.superAdmin || acceso?.modulos?.includes('atencion clinica')) {
-      <div class="nav-item nav-item-disabled"><span class="material-icons">local_hospital</span> Atención Clínica</div>
+      <div class="nav-item" routerLink="/atencion" routerLinkActive="active"><span class="material-icons">local_hospital</span> Atención Clínica</div>
     }
     @if (acceso?.superAdmin || acceso?.modulos?.includes('ventas')) {
       <div class="nav-item" routerLink="/ventas" routerLinkActive="active"><span class="material-icons">shopping_cart</span> Ventas</div>

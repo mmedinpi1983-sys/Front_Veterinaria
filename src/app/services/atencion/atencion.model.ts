@@ -107,3 +107,116 @@ export interface RecetaDetalleCreateRequest {
   viaAdministracion: number;
   indicacionesEspecificas: string;
 }
+
+// ---- Modo "ver"/"editar": precarga de una atención ya registrada ----
+// Ver AtencionDTO.DetalleCompleto en Backend_Veterinaria (GET /api/atencion/:id/detalle).
+
+export interface TriajeInfo {
+  idTriaje: number;
+  idTriajeDetalle: number | null;
+  codigoTemporal: string;
+  prioridad: number;
+  idMetodoIngreso: number;
+  temperatura: number | null;
+  peso: number | null;
+  alergias: string | null;
+  observaciones: string | null;
+}
+
+export interface ConsultaInfo {
+  idConsulta: number;
+  motivoConsulta: string;
+  evaluacionClinica: string;
+  tratamiento: string;
+  indicaciones: string;
+  observaciones: string;
+  requiereControl: boolean;
+  fechaProximoControl: string | null;
+}
+
+export interface AnamnesisInfo {
+  idAnamnesis: number;
+  antecedentes: string;
+  alergias: number;
+  detalleAlergias: string | null;
+  cirugiasAnteriores: number;
+  detalleCirugias: string | null;
+  medicamentosActuales: string;
+  historialVacunacion: string | null;
+  alimentacion: string | null;
+  comportamiento: string | null;
+  historialReproductivo: number;
+  inicioSintomas: string;
+  evolucionSintomas: string;
+  observaciones: string | null;
+}
+
+export interface MedicamentoRecetaInfo {
+  idRecetaDetalle: number;
+  idMedicamento: number;
+  dosis: string;
+  frecuencia: string;
+  duracion: string;
+  viaAdministracion: number;
+  indicacionesEspecificas: string;
+}
+
+export interface RecetaInfo {
+  idReceta: number;
+  fechaReceta: string;
+  detalle: MedicamentoRecetaInfo[];
+}
+
+export interface DetalleCompleto {
+  atencion: AtencionDetalle;
+  triaje: TriajeInfo | null;
+  consulta: ConsultaInfo | null;
+  anamnesis: AnamnesisInfo | null;
+  receta: RecetaInfo | null;
+}
+
+export interface TriajeUpdateRequest {
+  idCitaProgramada: number;
+  codigoTemporal: string;
+  idMascota: number;
+  prioridad: number;
+  estado?: boolean;
+  idMetodoIngreso: number;
+}
+
+export interface TriajeDetalleUpdateRequest {
+  temperatura: number | null;
+  peso: number | null;
+  observaciones: string | null;
+  alergias: string | null;
+}
+
+export interface AtencionConsultaUpdateRequest {
+  idAtencion: number;
+  evaluacionClinica: string;
+  tratamiento: string;
+  indicaciones: string;
+  observaciones: string;
+  requiereControl: boolean;
+  fechaProximoControl: string | null;
+  motivoConsulta: string;
+}
+
+export interface AnamnesisUpdateRequest {
+  idConsulta: number;
+  antecedentes: string;
+  alergias: number;
+  cirugiasAnteriores: number;
+  medicamentosActuales: string;
+  alimentacion: string | null;
+  comportamiento: string | null;
+  inicioSintomas: string;
+  evolucionSintomas: string;
+  observaciones: string | null;
+  detalleAlergias?: string | null;
+  detalleCirugias?: string | null;
+  historialVacunacion?: string | null;
+  estiloVida?: string | null;
+  historialReproductivo?: number;
+  reproduccionDetalle?: string | null;
+}

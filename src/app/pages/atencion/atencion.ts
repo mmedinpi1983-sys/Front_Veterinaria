@@ -14,6 +14,9 @@ import { AtencionService } from '../../services/atencion/atencion.service';
 })
 export class Atencion implements OnInit {
   idCita = 0;
+  // 'iniciar' (default, comportamiento de siempre) | 'ver' (solo lectura) | 'editar' (precarga y guarda sobre lo existente)
+  modo: 'iniciar' | 'ver' | 'editar' = 'iniciar';
+  get soloLectura(): boolean { return this.modo === 'ver'; }
   tabActivo = 'triaje';
   tabs = [{ id: 'triaje', label: 'Triaje' }, { id: 'anamnesis', label: 'Anamnesis' }, { id: 'consulta', label: 'Consulta' }, { id: 'receta', label: 'Receta' }];
   cita: any = null;
@@ -26,8 +29,13 @@ export class Atencion implements OnInit {
   modalPreviaReceta = false;
   clinica = { nombre: 'Clínica Veterinaria Vetclinic', direccion: 'Av. Primavera 123, Lima', telefono: '987 654 321' };
 
-  state = { idTriaje: null as any, idAtencion: null as any, idConsulta: null as any, idMascota: null as any };
+  state = {
+    idTriaje: null as any, idTriajeDetalle: null as any, idAtencion: null as any,
+    idConsulta: null as any, idAnamnesis: null as any, idReceta: null as any, idMascota: null as any
+  };
   anamnesisGuardada: any = null;
+  // Ids de RecetaDetalle ya guardados al precargar (modo editar), para poder reemplazarlos al guardar
+  private recetaDetalleIdsOriginales: number[] = [];
 
   triaje = { prioridad: '1', metodo: '1', temperatura: '', peso: '', alergias: '', observaciones: '' };
   anamnesis = { antecedentes: '', alergias: '0', cirugias: '0', medicamentos: '', vacunas: '', alimentacion: '', comportamiento: '', inicioSintomas: '', evolucionSintomas: '', observaciones: '' };
@@ -43,6 +51,8 @@ export class Atencion implements OnInit {
 
   ngOnInit() {
     this.idCita = +this.route.snapshot.paramMap.get('idCita')!;
+    const modoParam = this.route.snapshot.queryParamMap.get('modo');
+    this.modo = modoParam === 'ver' || modoParam === 'editar' ? modoParam : 'iniciar';
     this.cargarCita();
     this.cargarMedicamentos();
   }
@@ -56,14 +66,90 @@ export class Atencion implements OnInit {
       this.cdr.detectChanges();
     }});
     this.api.getAtencionPorCita(this.idCita).subscribe({
-      next: (r: any) => { if (r.success && r.data) this.state.idAtencion = r.data.idAtencion; },
+      next: (r: any) => {
+        if (r.success && r.data) {
+          this.state.idAtencion = r.data.idAtencion;
+          if (this.modo !== 'iniciar') this.cargarDetalleExistente(this.state.idAtencion);
+        }
+      },
       error: () => {}
     });
+  }
+
+  // Precarga triaje/anamnesis/consulta/receta ya guardados (modos "ver" y "editar")
+  cargarDetalleExistente(idAtencion: number) {
+    this.api.getAtencionDetalle(idAtencion).subscribe({ next: (r: any) => {
+      const d = r.data;
+      if (!d) return;
+
+      if (d.triaje) {
+        this.state.idTriaje = d.triaje.idTriaje;
+        this.state.idTriajeDetalle = d.triaje.idTriajeDetalle;
+        this.triaje = {
+          prioridad: String(d.triaje.prioridad ?? '1'),
+          metodo: String(d.triaje.idMetodoIngreso ?? '1'),
+          temperatura: d.triaje.temperatura != null ? String(d.triaje.temperatura) : '',
+          peso: d.triaje.peso != null ? String(d.triaje.peso) : '',
+          alergias: d.triaje.alergias || '',
+          observaciones: d.triaje.observaciones || ''
+        };
+      }
+
+      if (d.anamnesis) {
+        this.state.idAnamnesis = d.anamnesis.idAnamnesis;
+        this.anamnesis = {
+          antecedentes: d.anamnesis.antecedentes || '',
+          alergias: String(d.anamnesis.alergias ?? '0'),
+          cirugias: String(d.anamnesis.cirugiasAnteriores ?? '0'),
+          medicamentos: d.anamnesis.medicamentosActuales || '',
+          vacunas: d.anamnesis.historialVacunacion || '',
+          alimentacion: d.anamnesis.alimentacion || '',
+          comportamiento: d.anamnesis.comportamiento || '',
+          inicioSintomas: d.anamnesis.inicioSintomas || '',
+          evolucionSintomas: d.anamnesis.evolucionSintomas || '',
+          observaciones: d.anamnesis.observaciones || ''
+        };
+        this.anamnesisGuardada = { ...d.anamnesis };
+      }
+
+      if (d.consulta) {
+        this.state.idConsulta = d.consulta.idConsulta;
+        this.consulta = {
+          diagnostico: d.consulta.evaluacionClinica || '',
+          tratamiento: d.consulta.tratamiento || '',
+          observaciones: d.consulta.observaciones || '',
+          requiereControl: !!d.consulta.requiereControl,
+          fechaControl: d.consulta.fechaProximoControl || ''
+        };
+      }
+
+      if (d.receta) {
+        this.state.idReceta = d.receta.idReceta;
+        this.recetaDetalleIdsOriginales = (d.receta.detalle || []).map((m: any) => m.idRecetaDetalle);
+        this.medicamentosReceta = (d.receta.detalle || []).map((m: any) => {
+          const med = this.medicamentos.find(x => x.idMedicamento === m.idMedicamento);
+          const via = this.viasAdmin.find(v => v.id === m.viaAdministracion);
+          return {
+            idRecetaDetalle: m.idRecetaDetalle,
+            idMedicamento: m.idMedicamento,
+            nombre: med?.nombreMedicamento || '',
+            dosis: m.dosis, frecuencia: m.frecuencia, duracion: m.duracion,
+            indicacionesEspecificas: m.indicacionesEspecificas,
+            via: via?.nombre || 'Oral', viaAdministracion: m.viaAdministracion
+          };
+        });
+      }
+      this.cdr.detectChanges();
+    }});
   }
 
   cargarMedicamentos() {
     this.api.getMedicamentos().subscribe({ next: (r: any) => {
       this.medicamentos = r.data || [];
+      // Si el detalle precargado (modo ver/editar) llegó antes que el catálogo, completa los nombres pendientes
+      for (const m of this.medicamentosReceta) {
+        if (!m.nombre) m.nombre = this.medicamentos.find(x => x.idMedicamento === m.idMedicamento)?.nombreMedicamento || '';
+      }
       this.cdr.detectChanges();
     }});
   }
@@ -71,8 +157,34 @@ export class Atencion implements OnInit {
   showTab(tab: string) { this.tabActivo = tab; }
 
   async submitTriaje() {
+    if (this.soloLectura) { this.showTab('anamnesis'); return; }
     this.loading = true;
     try {
+      if (this.modo === 'editar' && this.state.idTriaje) {
+        await lastValueFrom(this.api.actualizarTriaje(this.state.idTriaje, {
+          idCitaProgramada: this.idCita,
+          codigoTemporal: `TRI-${new Date().getFullYear()}-${String(this.idCita).padStart(3,'0')}`,
+          idMascota: this.state.idMascota, prioridad: +this.triaje.prioridad,
+          estado: true, idMetodoIngreso: +this.triaje.metodo
+        }));
+        const detalleBody = {
+          temperatura: this.triaje.temperatura ? +this.triaje.temperatura : null,
+          peso: this.triaje.peso ? +this.triaje.peso : null,
+          alergias: this.triaje.alergias || null,
+          observaciones: this.triaje.observaciones || null
+        };
+        if (this.state.idTriajeDetalle) {
+          await lastValueFrom(this.api.actualizarTriajeDetalle(this.state.idTriajeDetalle, detalleBody));
+        } else {
+          await lastValueFrom(this.api.crearTriajeDetalle({ ...detalleBody, idTriaje: this.state.idTriaje }));
+        }
+        this.showToast('Triaje actualizado');
+        this.showTab('anamnesis');
+        this.loading = false;
+        this.cdr.detectChanges();
+        return;
+      }
+
       const tr: any = await lastValueFrom(this.api.crearTriaje({
         idCitaProgramada: this.idCita,
         codigoTemporal: `TRI-${new Date().getFullYear()}-${String(this.idCita).padStart(3,'0')}`,
@@ -107,6 +219,7 @@ export class Atencion implements OnInit {
   }
 
   guardarAnamnesis() {
+    if (this.soloLectura) { this.showTab('consulta'); return; }
     this.anamnesisGuardada = {
       antecedentes: this.anamnesis.antecedentes || 'Sin antecedentes',
       alergias: +this.anamnesis.alergias,
@@ -125,10 +238,11 @@ export class Atencion implements OnInit {
   }
 
   async submitConsulta() {
+    if (this.soloLectura) { this.showTab('receta'); return; }
     if (!this.consulta.diagnostico) { this.showToast('El diagnóstico es obligatorio', 'error'); return; }
     this.loading = true;
     try {
-      const cr: any = await lastValueFrom(this.api.crearAtencionConsulta({
+      const consultaBody = {
         idAtencion: this.state.idAtencion,
         motivoConsulta: 'Consulta médica',
         evaluacionClinica: this.consulta.diagnostico,
@@ -137,11 +251,21 @@ export class Atencion implements OnInit {
         observaciones: this.consulta.observaciones || '--',
         requiereControl: this.consulta.requiereControl,
         fechaProximoControl: this.consulta.fechaControl || null
-      }));
-      this.state.idConsulta = cr.data.idConsulta;
+      };
+
+      if (this.modo === 'editar' && this.state.idConsulta) {
+        await lastValueFrom(this.api.actualizarAtencionConsulta(this.state.idConsulta, consultaBody));
+      } else {
+        const cr: any = await lastValueFrom(this.api.crearAtencionConsulta(consultaBody));
+        this.state.idConsulta = cr.data.idConsulta;
+      }
 
       if (this.anamnesisGuardada) {
-        await lastValueFrom(this.api.crearAnamnesis({ ...this.anamnesisGuardada, idConsulta: this.state.idConsulta }));
+        if (this.modo === 'editar' && this.state.idAnamnesis) {
+          await lastValueFrom(this.api.actualizarAnamnesis(this.state.idAnamnesis, { ...this.anamnesisGuardada, idConsulta: this.state.idConsulta }));
+        } else {
+          await lastValueFrom(this.api.crearAnamnesis({ ...this.anamnesisGuardada, idConsulta: this.state.idConsulta }));
+        }
       }
 
       this.showToast('Consulta guardada');
@@ -151,6 +275,7 @@ export class Atencion implements OnInit {
   }
 
   agregarMedicamento() {
+    if (this.soloLectura) return;
     if (!this.recetaForm.idMedicamento) { this.showToast('Selecciona un medicamento', 'error'); return; }
     const med = this.medicamentos.find(m => m.idMedicamento === +this.recetaForm.idMedicamento);
     const via = this.viasAdmin.find(v => v.id === +this.recetaForm.via);
@@ -169,19 +294,34 @@ export class Atencion implements OnInit {
     this.cdr.detectChanges();
   }
 
-  quitarMedicamento(i: number) { this.medicamentosReceta.splice(i, 1); this.cdr.detectChanges(); }
+  quitarMedicamento(i: number) {
+    if (this.soloLectura) return;
+    this.medicamentosReceta.splice(i, 1);
+    this.cdr.detectChanges();
+  }
 
   async guardarReceta() {
+    if (this.soloLectura) { this.router.navigate(['/atencion']); return; }
     if (!this.medicamentosReceta.length) { this.showToast('Agrega al menos un medicamento', 'error'); return; }
     if (!this.state.idConsulta) { this.showToast('Primero completa la Consulta', 'error'); return; }
     this.loading = true;
     try {
-      const rr: any = await lastValueFrom(this.api.crearReceta({
-        idConsulta: this.state.idConsulta,
-        fechaReceta: new Date().toISOString(),
-        idEmpleadoAsociado: 1, idAsociado: 1
-      }));
-      const idReceta = rr.data.idReceta;
+      let idReceta: number;
+      if (this.modo === 'editar' && this.state.idReceta) {
+        idReceta = this.state.idReceta;
+        // Reemplaza por completo el detalle anterior de la receta con la lista actual
+        for (const idDetalle of this.recetaDetalleIdsOriginales) {
+          await lastValueFrom(this.api.eliminarRecetaDetalle(idDetalle));
+        }
+        this.recetaDetalleIdsOriginales = [];
+      } else {
+        const rr: any = await lastValueFrom(this.api.crearReceta({
+          idConsulta: this.state.idConsulta,
+          fechaReceta: new Date().toISOString(),
+          idEmpleadoAsociado: 1, idAsociado: 1
+        }));
+        idReceta = rr.data.idReceta;
+      }
 
       for (const med of this.medicamentosReceta) {
         await lastValueFrom(this.api.crearRecetaDetalle({ ...med, idReceta }));
@@ -190,8 +330,8 @@ export class Atencion implements OnInit {
       const citaRaw: any = await lastValueFrom(this.api.getCita(this.idCita));
       await lastValueFrom(this.api.actualizarCita(this.idCita, { ...citaRaw.data, idEstadoCita: 2 }));
 
-      this.showToast('¡Atención clínica completada!');
-      setTimeout(() => this.router.navigate(['/citas']), 2500);
+      this.showToast(this.modo === 'editar' ? 'Atención actualizada' : '¡Atención clínica completada!');
+      setTimeout(() => this.router.navigate(['/atencion']), 2000);
     } catch(e) { this.showToast('Error al guardar receta', 'error'); console.error(e); }
     finally { this.loading = false; this.cdr.detectChanges(); }
   }

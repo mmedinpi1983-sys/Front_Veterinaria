@@ -6,6 +6,7 @@ import { Citas } from './pages/citas/citas';
 import { Programacion } from './pages/programacion/programacion';
 import { Pacientes } from './pages/pacientes/pacientes';
 import { Atencion } from './pages/atencion/atencion';
+import { AtencionDia } from './pages/atencion-dia/atencion-dia';
 import { HistoriaClinica } from './pages/historia-clinica/historia-clinica';
 import { Ventas } from './pages/ventas/ventas';
 import { Configuracion } from './pages/configuracion/configuracion';
@@ -30,6 +31,7 @@ export const routes: Routes = [
       { path: 'citas', component: Citas, canActivate: [moduloGuard('citas')] },                                      // Gestión de citas
       { path: 'programacion', component: Programacion, canActivate: [moduloGuard('programacion')] },                  // Programación de veterinarios (turnos)
       { path: 'historia-clinica/:idMascota', component: HistoriaClinica, canActivate: [moduloGuard('pacientes')] },  // Expediente clínico
+      { path: 'atencion', component: AtencionDia, canActivate: [moduloGuard('atencion clinica')] },                  // Vista intermedia: citas del día por veterinario
       { path: 'atencion/:idCita', component: Atencion, canActivate: [moduloGuard('atencion clinica')] },             // Atención clínica
       { path: 'ventas', component: Ventas, canActivate: [moduloGuard('ventas')] },                                   // Ventas (POS + historial)
       { path: 'inventario', component: Inventario, canActivate: [moduloGuard('inventario')] },                       // Inventario (productos + movimientos)
