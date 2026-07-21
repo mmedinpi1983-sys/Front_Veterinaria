@@ -309,11 +309,20 @@ export class Atencion implements OnInit {
       let idReceta: number;
       if (this.modo === 'editar' && this.state.idReceta) {
         idReceta = this.state.idReceta;
-        // Reemplaza por completo el detalle anterior de la receta con la lista actual
-        for (const idDetalle of this.recetaDetalleIdsOriginales) {
+        // Guardado DIFERENCIAL: no se reemplaza toda la receta.
+        // Solo se elimina lo que el usuario quitó y se crea lo que agregó; lo que sigue igual no se toca.
+        const idsActuales = this.medicamentosReceta
+          .filter(m => m.idRecetaDetalle)
+          .map(m => m.idRecetaDetalle);
+        const eliminados = this.recetaDetalleIdsOriginales.filter(id => !idsActuales.includes(id));
+        for (const idDetalle of eliminados) {
           await lastValueFrom(this.api.eliminarRecetaDetalle(idDetalle));
         }
-        this.recetaDetalleIdsOriginales = [];
+        const agregados = this.medicamentosReceta.filter(m => !m.idRecetaDetalle);
+        for (const med of agregados) {
+          await lastValueFrom(this.api.crearRecetaDetalle(this.bodyDetalle(med, idReceta)));
+        }
+        this.recetaDetalleIdsOriginales = idsActuales;
       } else {
         const rr: any = await lastValueFrom(this.api.crearReceta({
           idConsulta: this.state.idConsulta,
@@ -321,10 +330,9 @@ export class Atencion implements OnInit {
           idEmpleadoAsociado: 1, idAsociado: 1
         }));
         idReceta = rr.data.idReceta;
-      }
-
-      for (const med of this.medicamentosReceta) {
-        await lastValueFrom(this.api.crearRecetaDetalle({ ...med, idReceta }));
+        for (const med of this.medicamentosReceta) {
+          await lastValueFrom(this.api.crearRecetaDetalle(this.bodyDetalle(med, idReceta)));
+        }
       }
 
       const citaRaw: any = await lastValueFrom(this.api.getCita(this.idCita));
@@ -334,6 +342,20 @@ export class Atencion implements OnInit {
       setTimeout(() => this.router.navigate(['/atencion']), 2000);
     } catch(e) { this.showToast('Error al guardar receta', 'error'); console.error(e); }
     finally { this.loading = false; this.cdr.detectChanges(); }
+  }
+
+  // Arma el cuerpo exacto que espera RecetaDetalleCreateRequest, sin campos de solo-vista
+  // (idRecetaDetalle, nombre, via) que hacían fallar el guardado.
+  private bodyDetalle(med: any, idReceta: number): any {
+    return {
+      idReceta,
+      idMedicamento: med.idMedicamento,
+      dosis: med.dosis,
+      frecuencia: med.frecuencia,
+      duracion: med.duracion,
+      viaAdministracion: med.viaAdministracion,
+      indicacionesEspecificas: med.indicacionesEspecificas
+    };
   }
 
   showToast(msg: string, type = 'success') {
