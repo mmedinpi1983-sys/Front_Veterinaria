@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Modal } from '../../shared/components/modal/modal';
 import { Pagination } from '../../shared/components/pagination/pagination';
 import { ReporteService } from '../../services/reportes/reporte.service';
+import Swal from 'sweetalert2';
 
 // Reportes de la clinica: resumen, graficos y un detalle que se filtra por fechas.
 @Component({
@@ -25,14 +26,11 @@ export class Reportes implements OnInit {
   // colores para el doughnut / leyenda de categorías
   colores = ['#0EA5E9', '#1E3A5F', '#16A34A', '#F59E0B', '#8B5CF6', '#64748B'];
 
-  // filtros / detalle
+  // generación del reporte Excel
   modalFiltrosVisible = false;
-  filtro = { fechaInicio: '', fechaFin: '', tipo: 'Todo' };
-  detalle: any[] = [];
-  detallePag: any[] = [];
-  itemsPorPag = 8;
-  pagDet = 1;
-  totalPagDet = 1;
+  descargando = false;
+  filtro = { fechaInicio: '', fechaFin: '' };
+  hojas = { resumen: true, ventas: true, citas: true, veterinarios: false };
 
   private readonly diasSemana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
   private readonly meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
@@ -96,21 +94,36 @@ export class Reportes implements OnInit {
     return Math.round(((b - a) / a) * 100);
   }
 
-  abrirFiltros() {
-    if (!this.detalle.length) this.generar();
-    this.modalFiltrosVisible = true;
-  }
+  abrirFiltros() { this.modalFiltrosVisible = true; }
+
+  get algunaHoja(): boolean { return Object.values(this.hojas).some(v => v); }
+
   generar() {
-    this.rep.getDetalle(this.filtro.fechaInicio, this.filtro.fechaFin).subscribe({
-      next: (r: any) => { this.detalle = r.data || []; this.pagDet = 1; this.paginarDet(); this.cdr.detectChanges(); }
+    const tipos = Object.entries(this.hojas).filter(([, v]) => v).map(([k]) => k);
+    if (!tipos.length) {
+      Swal.fire({ icon: 'warning', title: 'Selecciona al menos una hoja', timer: 1800, showConfirmButton: false });
+      return;
+    }
+    this.descargando = true;
+    this.rep.descargarExcel(tipos, this.filtro.fechaInicio, this.filtro.fechaFin).subscribe({
+      next: (blob: Blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `reporte_${new Date().toISOString().slice(0, 10)}.xlsx`;
+        a.click();
+        URL.revokeObjectURL(url);
+        this.descargando = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.descargando = false;
+        Swal.fire({ icon: 'error', title: 'No se pudo generar el reporte' });
+        this.cdr.detectChanges();
+      }
     });
   }
-  limpiar() { this.filtro = { fechaInicio: '', fechaFin: '', tipo: 'Todo' }; this.generar(); }
-  paginarDet() {
-    this.totalPagDet = Math.max(1, Math.ceil(this.detalle.length / this.itemsPorPag));
-    const ini = (this.pagDet - 1) * this.itemsPorPag;
-    this.detallePag = this.detalle.slice(ini, ini + this.itemsPorPag);
-  }
-  cambiarPagDet(p: number) { if (p < 1 || p > this.totalPagDet) return; this.pagDet = p; this.paginarDet(); }
+
+  limpiar() { this.filtro = { fechaInicio: '', fechaFin: '' }; }
 }
 

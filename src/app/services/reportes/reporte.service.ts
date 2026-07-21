@@ -20,4 +20,14 @@ export class ReporteService {
     ].filter(Boolean).join('&');
     return this.http.get<ApiResponse<DetalleReporteItem[]>>(`${API}/api/reporte/detalle${q ? '?' + q : ''}`);
   }
+
+  // Descarga el reporte en Excel. tipos: qué hojas incluir (resumen, ventas, citas, veterinarios).
+  descargarExcel(tipos: string[], fechaInicio = '', fechaFin = ''): Observable<Blob> {
+    const q = [
+      `tipos=${tipos.join(',')}`,
+      fechaInicio ? `fechaInicio=${fechaInicio}` : '',
+      fechaFin ? `fechaFin=${fechaFin}` : ''
+    ].filter(Boolean).join('&');
+    return this.http.get(`${API}/api/reporte/excel?${q}`, { responseType: 'blob' });
+  }
 }

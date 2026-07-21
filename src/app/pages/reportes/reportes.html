@@ -110,43 +110,31 @@
   </div>
 </main>
 
-<!-- MODAL: FILTROS / DETALLE -->
+<!-- MODAL: GENERAR REPORTE EXCEL -->
 @if (modalFiltrosVisible) {
-  <app-modal title="Filtros y Generación de Reporte" subtitle="Aplica filtros para ver el detalle de ventas" size="lg" (close)="modalFiltrosVisible=false">
-    <div class="form-row form-row-3">
+  <app-modal title="Generar Reporte" subtitle="Elige el rango de fechas y qué incluir en el Excel" (close)="modalFiltrosVisible=false">
+    <div class="form-row">
       <div class="form-group"><label for="filtro-fecha-inicio">Fecha Inicio</label><input id="filtro-fecha-inicio" class="form-control" type="date" [(ngModel)]="filtro.fechaInicio"></div>
       <div class="form-group"><label for="filtro-fecha-fin">Fecha Fin</label><input id="filtro-fecha-fin" class="form-control" type="date" [(ngModel)]="filtro.fechaFin"></div>
-      <div class="form-group"><label for="filtro-tipo-reporte">Tipo de reporte</label>
-        <select id="filtro-tipo-reporte" class="form-control" [(ngModel)]="filtro.tipo"><option>Todo</option><option>Ventas</option></select>
+    </div>
+    <p class="hint">Si dejas las fechas vacías, se incluye todo el historial.</p>
+
+    <div class="form-group">
+      <label>Hojas a incluir</label>
+      <div class="hojas-list">
+        <label class="hoja-item"><input type="checkbox" [(ngModel)]="hojas.resumen"> <span><strong>Resumen (KPIs)</strong> — ingresos, citas, productos y pacientes del periodo</span></label>
+        <label class="hoja-item"><input type="checkbox" [(ngModel)]="hojas.ventas"> <span><strong>Ventas</strong> — detalle de ventas (fecha, cliente, ítem, vendedor, total)</span></label>
+        <label class="hoja-item"><input type="checkbox" [(ngModel)]="hojas.citas"> <span><strong>Citas</strong> — detalle de citas (mascota, dueño, servicio, veterinario, estado)</span></label>
+        <label class="hoja-item"><input type="checkbox" [(ngModel)]="hojas.veterinarios"> <span><strong>Productividad por veterinario</strong> — atendidas vs canceladas por veterinario</span></label>
       </div>
     </div>
-    <div class="resultados-box">
-      <div class="resultados-title">Resultados · {{ detalle.length }} registro(s)</div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Fecha</th><th>Cliente</th><th>Ítem</th><th>Vendedor</th><th class="col-right">Total</th></tr></thead>
-          <tbody>
-            @for (r of detallePag; track $index) {
-              <tr>
-                <td class="text-sm">{{ r.fecha | date:'dd/MM/yyyy' }}</td>
-                <td class="text-sm">{{ r.cliente || 'Cliente general' }}</td>
-                <td class="text-sm">{{ r.item }}</td>
-                <td class="text-sm">{{ r.vendedor }}</td>
-                <td class="text-sm col-right">S/ {{ r.total | number:'1.2-2' }}</td>
-              </tr>
-            }
-            @if (!detalle.length) { <tr><td colspan="5" class="empty-row">Sin registros en el rango.</td></tr> }
-          </tbody>
-        </table>
-      </div>
-      @if (totalPagDet > 1) {
-        <app-pagination [paginaActual]="pagDet" [totalPaginas]="totalPagDet" (cambiar)="cambiarPagDet($event)"></app-pagination>
-      }
-    </div>
+
     <div modal-footer>
-      <button class="btn btn-secondary" (click)="limpiar()">Limpiar Filtros</button>
+      <button class="btn btn-secondary" (click)="limpiar()">Limpiar Fechas</button>
       <button class="btn btn-secondary" (click)="modalFiltrosVisible=false">Cerrar</button>
-      <button class="btn btn-primary" (click)="generar()">Generar Reporte</button>
+      <button class="btn btn-primary" [disabled]="descargando || !algunaHoja" (click)="generar()">
+        {{ descargando ? 'Generando...' : 'Descargar Excel' }}
+      </button>
     </div>
   </app-modal>
 }
