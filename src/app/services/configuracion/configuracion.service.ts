@@ -4,7 +4,8 @@ import { Observable } from 'rxjs';
 import {
   ApiResponse, Asociado, Empleado, EmpleadoDetalle, EmpleadoCreateRequest, EmpleadoUpdateRequest,
   RolClinica, Permiso, RolPermiso, DocumentoIdentidad, Medicamento, MedicamentoForm,
-  Diagnostico, DiagnosticoForm, ConfiguracionSistema, ConfiguracionSistemaForm
+  Diagnostico, DiagnosticoForm, ConfiguracionSistema, ConfiguracionSistemaForm,
+  Especie, EspecieDetalle, EspecieCat, Raza, RazaDetalle
 } from './configuracion.model';
 import { environment } from '../../../environments/environment';
 
@@ -68,6 +69,29 @@ export class ConfiguracionService {
   actualizarDiagnostico(id: number, body: DiagnosticoForm): Observable<ApiResponse<void>> { return this.http.put<ApiResponse<void>>(`${API}/api/diagnosticocatalogo/${id}`, body); }
   eliminarDiagnostico(id: number): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${API}/api/diagnosticocatalogo/${id}`, { body: { idDiagnosticoCatalogo: id } });
+  }
+
+  // Catálogo de Especies (tabla EspecieRaza raíz)
+  getEspecies(nombre: string, estado: boolean | null): Observable<ApiResponse<Especie[]>> {
+    return this.http.post<ApiResponse<Especie[]>>(`${API}/api/especie/listado`, { nombre: nombre || '', idRaza: null, estado, idAsociado: null });
+  }
+  getEspecie(id: number): Observable<ApiResponse<EspecieDetalle>> { return this.http.get<ApiResponse<EspecieDetalle>>(`${API}/api/especie/${id}`); }
+  getEspeciesCatalogo(): Observable<ApiResponse<EspecieCat[]>> { return this.http.get<ApiResponse<EspecieCat[]>>(`${API}/api/especie/catalogo`); }
+  crearEspecie(nombre: string): Observable<ApiResponse<void>> { return this.http.post<ApiResponse<void>>(`${API}/api/especie/crear`, { nombre }); }
+  actualizarEspecie(id: number, body: { nombre: string; estado: boolean }): Observable<ApiResponse<void>> { return this.http.put<ApiResponse<void>>(`${API}/api/especie/${id}`, body); }
+  eliminarEspecie(id: number, idUsuario: number, idAsociado: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${API}/api/especie`, { body: { idEspecie: id, idUsuario, idAsociado } });
+  }
+
+  // Catálogo de Razas (tabla EspecieRaza con especie padre)
+  getRazas(nombre: string, estado: boolean | null): Observable<ApiResponse<Raza[]>> {
+    return this.http.post<ApiResponse<Raza[]>>(`${API}/api/raza/listado`, { nombre: nombre || '', idEspecie: null, estado });
+  }
+  getRaza(id: number): Observable<ApiResponse<RazaDetalle>> { return this.http.get<ApiResponse<RazaDetalle>>(`${API}/api/raza/${id}`); }
+  crearRaza(body: { nombre: string; idEspecie: number }): Observable<ApiResponse<void>> { return this.http.post<ApiResponse<void>>(`${API}/api/raza/crear`, body); }
+  actualizarRaza(id: number, body: { nombre: string; idEspecie: number; estado: boolean }): Observable<ApiResponse<void>> { return this.http.put<ApiResponse<void>>(`${API}/api/raza/${id}`, body); }
+  eliminarRaza(id: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${API}/api/raza`, { body: { idRaza: id } });
   }
 
   // Catálogo de tipos de documento (para el select del formulario de usuario)

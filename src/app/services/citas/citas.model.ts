@@ -57,6 +57,18 @@ export interface VeterinarioDisponible {
   horaFin: string;
 }
 
+// Programación para el form de Nueva Cita: incluye fecha y servicio para encadenar filtros.
+export interface ProgramacionCita {
+  idProgramacion: number;
+  fecha: string;
+  idServicio: number;
+  nombreServicio: string;
+  nombreVeterinario: string;
+  nombreTurno: string;
+  horaInicio: string;
+  horaFin: string;
+}
+
 export interface ServicioCita {
   idServicio: number;
   nombre: string;

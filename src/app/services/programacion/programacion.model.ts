@@ -24,6 +24,7 @@ export interface ProgramacionDetalle {
   idEstadoProgramacion: number;
   idCategoria: number;
   idServicio: number;
+  idConsultorio: number | null;
   ambiente: string | null;
   descripcion: string | null;
 }
@@ -35,7 +36,8 @@ export interface ProgramacionCreateRequest {
   idEstadoProgramacion: number;
   idCategoria: number;
   idServicio: number;
-  ambiente: string | null;
+  idConsultorio: number | null;
+  ambiente?: string | null;
   descripcion: string | null;
 }
 
@@ -44,6 +46,8 @@ export type ProgramacionUpdateRequest = ProgramacionCreateRequest;
 export interface ProgramacionFiltros {
   fecha?: string;
   idEmpleadoRegistrador?: number;
+  idEstadoProgramacion?: number;
+  idTurno?: number;
 }
 
 export interface TurnoItem {
@@ -66,6 +70,30 @@ export interface TurnoUpdateRequest extends TurnoCreateRequest {
 }
 
 export interface TurnoFiltros {
+  nombre?: string;
+  estado?: boolean;
+}
+
+export interface ConsultorioItem {
+  idConsultorio: number;
+  nombre: string;
+  descripcion: string | null;
+  piso: string | null;
+  estado: boolean;
+  fechaCreacion: string;
+}
+
+export interface ConsultorioCreateRequest {
+  nombre: string;
+  descripcion: string | null;
+  piso: string | null;
+}
+
+export interface ConsultorioUpdateRequest extends ConsultorioCreateRequest {
+  estado: boolean;
+}
+
+export interface ConsultorioFiltros {
   nombre?: string;
   estado?: boolean;
 }

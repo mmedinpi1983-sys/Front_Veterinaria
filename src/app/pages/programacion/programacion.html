@@ -8,6 +8,7 @@
       <div class="page-header-actions">
         @if (tab === 'programaciones') { <button class="btn btn-primary" (click)="abrirNuevoProg()">+ Nueva Programación</button> }
         @if (tab === 'turnos') { <button class="btn btn-primary" (click)="abrirNuevoTurno()">+ Nuevo Turno</button> }
+        @if (tab === 'consultorios') { <button class="btn btn-primary" (click)="abrirNuevoCons()">+ Nuevo Consultorio</button> }
       </div>
     </div>
   </div>
@@ -15,6 +16,7 @@
   <div class="prog-tabs">
     <button class="btn btn-sm" [class.btn-navy]="tab==='programaciones'" [class.btn-secondary]="tab!=='programaciones'" (click)="cambiarTab('programaciones')">Programaciones</button>
     <button class="btn btn-sm" [class.btn-navy]="tab==='turnos'" [class.btn-secondary]="tab!=='turnos'" (click)="cambiarTab('turnos')">Turnos</button>
+    <button class="btn btn-sm" [class.btn-navy]="tab==='consultorios'" [class.btn-secondary]="tab!=='consultorios'" (click)="cambiarTab('consultorios')">Consultorios</button>
   </div>
 
   <!-- Programaciones -->
@@ -29,11 +31,21 @@
             <option value="">Todos los veterinarios</option>
             @for (e of empleados; track e.idEmpleadoAsociado) { <option [value]="e.idEmpleadoAsociado">{{ e.nombreEmpleado }} {{ e.apellidoPaterno }}</option> }
           </select>
+          <label for="filtro-prog-estado" class="visually-hidden">Filtrar por estado</label>
+          <select id="filtro-prog-estado" class="filter-select" [(ngModel)]="filtroProg.idEstadoProgramacion" (ngModelChange)="onFiltroProg()">
+            <option value="">Todos los estados</option>
+            @for (es of estados; track es.idEstadoProgramacion) { <option [value]="es.idEstadoProgramacion">{{ es.nombre }}</option> }
+          </select>
+          <label for="filtro-prog-turno" class="visually-hidden">Filtrar por turno</label>
+          <select id="filtro-prog-turno" class="filter-select" [(ngModel)]="filtroProg.idTurno" (ngModelChange)="onFiltroProg()">
+            <option value="">Todos los turnos</option>
+            @for (t of turnosCatalogo; track t.idTurno) { <option [value]="t.idTurno">{{ t.nombre }}</option> }
+          </select>
         </div>
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Fecha</th><th>Veterinario</th><th>Turno</th><th>Horario</th><th>Estado</th><th>Ambiente</th><th>Acciones</th></tr></thead>
+          <thead><tr><th>Fecha</th><th>Veterinario</th><th>Turno</th><th>Horario</th><th>Estado</th><th>Consultorio</th><th>Acciones</th></tr></thead>
           <tbody>
             @for (p of programacionesPag; track p.idProgramacion) {
               <tr>
@@ -62,6 +74,18 @@
   <!-- Turnos -->
   @if (tab === 'turnos') {
     <div class="card">
+      <div class="card-body card-body-tight">
+        <div class="search-bar search-bar-flush">
+          <label for="filtro-turno-nombre" class="visually-hidden">Buscar por nombre</label>
+          <input id="filtro-turno-nombre" class="form-control filter-search" type="text" placeholder="Buscar turno..." [(ngModel)]="filtroTurno.nombre" (ngModelChange)="onFiltroTurno()">
+          <label for="filtro-turno-estado" class="visually-hidden">Filtrar por estado</label>
+          <select id="filtro-turno-estado" class="filter-select" [(ngModel)]="filtroTurno.estado" (ngModelChange)="onFiltroTurno()">
+            <option value="">Todos los estados</option>
+            <option value="true">Activos</option>
+            <option value="false">Inactivos</option>
+          </select>
+        </div>
+      </div>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Nombre</th><th>Hora Inicio</th><th>Hora Fin</th><th>Estado</th><th>Acciones</th></tr></thead>
@@ -88,6 +112,46 @@
     </div>
     @if (totalPagTurno > 1) {
       <app-pagination [paginaActual]="pagTurno" [totalPaginas]="totalPagTurno" (cambiar)="cambiarPagTurno($event)"></app-pagination>
+    }
+  }
+
+  <!-- Consultorios -->
+  @if (tab === 'consultorios') {
+    <div class="card">
+      <div class="card-body card-body-tight">
+        <div class="search-bar search-bar-flush">
+          <label for="filtro-cons-nombre" class="visually-hidden">Buscar por nombre</label>
+          <input id="filtro-cons-nombre" class="form-control filter-search" type="text" placeholder="Buscar consultorio..." [(ngModel)]="filtroCons.nombre" (ngModelChange)="onFiltroCons()">
+          <label for="filtro-cons-estado" class="visually-hidden">Filtrar por estado</label>
+          <select id="filtro-cons-estado" class="filter-select" [(ngModel)]="filtroCons.estado" (ngModelChange)="onFiltroCons()">
+            <option value="true">Activos</option>
+            <option value="false">Inactivos</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Nombre</th><th>Piso</th><th>Descripción</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody>
+            @for (c of consultoriosPag; track c.idConsultorio) {
+              <tr>
+                <td class="cell-name">{{ c.nombre }}</td>
+                <td class="text-muted text-sm">{{ c.piso || '—' }}</td>
+                <td class="text-muted text-sm">{{ c.descripcion || '—' }}</td>
+                <td><span class="estado-pill" [class.activo]="c.estado">{{ c.estado ? 'Activo' : 'Inactivo' }}</span></td>
+                <td><div class="table-actions">
+                  <button class="btn btn-sm btn-secondary" (click)="abrirEditarCons(c)"><span class="material-icons">edit_note</span></button>
+                  <button class="btn btn-sm btn-danger-soft" (click)="eliminarCons(c)"><span class="material-icons">delete</span></button>
+                </div></td>
+              </tr>
+            }
+            @if (!consultorios.length) { <tr><td colspan="5" class="empty-row">No hay consultorios registrados.</td></tr> }
+          </tbody>
+        </table>
+      </div>
+    </div>
+    @if (totalPagCons > 1) {
+      <app-pagination [paginaActual]="pagCons" [totalPaginas]="totalPagCons" (cambiar)="cambiarPagCons($event)"></app-pagination>
     }
   }
 </main>
@@ -131,7 +195,12 @@
           @for (es of estados; track es.idEstadoProgramacion) { <option [value]="es.idEstadoProgramacion">{{ es.nombre }}</option> }
         </select>
       </div>
-      <div class="form-group"><label for="prog-ambiente">Ambiente</label><input id="prog-ambiente" class="form-control" [(ngModel)]="formProg.ambiente" placeholder="Ej: Consultorio 1"></div>
+      <div class="form-group"><label for="prog-consultorio">Consultorio</label>
+        <select id="prog-consultorio" class="form-control" [(ngModel)]="formProg.idConsultorio">
+          <option value="">Sin asignar</option>
+          @for (co of consultoriosCatalogo; track co.idConsultorio) { <option [value]="co.idConsultorio">{{ co.nombre }}{{ co.piso ? ' - ' + co.piso : '' }}</option> }
+        </select>
+      </div>
     </div>
     <div class="form-group"><label for="prog-descripcion">Descripción</label><textarea id="prog-descripcion" class="form-control" [(ngModel)]="formProg.descripcion"></textarea></div>
     <div modal-footer>
@@ -152,6 +221,29 @@
     <div modal-footer>
       <button class="btn btn-secondary" (click)="modalTurnoVisible=false">Cancelar</button>
       <button class="btn btn-primary" (click)="guardarTurno()">{{ editandoTurno ? 'Guardar Cambios' : 'Crear Turno' }}</button>
+    </div>
+  </app-modal>
+}
+
+<!-- MODAL: CONSULTORIO -->
+@if (modalConsVisible) {
+  <app-modal [title]="editandoCons ? 'Editar Consultorio' : 'Nuevo Consultorio'" subtitle="Consultorio físico de la clínica" (close)="modalConsVisible=false">
+    <div class="form-group"><label for="cons-nombre">Nombre <span class="req">*</span></label><input id="cons-nombre" class="form-control" [(ngModel)]="formCons.nombre" placeholder="Ej: Consultorio 1"></div>
+    <div class="form-row">
+      <div class="form-group"><label for="cons-piso">Piso</label><input id="cons-piso" class="form-control" [(ngModel)]="formCons.piso" placeholder="Ej: Piso 2"></div>
+      @if (editandoCons) {
+        <div class="form-group"><label for="cons-estado">Estado</label>
+          <select id="cons-estado" class="form-control" [(ngModel)]="formCons.estado">
+            <option [ngValue]="true">Activo</option>
+            <option [ngValue]="false">Inactivo</option>
+          </select>
+        </div>
+      }
+    </div>
+    <div class="form-group"><label for="cons-descripcion">Descripción</label><textarea id="cons-descripcion" class="form-control" [(ngModel)]="formCons.descripcion" placeholder="Ej: Sala de consulta general"></textarea></div>
+    <div modal-footer>
+      <button class="btn btn-secondary" (click)="modalConsVisible=false">Cancelar</button>
+      <button class="btn btn-primary" (click)="guardarCons()">{{ editandoCons ? 'Guardar Cambios' : 'Crear Consultorio' }}</button>
     </div>
   </app-modal>
 }

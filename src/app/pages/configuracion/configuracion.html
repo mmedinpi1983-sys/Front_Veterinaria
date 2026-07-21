@@ -194,6 +194,83 @@
         </div>
       </div>
     }
+
+    @if (tabCatalogoActivo === 'especies') {
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title"><span class="material-icons">pets</span>Catálogo de Especies</span>
+          <button class="btn btn-primary btn-sm" (click)="abrirNuevaEsp()">+ Nueva Especie</button>
+        </div>
+        <div class="catalog-search">
+          <div class="search-bar">
+            <input class="form-control filter-search" type="text" placeholder="Buscar especie..." [(ngModel)]="filtroEspecie.nombre" (ngModelChange)="onFiltroEspecie()">
+            <select class="filter-select" [(ngModel)]="filtroEspecie.estado" (ngModelChange)="onFiltroEspecie()">
+              <option value="">Todos los estados</option>
+              <option value="true">Activos</option>
+              <option value="false">Inactivos</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nombre</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody>
+              @if (especies.length === 0) { <tr><td colspan="3" class="empty-row">No hay especies registradas</td></tr> }
+              @for (e of especies; track e.idEspecieRaza) {
+                <tr>
+                  <td>{{e.nombre}}</td>
+                  <td><span class="badge" [class.badge-success]="e.estado" [class.badge-gray]="!e.estado">{{ e.estado ? 'Activo' : 'Inactivo' }}</span></td>
+                  <td><div class="table-actions">
+                    <button class="btn btn-sm btn-secondary" (click)="verDetalleEsp(e)"><span class="material-icons">visibility</span></button>
+                    <button class="btn btn-sm btn-secondary" (click)="abrirEditarEsp(e)"><span class="material-icons">edit_note</span></button>
+                    <button class="btn btn-sm btn-danger-soft" (click)="eliminarEsp(e)"><span class="material-icons">delete</span></button>
+                  </div></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+    @if (tabCatalogoActivo === 'razas') {
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title"><span class="material-icons">sound_detection_dog_barking</span>Catálogo de Razas</span>
+          <button class="btn btn-primary btn-sm" (click)="abrirNuevaRaza()">+ Nueva Raza</button>
+        </div>
+        <div class="catalog-search">
+          <div class="search-bar">
+            <input class="form-control filter-search" type="text" placeholder="Buscar raza..." [(ngModel)]="filtroRaza.nombre" (ngModelChange)="onFiltroRaza()">
+            <select class="filter-select" [(ngModel)]="filtroRaza.estado" (ngModelChange)="onFiltroRaza()">
+              <option value="">Todos los estados</option>
+              <option value="true">Activos</option>
+              <option value="false">Inactivos</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nombre</th><th>Especie</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody>
+              @if (razas.length === 0) { <tr><td colspan="4" class="empty-row">No hay razas registradas</td></tr> }
+              @for (r of razas; track r.idEspecieRaza) {
+                <tr>
+                  <td>{{r.nombre}}</td>
+                  <td class="text-muted text-sm">{{r.nombreEspecie}}</td>
+                  <td><span class="badge" [class.badge-success]="r.estado" [class.badge-gray]="!r.estado">{{ r.estado ? 'Activo' : 'Inactivo' }}</span></td>
+                  <td><div class="table-actions">
+                    <button class="btn btn-sm btn-secondary" (click)="verDetalleRaza(r)"><span class="material-icons">visibility</span></button>
+                    <button class="btn btn-sm btn-secondary" (click)="abrirEditarRaza(r)"><span class="material-icons">edit_note</span></button>
+                    <button class="btn btn-sm btn-danger-soft" (click)="eliminarRaza(r)"><span class="material-icons">delete</span></button>
+                  </div></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
   }
 
   <!-- ================= SISTEMA ================= -->
@@ -487,6 +564,137 @@
     <div class="modal-footer">
       <button class="btn btn-secondary" (click)="modalEditarDiag=false">Cancelar</button>
       <button class="btn btn-primary" (click)="guardarEdicionDiag()">Guardar Cambios</button>
+    </div>
+  </app-modal>
+}
+
+<!-- MODAL: NUEVA ESPECIE -->
+@if (modalNuevaEsp) {
+  <app-modal title="Nueva Especie" subtitle="Registra una especie del catálogo" (close)="modalNuevaEsp=false">
+    <div class="form-group">
+      <label for="espNombre">Nombre <span class="req">*</span></label>
+      <input class="form-control" id="espNombre" [(ngModel)]="nuevaEsp.nombre" placeholder="Ej: Canino">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="modalNuevaEsp=false">Cancelar</button>
+      <button class="btn btn-primary" (click)="guardarNuevaEsp()">Registrar</button>
+    </div>
+  </app-modal>
+}
+
+<!-- MODAL: EDITAR ESPECIE -->
+@if (modalEditarEsp && editandoEsp) {
+  <app-modal title="Editar Especie" subtitle="Modifica el nombre o el estado" (close)="modalEditarEsp=false">
+    <div class="form-row">
+      <div class="form-group">
+        <label for="espNombreEd">Nombre <span class="req">*</span></label>
+        <input class="form-control" id="espNombreEd" [(ngModel)]="editandoEsp.nombre">
+      </div>
+      <div class="form-group">
+        <label for="espEstadoEd">Estado</label>
+        <select class="form-control" id="espEstadoEd" [(ngModel)]="editandoEsp.estado">
+          <option [ngValue]="true">Activo</option>
+          <option [ngValue]="false">Inactivo</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="modalEditarEsp=false">Cancelar</button>
+      <button class="btn btn-primary" (click)="guardarEdicionEsp()">Guardar Cambios</button>
+    </div>
+  </app-modal>
+}
+
+<!-- MODAL: DETALLE ESPECIE -->
+@if (modalDetalleEsp && detalleEsp) {
+  <app-modal title="Detalle de Especie" subtitle="Información completa del registro" (close)="modalDetalleEsp=false">
+    <div class="form-row">
+      <div class="form-group"><label>Nombre</label><input class="form-control" [value]="detalleEsp.nombre" disabled></div>
+      <div class="form-group"><label>Estado</label><input class="form-control" [value]="detalleEsp.estado ? 'Activo' : 'Inactivo'" disabled></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Creado por</label><input class="form-control" [value]="detalleEsp.usuarioCreador || '—'" disabled></div>
+      <div class="form-group"><label>Fecha de creación</label><input class="form-control" [value]="(detalleEsp.fechaCreacion | date:'dd/MM/yyyy HH:mm') || '—'" disabled></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Modificado por</label><input class="form-control" [value]="detalleEsp.usuarioModificador || '—'" disabled></div>
+      <div class="form-group"><label>Fecha de modificación</label><input class="form-control" [value]="(detalleEsp.fechaModificacion | date:'dd/MM/yyyy HH:mm') || '—'" disabled></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="modalDetalleEsp=false">Cerrar</button>
+    </div>
+  </app-modal>
+}
+
+<!-- MODAL: NUEVA RAZA -->
+@if (modalNuevaRaza) {
+  <app-modal title="Nueva Raza" subtitle="Registra una raza y su especie" (close)="modalNuevaRaza=false">
+    <div class="form-row">
+      <div class="form-group">
+        <label for="razNombre">Nombre <span class="req">*</span></label>
+        <input class="form-control" id="razNombre" [(ngModel)]="nuevaRaza.nombre" placeholder="Ej: Labrador">
+      </div>
+      <div class="form-group">
+        <label for="razEspecie">Especie <span class="req">*</span></label>
+        <select class="form-control" id="razEspecie" [(ngModel)]="nuevaRaza.idEspecie">
+          <option value="">Seleccionar...</option>
+          @for (es of especiesCatalogo; track es.idEspecieRaza) { <option [value]="es.idEspecieRaza">{{es.nombre}}</option> }
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="modalNuevaRaza=false">Cancelar</button>
+      <button class="btn btn-primary" (click)="guardarNuevaRaza()">Registrar</button>
+    </div>
+  </app-modal>
+}
+
+<!-- MODAL: EDITAR RAZA -->
+@if (modalEditarRaza && editandoRaza) {
+  <app-modal title="Editar Raza" subtitle="Modifica el nombre, especie o estado" (close)="modalEditarRaza=false">
+    <div class="form-row">
+      <div class="form-group">
+        <label for="razNombreEd">Nombre <span class="req">*</span></label>
+        <input class="form-control" id="razNombreEd" [(ngModel)]="editandoRaza.nombre">
+      </div>
+      <div class="form-group">
+        <label for="razEspecieEd">Especie <span class="req">*</span></label>
+        <select class="form-control" id="razEspecieEd" [(ngModel)]="editandoRaza.idEspecie">
+          @for (es of especiesCatalogo; track es.idEspecieRaza) { <option [value]="es.idEspecieRaza">{{es.nombre}}</option> }
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="razEstadoEd">Estado</label>
+      <select class="form-control" id="razEstadoEd" [(ngModel)]="editandoRaza.estado">
+        <option [ngValue]="true">Activo</option>
+        <option [ngValue]="false">Inactivo</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="modalEditarRaza=false">Cancelar</button>
+      <button class="btn btn-primary" (click)="guardarEdicionRaza()">Guardar Cambios</button>
+    </div>
+  </app-modal>
+}
+
+<!-- MODAL: DETALLE RAZA -->
+@if (modalDetalleRaza && detalleRaza) {
+  <app-modal title="Detalle de Raza" subtitle="Información completa del registro" (close)="modalDetalleRaza=false">
+    <div class="form-row">
+      <div class="form-group"><label>Nombre</label><input class="form-control" [value]="detalleRaza.nombre" disabled></div>
+      <div class="form-group"><label>Especie</label><input class="form-control" [value]="detalleRaza.nombreEspecie || '—'" disabled></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Estado</label><input class="form-control" [value]="detalleRaza.estado ? 'Activo' : 'Inactivo'" disabled></div>
+      <div class="form-group"><label>Creado por</label><input class="form-control" [value]="detalleRaza.usuarioCreador || '—'" disabled></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Fecha de creación</label><input class="form-control" [value]="(detalleRaza.fechaCreacion | date:'dd/MM/yyyy HH:mm') || '—'" disabled></div>
+      <div class="form-group"><label>Fecha de modificación</label><input class="form-control" [value]="(detalleRaza.fechaModificacion | date:'dd/MM/yyyy HH:mm') || '—'" disabled></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="modalDetalleRaza=false">Cerrar</button>
     </div>
   </app-modal>
 }

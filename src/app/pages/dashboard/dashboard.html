@@ -86,6 +86,7 @@
       <div class="card">
         <div class="card-header">
           <span class="card-title"><span class="material-icons alert-icon">warning</span>Alertas de Stock</span>
+          <a class="card-link" (click)="irInventario()">Ver todos<span class="material-icons">arrow_forward</span></a>
         </div>
         <div class="card-body">
           @for (a of alertasStock; track a.nombre) {

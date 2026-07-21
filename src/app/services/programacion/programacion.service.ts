@@ -5,6 +5,7 @@ import { environment } from '../../../environments/environment';
 import {
   ApiResponse, ProgramacionListItem, ProgramacionDetalle, ProgramacionCreateRequest, ProgramacionUpdateRequest,
   ProgramacionFiltros, TurnoItem, TurnoCreateRequest, TurnoUpdateRequest, TurnoFiltros,
+  ConsultorioItem, ConsultorioCreateRequest, ConsultorioUpdateRequest, ConsultorioFiltros,
   EstadoProgramacionCatalogo, CategoriaCatalogo, ServicioCatalogo, EmpleadoCatalogo
 } from './programacion.model';
 
@@ -47,6 +48,24 @@ export class ProgramacionService {
   }
   eliminarTurno(id: number): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${API}/api/turno/${id}`, { body: { idTurno: id } });
+  }
+
+  // ---- Consultorios ----
+  getConsultorios(params: ConsultorioFiltros = {}): Observable<ApiResponse<ConsultorioItem[]>> {
+    const q = Object.entries(params).filter(([, v]) => v !== '' && v != null).map(([k, v]) => `${k}=${encodeURIComponent(v as string)}`).join('&');
+    return this.http.get<ApiResponse<ConsultorioItem[]>>(`${API}/api/consultorio${q ? '?' + q : ''}`);
+  }
+  crearConsultorio(body: ConsultorioCreateRequest): Observable<ApiResponse<void>> {
+    return this.http.post<ApiResponse<void>>(`${API}/api/consultorio/crear`, body);
+  }
+  actualizarConsultorio(id: number, body: ConsultorioUpdateRequest): Observable<ApiResponse<void>> {
+    return this.http.put<ApiResponse<void>>(`${API}/api/consultorio/${id}`, body);
+  }
+  eliminarConsultorio(id: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${API}/api/consultorio/${id}`, { body: { idConsultorio: id } });
+  }
+  getConsultoriosCatalogo(): Observable<ApiResponse<ConsultorioItem[]>> {
+    return this.http.get<ApiResponse<ConsultorioItem[]>>(`${API}/api/consultorio/catalogo`);
   }
 
   // ---- Catálogos de apoyo para el formulario ----

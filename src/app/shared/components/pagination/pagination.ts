@@ -4,7 +4,8 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 @Component({
   selector: 'app-pagination',
   imports: [],
-  templateUrl: './pagination.html'
+  templateUrl: './pagination.html',
+  styleUrl: './pagination.css'
 })
 export class Pagination {
   @Input() paginaActual = 1;

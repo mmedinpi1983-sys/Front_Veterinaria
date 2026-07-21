@@ -145,6 +145,51 @@ export interface Diagnostico {
 export type DiagnosticoForm = Omit<Diagnostico, 'idDiagnosticoCatalogo'>;
 
 // ---- Sistema ----
+// ---- Catálogo de Especies (tabla EspecieRaza, registros raíz) ----
+export interface Especie {
+  idEspecieRaza: number;
+  nombre: string;
+  estado: boolean;
+  fechaCreacion?: string;
+}
+export interface EspecieDetalle {
+  idEspecieRaza: number;
+  nombre: string;
+  estado: boolean;
+  usuarioCreador?: string;
+  fechaCreacion?: string;
+  usuarioModificador?: string | null;
+  fechaModificacion?: string | null;
+  usuarioEliminador?: string | null;
+  fechaEliminacion?: string | null;
+}
+export interface EspecieCat {
+  idEspecieRaza: number;
+  nombre: string;
+}
+
+// ---- Catálogo de Razas (tabla EspecieRaza, con especie padre) ----
+export interface Raza {
+  idEspecieRaza: number;
+  nombre: string;
+  nombreEspecie: string;
+  estado: boolean;
+  fechaCreacion?: string;
+}
+export interface RazaDetalle {
+  idEspecieRaza: number;
+  nombre: string;
+  idEspecie: number;
+  nombreEspecie: string;
+  estado: boolean;
+  usuarioCreador?: string;
+  fechaCreacion?: string;
+  usuarioModificador?: string | null;
+  fechaModificacion?: string | null;
+  usuarioEliminador?: string | null;
+  fechaEliminacion?: string | null;
+}
+
 export interface ConfiguracionSistema {
   idConfiguracionSistema: number;
   idAsociado: number;

@@ -15,7 +15,7 @@ import Swal from 'sweetalert2';
   styleUrl: './programacion.css'
 })
 export class Programacion implements OnInit {
-  tab: 'programaciones' | 'turnos' = 'programaciones';
+  tab: 'programaciones' | 'turnos' | 'consultorios' = 'programaciones';
 
   // ---- Programaciones ----
   programaciones: any[] = [];
@@ -23,7 +23,7 @@ export class Programacion implements OnInit {
   itemsPorPag = 10;
   pagProg = 1;
   totalPagProg = 1;
-  filtroProg = { fecha: '', idEmpleadoRegistrador: '' };
+  filtroProg = { fecha: '', idEmpleadoRegistrador: '', idEstadoProgramacion: '', idTurno: '' };
   filtroTimeout: any;
   modalProgVisible = false;
   editandoProg = false;
@@ -34,28 +34,49 @@ export class Programacion implements OnInit {
   estados: any[] = [];
   categorias: any[] = [];
   servicios: any[] = [];
+  consultoriosCatalogo: any[] = [];
 
   // ---- Turnos ----
   turnos: any[] = [];
   turnosPag: any[] = [];
   pagTurno = 1;
   totalPagTurno = 1;
+  filtroTurno = { nombre: '', estado: '' };
+  filtroTurnoTimeout: any;
   modalTurnoVisible = false;
   editandoTurno = false;
   formTurno: any = this.turnoVacio();
+
+  // ---- Consultorios ----
+  consultorios: any[] = [];
+  consultoriosPag: any[] = [];
+  pagCons = 1;
+  totalPagCons = 1;
+  filtroCons = { nombre: '', estado: 'true' };
+  filtroConsTimeout: any;
+  modalConsVisible = false;
+  editandoCons = false;
+  formCons: any = this.consVacio();
+  consultorioSeleccionadoId: number | null = null;
 
   constructor(private prog: ProgramacionService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.cargarProgramaciones();
-    this.cargarTurnos();
+    this.recargarTurnos();
+    this.cargarConsultorios();
     this.prog.getEmpleados().subscribe({ next: (r: any) => { this.empleados = r.data || []; this.cdr.detectChanges(); } });
     this.prog.getEstadosProgramacion().subscribe({ next: (r: any) => { this.estados = r.data || []; this.cdr.detectChanges(); } });
     this.prog.getCategorias().subscribe({ next: (r: any) => { this.categorias = r.data || []; this.cdr.detectChanges(); } });
     this.prog.getServicios().subscribe({ next: (r: any) => { this.servicios = r.data || []; this.cdr.detectChanges(); } });
+    this.cargarConsultoriosCatalogo();
   }
 
-  cambiarTab(t: 'programaciones' | 'turnos') {
+  cargarConsultoriosCatalogo() {
+    this.prog.getConsultoriosCatalogo().subscribe({ next: (r: any) => { this.consultoriosCatalogo = r.data || []; this.cdr.detectChanges(); } });
+  }
+
+  cambiarTab(t: 'programaciones' | 'turnos' | 'consultorios') {
     this.tab = t;
   }
 
@@ -64,6 +85,8 @@ export class Programacion implements OnInit {
     const p: any = {};
     if (this.filtroProg.fecha) p['fecha'] = this.filtroProg.fecha;
     if (this.filtroProg.idEmpleadoRegistrador) p['idEmpleadoRegistrador'] = this.filtroProg.idEmpleadoRegistrador;
+    if (this.filtroProg.idEstadoProgramacion) p['idEstadoProgramacion'] = this.filtroProg.idEstadoProgramacion;
+    if (this.filtroProg.idTurno) p['idTurno'] = this.filtroProg.idTurno;
     this.prog.getProgramaciones(p).subscribe({ next: (r: any) => {
       this.programaciones = r.data || [];
       this.pagProg = 1;
@@ -92,7 +115,7 @@ export class Programacion implements OnInit {
   }
 
   progVacio() {
-    return { fecha: '', idTurno: '', idEmpleadoRegistrador: '', idEstadoProgramacion: '', idCategoria: '', idServicio: '', ambiente: '', descripcion: '' };
+    return { fecha: '', idTurno: '', idEmpleadoRegistrador: '', idEstadoProgramacion: '', idCategoria: '', idServicio: '', idConsultorio: '', descripcion: '' };
   }
 
   abrirNuevoProg() {
@@ -109,7 +132,7 @@ export class Programacion implements OnInit {
         fecha: (d.fecha || '').substring(0, 10),
         idTurno: d.idTurno, idEmpleadoRegistrador: d.idEmpleadoRegistrador,
         idEstadoProgramacion: d.idEstadoProgramacion, idCategoria: d.idCategoria, idServicio: d.idServicio,
-        ambiente: d.ambiente || '', descripcion: d.descripcion || ''
+        idConsultorio: d.idConsultorio || '', descripcion: d.descripcion || ''
       };
       this.programacionSeleccionadaId = row.idProgramacion;
       this.editandoProg = true;
@@ -127,7 +150,7 @@ export class Programacion implements OnInit {
     const body = {
       fecha: f.fecha, idTurno: +f.idTurno, idEmpleadoRegistrador: +f.idEmpleadoRegistrador,
       idEstadoProgramacion: +f.idEstadoProgramacion, idCategoria: +f.idCategoria, idServicio: +f.idServicio,
-      ambiente: f.ambiente || null, descripcion: f.descripcion || null
+      idConsultorio: f.idConsultorio ? +f.idConsultorio : null, descripcion: f.descripcion || null
     };
     const obs = this.editandoProg
       ? this.prog.actualizarProgramacion(this.programacionSeleccionadaId!, body)
@@ -154,7 +177,7 @@ export class Programacion implements OnInit {
       if (!result.isConfirmed) return;
       this.prog.eliminarProgramacion(row.idProgramacion).subscribe({
         next: () => { Swal.fire({ icon: 'success', title: 'Eliminada', timer: 1300, showConfirmButton: false }); this.cargarProgramaciones(); },
-        error: () => Swal.fire({ icon: 'error', title: 'Error al eliminar' })
+        error: (e: any) => Swal.fire({ icon: 'error', title: 'No se pudo eliminar', text: e?.error?.message || e?.error?.error || 'Error al eliminar' })
       });
     });
   }
@@ -165,14 +188,33 @@ export class Programacion implements OnInit {
   }
 
   // ==================== TURNOS ====================
+  // Lista de la pestaña (con filtros de nombre/estado). NO toca turnosCatalogo.
   cargarTurnos() {
-    this.prog.getTurnos().subscribe({ next: (r: any) => {
+    const p: any = {};
+    if (this.filtroTurno.nombre) p['nombre'] = this.filtroTurno.nombre;
+    if (this.filtroTurno.estado !== '') p['estado'] = this.filtroTurno.estado;
+    this.prog.getTurnos(p).subscribe({ next: (r: any) => {
       this.turnos = r.data || [];
-      this.turnosCatalogo = this.turnos;
       this.pagTurno = 1;
       this.paginarTurno();
       this.cdr.detectChanges();
     }});
+  }
+
+  // Catálogo completo (sin filtrar) para los desplegables de Programaciones.
+  cargarTurnosCatalogo() {
+    this.prog.getTurnos().subscribe({ next: (r: any) => { this.turnosCatalogo = r.data || []; this.cdr.detectChanges(); }});
+  }
+
+  // Refresca ambos: la lista de la pestaña y el catálogo (tras crear/editar/eliminar).
+  recargarTurnos() {
+    this.cargarTurnos();
+    this.cargarTurnosCatalogo();
+  }
+
+  onFiltroTurno() {
+    clearTimeout(this.filtroTurnoTimeout);
+    this.filtroTurnoTimeout = setTimeout(() => this.cargarTurnos(), 350);
   }
 
   paginarTurno() {
@@ -212,7 +254,7 @@ export class Programacion implements OnInit {
       next: () => {
         this.modalTurnoVisible = false;
         Swal.fire({ icon: 'success', title: this.editandoTurno ? 'Turno actualizado' : 'Turno creado', timer: 1500, showConfirmButton: false });
-        this.cargarTurnos();
+        this.recargarTurnos();
       },
       error: (e: any) => Swal.fire({ icon: 'error', title: 'No se pudo guardar', text: e?.error?.message || e?.error?.error || '' })
     });
@@ -220,7 +262,7 @@ export class Programacion implements OnInit {
 
   toggleEstadoTurno(t: any) {
     this.prog.actualizarTurno(t.idTurno, { nombre: t.nombre, horaInicio: t.horaInicio, horaFin: t.horaFin, estado: !t.estado }).subscribe({
-      next: () => this.cargarTurnos(),
+      next: () => this.recargarTurnos(),
       error: () => Swal.fire({ icon: 'error', title: 'No se pudo cambiar el estado' })
     });
   }
@@ -233,8 +275,90 @@ export class Programacion implements OnInit {
     }).then(result => {
       if (!result.isConfirmed) return;
       this.prog.eliminarTurno(t.idTurno).subscribe({
-        next: () => { Swal.fire({ icon: 'success', title: 'Eliminado', timer: 1300, showConfirmButton: false }); this.cargarTurnos(); },
+        next: () => { Swal.fire({ icon: 'success', title: 'Eliminado', timer: 1300, showConfirmButton: false }); this.recargarTurnos(); },
         error: () => Swal.fire({ icon: 'error', title: 'Error al eliminar' })
+      });
+    });
+  }
+
+  // ==================== CONSULTORIOS ====================
+  cargarConsultorios() {
+    const p: any = {};
+    if (this.filtroCons.nombre) p['nombre'] = this.filtroCons.nombre;
+    if (this.filtroCons.estado !== '') p['estado'] = this.filtroCons.estado;
+    this.prog.getConsultorios(p).subscribe({ next: (r: any) => {
+      this.consultorios = r.data || [];
+      this.pagCons = 1;
+      this.paginarCons();
+      this.cdr.detectChanges();
+    }});
+  }
+
+  onFiltroCons() {
+    clearTimeout(this.filtroConsTimeout);
+    this.filtroConsTimeout = setTimeout(() => this.cargarConsultorios(), 350);
+  }
+
+  paginarCons() {
+    this.totalPagCons = Math.max(1, Math.ceil(this.consultorios.length / this.itemsPorPag));
+    const ini = (this.pagCons - 1) * this.itemsPorPag;
+    this.consultoriosPag = this.consultorios.slice(ini, ini + this.itemsPorPag);
+  }
+  cambiarPagCons(p: number) { if (p < 1 || p > this.totalPagCons) return; this.pagCons = p; this.paginarCons(); }
+
+  consVacio() {
+    return { nombre: '', descripcion: '', piso: '', estado: true };
+  }
+
+  abrirNuevoCons() {
+    this.editandoCons = false;
+    this.formCons = this.consVacio();
+    this.consultorioSeleccionadoId = null;
+    this.modalConsVisible = true;
+  }
+
+  abrirEditarCons(row: any) {
+    this.editandoCons = true;
+    this.consultorioSeleccionadoId = row.idConsultorio;
+    this.formCons = {
+      nombre: row.nombre || '',
+      descripcion: row.descripcion || '',
+      piso: row.piso || '',
+      estado: row.estado
+    };
+    this.modalConsVisible = true;
+  }
+
+  guardarCons() {
+    const f = this.formCons;
+    if (!f.nombre) {
+      Swal.fire({ icon: 'warning', title: 'El nombre es obligatorio', timer: 2000, showConfirmButton: false });
+      return;
+    }
+    const body: any = { nombre: f.nombre, descripcion: f.descripcion || null, piso: f.piso || null };
+    const obs = this.editandoCons
+      ? this.prog.actualizarConsultorio(this.consultorioSeleccionadoId!, { ...body, estado: f.estado })
+      : this.prog.crearConsultorio(body);
+    obs.subscribe({
+      next: () => {
+        this.modalConsVisible = false;
+        Swal.fire({ icon: 'success', title: this.editandoCons ? 'Consultorio actualizado' : 'Consultorio creado', timer: 1500, showConfirmButton: false });
+        this.cargarConsultorios();
+      },
+      error: (e: any) => Swal.fire({ icon: 'error', title: 'No se pudo guardar', text: e?.error?.message || e?.error?.error || '' })
+    });
+  }
+
+  eliminarCons(row: any) {
+    Swal.fire({
+      title: '¿Desactivar este consultorio?', text: 'Se dará de baja (soft delete) y dejará de aparecer en el listado.', icon: 'warning',
+      showCancelButton: true, confirmButtonColor: '#DC2626', cancelButtonColor: '#64748B',
+      confirmButtonText: 'Sí, desactivar', cancelButtonText: 'Cancelar'
+    }).then(result => {
+      if (!result.isConfirmed) return;
+      this.prog.eliminarConsultorio(row.idConsultorio).subscribe({
+        next: () => { Swal.fire({ icon: 'success', title: 'Desactivado', timer: 1300, showConfirmButton: false }); this.cargarConsultorios(); },
+        error: () => Swal.fire({ icon: 'error', title: 'Error al desactivar' })
       });
     });
   }

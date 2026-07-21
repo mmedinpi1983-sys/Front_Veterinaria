@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   ApiResponse, CitaEnriquecida, CitaDetalle, CitaStats, VeterinarioDisponible,
-  ServicioCita, CitaFiltros, CitaCreateRequest, CitaUpdateRequest
+  ProgramacionCita, ServicioCita, CitaFiltros, CitaCreateRequest, CitaUpdateRequest
 } from './citas.model';
 
 const API = environment.apiUrl;
@@ -48,6 +48,11 @@ export class CitaService {
   // Lista veterinarios disponibles con su turno (para el select del modal de Nueva Cita)
   getVeterinarios(): Observable<ApiResponse<VeterinarioDisponible[]>> {
     return this.http.get<ApiResponse<VeterinarioDisponible[]>>(`${API}/api/citaprogramada/veterinarios`);
+  }
+
+  // Lista de programaciones (con fecha y servicio) para encadenar el form de Nueva Cita
+  getProgramacionesCita(): Observable<ApiResponse<ProgramacionCita[]>> {
+    return this.http.get<ApiResponse<ProgramacionCita[]>>(`${API}/api/citaprogramada/programaciones`);
   }
 
   // Horas (HH:mm) ya ocupadas por ese veterinario (programación) en una fecha.

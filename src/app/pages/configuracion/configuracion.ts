@@ -9,7 +9,8 @@ import { Modal } from '../../shared/components/modal/modal';
 import { Tabs } from '../../shared/components/tabs/tabs';
 import {
   Asociado, Empleado, RolClinica, Permiso, RolPermiso, DocumentoIdentidad,
-  Medicamento, MedicamentoForm, Diagnostico, DiagnosticoForm, UsuarioForm, ConfiguracionSistemaForm
+  Medicamento, MedicamentoForm, Diagnostico, DiagnosticoForm, UsuarioForm, ConfiguracionSistemaForm,
+  Especie, EspecieDetalle, EspecieCat, Raza, RazaDetalle
 } from '../../services/configuracion/configuracion.model';
 
 
@@ -45,7 +46,12 @@ export class Configuracion implements OnInit {
   ];
   tabActivo = 'veterinaria';
 
-  tabsCatalogo = [{ id: 'medicamentos', label: 'Medicamentos' }, { id: 'diagnosticos', label: 'Diagnósticos' }];
+  tabsCatalogo = [
+    { id: 'medicamentos', label: 'Medicamentos' },
+    { id: 'diagnosticos', label: 'Diagnósticos' },
+    { id: 'especies', label: 'Especies' },
+    { id: 'razas', label: 'Razas' }
+  ];
   tabCatalogoActivo = 'medicamentos';
 
   // ---- Veterinaria ----
@@ -75,6 +81,29 @@ export class Configuracion implements OnInit {
   nuevoDiag: DiagnosticoForm = diagnosticoFormVacio();
   editandoDiag: Diagnostico | null = null;
 
+  // ---- Especies ----
+  especies: Especie[] = [];
+  filtroEspecie = { nombre: '', estado: '' };
+  filtroEspecieTimeout: any;
+  modalNuevaEsp = false;
+  modalEditarEsp = false;
+  modalDetalleEsp = false;
+  nuevaEsp = { nombre: '' };
+  editandoEsp: { idEspecieRaza: number; nombre: string; estado: boolean } | null = null;
+  detalleEsp: EspecieDetalle | null = null;
+
+  // ---- Razas ----
+  razas: Raza[] = [];
+  especiesCatalogo: EspecieCat[] = [];
+  filtroRaza = { nombre: '', estado: '' };
+  filtroRazaTimeout: any;
+  modalNuevaRaza = false;
+  modalEditarRaza = false;
+  modalDetalleRaza = false;
+  nuevaRaza = { nombre: '', idEspecie: '' };
+  editandoRaza: { idEspecieRaza: number; nombre: string; idEspecie: number; estado: boolean } | null = null;
+  detalleRaza: RazaDetalle | null = null;
+
   // ---- Sistema ----
   sistema: ConfiguracionSistemaForm = { zonaHoraria: 'GMT-5 (Lima)', formatoFecha: 'DD/MM/YYYY', moneda: 'Soles (S/)' };
   sistemaId: number | null = null;
@@ -94,6 +123,9 @@ export class Configuracion implements OnInit {
     this.cargarDocumentos();
     this.cargarMedicamentos();
     this.cargarDiagnosticos();
+    this.cargarEspecies();
+    this.cargarRazas();
+    this.cargarEspeciesCatalogo();
     this.cargarSistema();
   }
 
@@ -489,6 +521,127 @@ export class Configuracion implements OnInit {
       this.configService.eliminarDiagnostico(d.idDiagnosticoCatalogo).subscribe({
         next: () => { this.toast('success', 'Diagnóstico eliminado'); this.cargarDiagnosticos(); },
         error: () => Swal.fire({ icon: 'error', title: 'Error al eliminar' })
+      });
+    });
+  }
+
+  // ============== Especies ================
+  private estadoFiltro(v: string): boolean | null { return v === '' ? null : v === 'true'; }
+
+  cargarEspecies() {
+    this.configService.getEspecies(this.filtroEspecie.nombre, this.estadoFiltro(this.filtroEspecie.estado)).subscribe({
+      next: (r) => { this.especies = r.data || []; this.cdr.detectChanges(); }
+    });
+  }
+  cargarEspeciesCatalogo() {
+    this.configService.getEspeciesCatalogo().subscribe({ next: (r) => { this.especiesCatalogo = r.data || []; this.cdr.detectChanges(); } });
+  }
+  onFiltroEspecie() {
+    clearTimeout(this.filtroEspecieTimeout);
+    this.filtroEspecieTimeout = setTimeout(() => this.cargarEspecies(), 350);
+  }
+
+  abrirNuevaEsp() { this.nuevaEsp = { nombre: '' }; this.modalNuevaEsp = true; }
+  guardarNuevaEsp() {
+    if (!this.nuevaEsp.nombre.trim()) { Swal.fire({ icon: 'warning', title: 'El nombre es obligatorio' }); return; }
+    this.configService.crearEspecie(this.nuevaEsp.nombre.trim()).subscribe({
+      next: () => { this.modalNuevaEsp = false; this.toast('success', 'Especie registrada'); this.cargarEspecies(); this.cargarEspeciesCatalogo(); },
+      error: (e: HttpErrorResponse) => Swal.fire({ icon: 'error', title: 'No se pudo registrar', html: this.extraerMensajeError(e, 'Error al registrar') })
+    });
+  }
+
+  abrirEditarEsp(e: Especie) {
+    this.editandoEsp = { idEspecieRaza: e.idEspecieRaza, nombre: e.nombre, estado: e.estado };
+    this.modalEditarEsp = true;
+  }
+  guardarEdicionEsp() {
+    const e = this.editandoEsp;
+    if (!e || !e.nombre.trim()) { Swal.fire({ icon: 'warning', title: 'El nombre es obligatorio' }); return; }
+    this.configService.actualizarEspecie(e.idEspecieRaza, { nombre: e.nombre.trim(), estado: e.estado }).subscribe({
+      next: () => { this.modalEditarEsp = false; this.toast('success', 'Especie actualizada'); this.cargarEspecies(); this.cargarEspeciesCatalogo(); },
+      error: (err: HttpErrorResponse) => Swal.fire({ icon: 'error', title: 'No se pudo actualizar', html: this.extraerMensajeError(err, 'Error al actualizar') })
+    });
+  }
+
+  verDetalleEsp(e: Especie) {
+    this.configService.getEspecie(e.idEspecieRaza).subscribe({ next: (r) => {
+      this.detalleEsp = r.data ?? null;
+      this.modalDetalleEsp = true;
+      this.cdr.detectChanges();
+    }});
+  }
+
+  eliminarEsp(e: Especie) {
+    const sesion = this.authService.getSesion();
+    if (!sesion) return;
+    Swal.fire({
+      title: '¿Desactivar esta especie?', text: 'Se dará de baja (soft delete).', icon: 'warning',
+      showCancelButton: true, confirmButtonColor: '#DC2626', cancelButtonColor: '#64748B', confirmButtonText: 'Sí, desactivar', cancelButtonText: 'Cancelar'
+    }).then(result => {
+      if (!result.isConfirmed) return;
+      this.configService.eliminarEspecie(e.idEspecieRaza, sesion.idEmpleadoAsociado, sesion.idAsociado).subscribe({
+        next: () => { this.toast('success', 'Especie desactivada'); this.cargarEspecies(); this.cargarEspeciesCatalogo(); },
+        error: () => Swal.fire({ icon: 'error', title: 'Error al desactivar' })
+      });
+    });
+  }
+
+  // ============== Razas ================
+  cargarRazas() {
+    this.configService.getRazas(this.filtroRaza.nombre, this.estadoFiltro(this.filtroRaza.estado)).subscribe({
+      next: (r) => { this.razas = r.data || []; this.cdr.detectChanges(); }
+    });
+  }
+  onFiltroRaza() {
+    clearTimeout(this.filtroRazaTimeout);
+    this.filtroRazaTimeout = setTimeout(() => this.cargarRazas(), 350);
+  }
+
+  abrirNuevaRaza() { this.nuevaRaza = { nombre: '', idEspecie: '' }; this.modalNuevaRaza = true; }
+  guardarNuevaRaza() {
+    const r = this.nuevaRaza;
+    if (!r.nombre.trim() || !r.idEspecie) { Swal.fire({ icon: 'warning', title: 'Completa nombre y especie' }); return; }
+    this.configService.crearRaza({ nombre: r.nombre.trim(), idEspecie: +r.idEspecie }).subscribe({
+      next: () => { this.modalNuevaRaza = false; this.toast('success', 'Raza registrada'); this.cargarRazas(); },
+      error: (e: HttpErrorResponse) => Swal.fire({ icon: 'error', title: 'No se pudo registrar', html: this.extraerMensajeError(e, 'Error al registrar') })
+    });
+  }
+
+  abrirEditarRaza(row: Raza) {
+    this.configService.getRaza(row.idEspecieRaza).subscribe({ next: (r) => {
+      const d = r.data;
+      if (!d) return;
+      this.editandoRaza = { idEspecieRaza: d.idEspecieRaza, nombre: d.nombre, idEspecie: d.idEspecie, estado: d.estado };
+      this.modalEditarRaza = true;
+      this.cdr.detectChanges();
+    }});
+  }
+  guardarEdicionRaza() {
+    const r = this.editandoRaza;
+    if (!r || !r.nombre.trim() || !r.idEspecie) { Swal.fire({ icon: 'warning', title: 'Completa nombre y especie' }); return; }
+    this.configService.actualizarRaza(r.idEspecieRaza, { nombre: r.nombre.trim(), idEspecie: +r.idEspecie, estado: r.estado }).subscribe({
+      next: () => { this.modalEditarRaza = false; this.toast('success', 'Raza actualizada'); this.cargarRazas(); },
+      error: (err: HttpErrorResponse) => Swal.fire({ icon: 'error', title: 'No se pudo actualizar', html: this.extraerMensajeError(err, 'Error al actualizar') })
+    });
+  }
+
+  verDetalleRaza(row: Raza) {
+    this.configService.getRaza(row.idEspecieRaza).subscribe({ next: (r) => {
+      this.detalleRaza = r.data ?? null;
+      this.modalDetalleRaza = true;
+      this.cdr.detectChanges();
+    }});
+  }
+
+  eliminarRaza(row: Raza) {
+    Swal.fire({
+      title: '¿Desactivar esta raza?', text: 'Se dará de baja (soft delete).', icon: 'warning',
+      showCancelButton: true, confirmButtonColor: '#DC2626', cancelButtonColor: '#64748B', confirmButtonText: 'Sí, desactivar', cancelButtonText: 'Cancelar'
+    }).then(result => {
+      if (!result.isConfirmed) return;
+      this.configService.eliminarRaza(row.idEspecieRaza).subscribe({
+        next: () => { this.toast('success', 'Raza desactivada'); this.cargarRazas(); },
+        error: () => Swal.fire({ icon: 'error', title: 'Error al desactivar' })
       });
     });
   }

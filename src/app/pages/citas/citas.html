@@ -127,38 +127,41 @@
           }
         </div>
 
-        <div class="form-group">
-          <label for="nueva-cita-servicio">Tipo de Servicio <span class="req">*</span></label>
-          <select id="nueva-cita-servicio" class="form-control" [(ngModel)]="nuevaCita.idServicio">
-            <option value="">Seleccionar servicio...</option>
-            @for (s of servicios; track s.idServicio) {
-              <option [value]="s.idServicio">{{s.nombre}}</option>
-            }
-          </select>
+        <!-- 1) Fecha + Tipo de Servicio -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nueva-cita-fecha">Fecha <span class="req">*</span></label>
+            <input id="nueva-cita-fecha" class="form-control" type="date" [(ngModel)]="nuevaCita.fecha" (change)="onFechaServicioChange()">
+          </div>
+          <div class="form-group">
+            <label for="nueva-cita-servicio">Tipo de Servicio <span class="req">*</span></label>
+            <select id="nueva-cita-servicio" class="form-control" [(ngModel)]="nuevaCita.idServicio" (change)="onFechaServicioChange()">
+              <option value="">Seleccionar servicio...</option>
+              @for (s of servicios; track s.idServicio) {
+                <option [value]="s.idServicio">{{s.nombre}}</option>
+              }
+            </select>
+          </div>
         </div>
+        <!-- 2) Veterinario (solo los que tienen programación esa fecha y servicio) -->
         <div class="form-group">
           <label for="nueva-cita-veterinario">Veterinario <span class="req">*</span></label>
-          <select id="nueva-cita-veterinario" class="form-control" [(ngModel)]="nuevaCita.idProgramacion" (change)="onVetOrFechaChange()">
-            <option value="">Seleccionar veterinario...</option>
-            @for (v of veterinarios; track v.idProgramacion) {
+          <select id="nueva-cita-veterinario" class="form-control" [(ngModel)]="nuevaCita.idProgramacion" (change)="onVetOrFechaChange()" [disabled]="!nuevaCita.fecha || !nuevaCita.idServicio">
+            <option value="">{{ (!nuevaCita.fecha || !nuevaCita.idServicio) ? 'Elige fecha y servicio primero' : (veterinariosFiltrados.length ? 'Seleccionar veterinario...' : 'Sin veterinarios para esa fecha/servicio') }}</option>
+            @for (v of veterinariosFiltrados; track v.idProgramacion) {
               <option [value]="v.idProgramacion">{{v.nombreVeterinario}} — {{v.nombreTurno}} ({{v.horaInicio}}–{{v.horaFin}})</option>
             }
           </select>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="nueva-cita-fecha">Fecha <span class="req">*</span></label>
-            <input id="nueva-cita-fecha" class="form-control" type="date" [(ngModel)]="nuevaCita.fecha" (change)="onVetOrFechaChange()">
-          </div>
-          <div class="form-group">
-            <label for="nueva-cita-hora">Hora <span class="req">*</span></label>
-            <select id="nueva-cita-hora" class="form-control" [(ngModel)]="nuevaCita.hora" [disabled]="!nuevaCita.idProgramacion || !nuevaCita.fecha">
-              <option value="">{{ !nuevaCita.idProgramacion ? 'Elige un veterinario' : (!nuevaCita.fecha ? 'Elige una fecha' : (horasDisponibles.length ? 'Seleccionar hora...' : 'Sin horas disponibles')) }}</option>
-              @for (h of horasDisponibles; track h) {
-                <option [value]="h">{{h}}</option>
-              }
-            </select>
-          </div>
+        <!-- 3) Hora (franjas libres del turno del veterinario) -->
+        <div class="form-group">
+          <label for="nueva-cita-hora">Hora <span class="req">*</span></label>
+          <select id="nueva-cita-hora" class="form-control" [(ngModel)]="nuevaCita.hora" [disabled]="!nuevaCita.idProgramacion">
+            <option value="">{{ !nuevaCita.idProgramacion ? 'Elige un veterinario' : (horasDisponibles.length ? 'Seleccionar hora...' : 'Sin horas disponibles') }}</option>
+            @for (h of horasDisponibles; track h) {
+              <option [value]="h">{{h}}</option>
+            }
+          </select>
         </div>
         <div class="form-group">
           <label for="nueva-cita-motivo">Motivo de Consulta <span class="req">*</span></label>

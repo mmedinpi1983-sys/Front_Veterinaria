@@ -105,4 +105,5 @@ export class Dashboard implements OnInit {
 
   irCitas() { this.router.navigate(['/citas']); }
   irPacientes() { this.router.navigate(['/pacientes']); }
+  irInventario() { this.router.navigate(['/inventario']); }
 }

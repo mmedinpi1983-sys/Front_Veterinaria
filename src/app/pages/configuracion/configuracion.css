@@ -4,6 +4,9 @@
 
 .tabs-wrap-sm { margin-bottom: 16px; }
 
+.catalog-search { padding: 16px 16px 0; }
+.filter-search { width: 260px; max-width: 100%; }
+
 .card-veterinaria { max-width: 680px;}
 
 .card-sistema { max-width: 540px;}

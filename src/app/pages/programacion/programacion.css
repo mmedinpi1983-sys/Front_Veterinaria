@@ -6,6 +6,7 @@
 .card-body-tight { padding-bottom: 0; }
 .search-bar-flush { margin-bottom: 0; }
 .filter-date { max-width: 180px; }
+.filter-search { width: 260px; max-width: 100%; }
 
 .cell-name { font-weight: 600; }
 .btn-danger-soft { background: #FEE2E2; color: #DC2626; }

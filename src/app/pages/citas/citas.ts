@@ -25,6 +25,7 @@ export class Citas implements OnInit {
   citasPaginadas: any[] = [];
   servicios: any[] = [];
   veterinarios: any[] = [];
+  programacionesCita: any[] = [];
   horasDisponibles: string[] = [];
   horasDisponiblesReprog: string[] = [];
 
@@ -68,6 +69,24 @@ export class Citas implements OnInit {
     this.cargarCitas();
     this.citaService.getServicios().subscribe({ next: (r: any) => { this.servicios = r.data || []; this.cdr.detectChanges(); } });
     this.citaService.getVeterinarios().subscribe({ next: (r: any) => { this.veterinarios = r.data || []; this.cdr.detectChanges(); } });
+    this.citaService.getProgramacionesCita().subscribe({ next: (r: any) => { this.programacionesCita = r.data || []; this.cdr.detectChanges(); } });
+  }
+
+  // Veterinarios (programaciones) que coinciden con la fecha y el servicio elegidos.
+  // Este es el select dinámico: solo aparecen los vets con programación ese día para ese servicio.
+  get veterinariosFiltrados(): any[] {
+    if (!this.nuevaCita.fecha || !this.nuevaCita.idServicio) return [];
+    return this.programacionesCita.filter(p =>
+      p.fecha === this.nuevaCita.fecha &&
+      String(p.idServicio) === String(this.nuevaCita.idServicio)
+    );
+  }
+
+  // Al cambiar fecha o servicio se reinicia el veterinario y la hora (cascada).
+  onFechaServicioChange() {
+    this.nuevaCita.idProgramacion = '';
+    this.nuevaCita.hora = '';
+    this.horasDisponibles = [];
   }
 
   cargarStats() {
@@ -171,7 +190,7 @@ export class Citas implements OnInit {
   // Al cambiar el veterinario o la fecha, recalcula las horas seleccionables:
   // las del turno del vet menos las que ya están ocupadas ese día.
   onVetOrFechaChange() {
-    const vet = this.veterinarios.find(v => String(v.idProgramacion) === String(this.nuevaCita.idProgramacion));
+    const vet = this.programacionesCita.find(v => String(v.idProgramacion) === String(this.nuevaCita.idProgramacion));
     if (!vet || !this.nuevaCita.fecha) {
       this.horasDisponibles = [];
       this.nuevaCita.hora = '';
